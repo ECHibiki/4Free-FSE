@@ -1,10 +1,13 @@
 // ==UserScript==
-// @name Kita-Yen_4Chan
+// @name Kita-Yen 4Chan
 // @description Add kita to your post with ctr+"k" and Yen with ctr+"\"
-// @version 2.0
+// @version 2.1
 // @match *://boards.4chan.org/*
 // @grant none
 // @namespace https://greasyfork.org/users/125336
+// @updateURL    https://raw.githubusercontent.com/ECHibiki/4chan-UserScripts/master/Kita-Yen_4chan.js
+// @downloadURL  https://raw.githubusercontent.com/ECHibiki/4chan-UserScripts/master/Kita-Yen_4chan.js
+
 // ==/UserScript==
 
 //insertion logic
