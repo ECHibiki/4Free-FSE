@@ -1,11 +1,13 @@
 // ==UserScript==
 // @name         Danbooru-Image-Adder
 // @namespace    http://tampermonkey.net/
-// @version      0.8.3
+// @version      0.8.6
 // @description  Add images to posts
 // @author       ECHibiki /qa/
 // @match *://boards.4chan.org/*
 // @grant         GM_xmlhttpRequest
+// @updateURL    https://github.com/ECHibiki/4chan-UserScripts/raw/master/Danbooru-Image-Adder.user.js
+// @downloadURL  https://github.com/ECHibiki/4chan-UserScripts/raw/master/Danbooru-Image-Adder.user.js
 // ==/UserScript==
 
 /*
@@ -441,6 +443,7 @@ var setImageFromDanbooru = function(err, data, tags){
             clearInterval(counterFunction);
             document.getElementById("timer").textContent = "";
             document.getElementById("tags").removeAttribute("disabled");
+            document.getElementById("imageButton").removeAttribute("disabled");
             top_page = top_page_max;
             attemptCounter = attemptMax;
 

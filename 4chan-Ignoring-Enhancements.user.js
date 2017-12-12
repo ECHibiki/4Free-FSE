@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.3
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -9,7 +9,8 @@
 // @include https://boards.4chan.org/*
 // @include http://boards.4chan.org/*
 // @run-at document-body
-// @grant none
+// @updateURL    https://github.com/ECHibiki/4chan-UserScripts/raw/master/4chan-Ignoring-Enhancements.user.js
+// @downloadURL  https://github.com/ECHibiki/4chan-UserScripts/raw/master/4chan-Ignoring-Enhancements.user.js
 // ==/UserScript==
 
 var localStoreThreads;
