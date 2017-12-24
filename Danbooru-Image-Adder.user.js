@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru-Image-Adder
 // @namespace    http://tampermonkey.net/
-// @version      0.8.8
+// @version      0.8.9
 // @description  Add images to posts
 // @author       ECHibiki /qa/
 // @match *://boards.4chan.org/*
@@ -34,6 +34,9 @@ III(CHECKBOXES)
    3)***   (TODO)
 */
 
+//update 0.8.9 single tag warning and number_of_posts bug.
+
+
 function alert4ChanX(message, type){
     var detail = {type: type, content: message, lifetime: 10};
     if (typeof cloneInto === 'function') {
@@ -43,7 +46,7 @@ function alert4ChanX(message, type){
     document.dispatchEvent(event);
 }
 
-var numberOfPosts;
+var number_of_posts;
 var pageNo;
 var JSONPage;
 var JSONTag;
@@ -61,6 +64,7 @@ var oldVal = "";
 
 var timeout = false;
 var fail_state = false;
+var tag_incorrect_state = false;
 var time_max = 10;
 var time = time_max;
 var intervalFunction;
@@ -202,22 +206,26 @@ var enhance4ChanX = function(){
 
 
     //event listener logic
-    secondRowNodes[2].addEventListener("click", function(){
-        for(var i = 0 ; i < timeout_functions.length; i++){
-            clearInterval(timeout_functions[i]);
-        }
-        timeout = false;
-        document.getElementById("tags").setAttribute("disabled", 1);
-        document.getElementById("imageButton").setAttribute("disabled", 1);
-        time = time_max;
-        timeout_functions.push(setInterval(counterFunction, 1000));
-        setImage();
-    });
+    secondRowNodes[2].addEventListener("click", buttonClickFunction);
+
     //ping ever 0.5s for changes
     taggingFunction = setInterval(
         function(){setTagInterface(tagNode, autoCompleteRow, secondRowNodes);},
         500);
 
+};
+
+function buttonClickFunction(){
+	for(var i = 0 ; i < timeout_functions.length; i++){
+		clearInterval(timeout_functions[i]);
+	}
+	tag_incorrect_state = false;
+	timeout = false;
+	document.getElementById("tags").setAttribute("disabled", 1);
+	document.getElementById("imageButton").setAttribute("disabled", 1);
+	time = time_max;
+	timeout_functions.push(setInterval(counterFunction, 1000));
+	setImage();
 };
 
 function clearImage(){
@@ -298,7 +306,7 @@ var setImage = function(){
         responseType : "json",
         onload: function(data)
         {
-            verifyTags(data);
+            verifyTags(data, tags);
 			if(fail_state) return;
 			
             //set the end
@@ -311,7 +319,7 @@ var setImage = function(){
         }}));
 };
 
-function verifyTags(data){
+function verifyTags(data, tags){
     data = data.response;
     if(tags.length == 1 && tags[0] == "") JSONTag = [{"name":""}];
     else JSONTag = data;
@@ -325,12 +333,18 @@ function verifyTags(data){
 		document.getElementById("imageButton").removeAttribute("disabled");
         return;
     }
+	else if(data.length != tags.length && !tag_incorrect_state){
+		tag_incorrect_state = true;
+		alert4ChanX("One Tag Incorrect", "warning");
+	}
     //tag size. Smallest tag is placed at bottom of JSON
     smallestTag = parseInt(data[data.length-1]["post_count"]);
 }
 
 var setPostAndPage = function(endURL, tags){
-    numberOfPosts = Math.floor(Math.random() * 100) % (smallestTag % 20);
+	console.log(smallestTag);
+    number_of_posts = Math.floor(Math.random() * 100) % (smallestTag % 20 + 1);
+	console.log(number_of_posts);
     if(top_page != top_page_max) smallestTag = top_page * 20;
     //1000 is max page search limit
     if(smallestTag == 0) smallestTag = 100;
@@ -340,7 +354,7 @@ var setPostAndPage = function(endURL, tags){
 
     loopOne = false;
     loopPage = pageNo;
-    loopPost = numberOfPosts;
+    loopPost = number_of_posts;
     sameTrigger = 0;
     return URL;
 };
@@ -358,10 +372,10 @@ var ratingURL = function(tags, data){
             }
         }
         else if(document.getElementById("explicit").checked){
-            URL =  "&utf8=%E2%9C%93&tags=" + "-rating%3Aquestionable" + "+" + data[data.length-1]["name"];
+            URL = "&utf8=%E2%9C%93&tags=" + "-rating%3Aquestionable" + "+" + data[data.length-1]["name"];
         }
         else{
-            URL =  "&utf8=%E2%9C%93&tags=" + "rating%3Asafe" + "+" + data[data.length-1]["name"];
+            URL = "&utf8=%E2%9C%93&tags=" + "rating%3Asafe" + "+" + data[data.length-1]["name"];
         }
     }
     else if(document.getElementById("questionable").checked){
@@ -393,7 +407,7 @@ var checkPageFromDanbooru = function(err, data, tags){
         document.getElementById("tags").removeAttribute("disabled");
         document.getElementById("imageButton").removeAttribute("disabled");
         pageNo = 1;
-        numberOfPosts = 0;
+        number_of_posts = 0;
     }
     else {
         if(smallestTag == 0 && attemptCounter <= 0){
@@ -406,9 +420,9 @@ var checkPageFromDanbooru = function(err, data, tags){
             return;
         }
         //redo
-        else if(data.length < numberOfPosts+1 && attemptCounter > 0) {
+        else if(data.length < number_of_posts+1 && attemptCounter > 0) {
             if(top_page > pageNo){
-                top_page = pageNo + numberOfPosts / 20;
+                top_page = pageNo + number_of_posts / 20;
             }
             attemptCounter--;
             document.getElementById("timer").textContent = attemptCounter + "|" + time;
@@ -456,14 +470,14 @@ var setImageFromDanbooru = function(err, data, tags){
 
             return;
         }
-        else if(JSONPage["" + numberOfPosts] == undefined){
+        else if(JSONPage["" + number_of_posts] == undefined){
             top_page = pageNo;
             attemptCounter--;
             setImage();
             return;
         }
 
-        var endURL = JSONPage["" + numberOfPosts].file_url;
+        var endURL = JSONPage["" + number_of_posts].file_url;
         var URL = "https://danbooru.donmai.us" + endURL;
 
         urlContainterFunction(URL);
@@ -481,12 +495,12 @@ var setImageFromDanbooru = function(err, data, tags){
             tags.forEach(function(tag){
                 if(tag.indexOf("order:") > -1);
                 else if(tag.indexOf("rating:") > -1){
-                    if(tag.charAt(7) !== JSONPage["" + numberOfPosts]["rating"]){
+                    if(tag.charAt(7) !== JSONPage["" + number_of_posts]["rating"]){
                         fail = true;
                         return;
                     }
                 }
-                else if(JSONPage["" + numberOfPosts]["tag_string"].indexOf(tag) == -1){
+                else if(JSONPage["" + number_of_posts]["tag_string"].indexOf(tag) == -1){
                     fail = true;
                     return;
                 }
@@ -499,8 +513,8 @@ var setImageFromDanbooru = function(err, data, tags){
             return;
         }
         else{
-            if(JSONPage["" + numberOfPosts].file_size >= 4000000){
-                var endURL = JSONPage["" + numberOfPosts].large_file_url;
+            if(JSONPage["" + number_of_posts].file_size >= 4000000){
+                var endURL = JSONPage["" + number_of_posts].large_file_url;
                 var URL = "https://danbooru.donmai.us" + endURL;
             }
             document.getElementById("timer").textContent = "...";
@@ -543,9 +557,9 @@ var setImageFromDanbooru = function(err, data, tags){
                     document.getElementById("dump-list").firstChild.click();
                     document.dispatchEvent(new CustomEvent('QRSetFile', {bubbles:true, detail}));
 
-                    numberOfPosts++;
-                    if(numberOfPosts == 20){
-                        numberOfPosts = 0;
+                    number_of_posts++;
+                    if(number_of_posts == 20){
+                        number_of_posts = 0;
                         pageNo++;
                     }
                 }
