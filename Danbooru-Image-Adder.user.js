@@ -60,7 +60,8 @@ var sendURL = "";
 var oldVal = "";
 
 var timeout = false;
-var five = 5;
+var time_max = 10;
+var time = time_max;
 var intervalFunction;
 var timeout_functions = [];
 
@@ -207,7 +208,7 @@ var enhance4ChanX = function(){
         timeout = false;
         document.getElementById("tags").setAttribute("disabled", 1);
         document.getElementById("imageButton").setAttribute("disabled", 1);
-        five = 5;
+        time = time_max;
         timeout_functions.push(setInterval(counterFunction, 1000));
         setImage();
     });
@@ -404,13 +405,13 @@ var checkPageFromDanbooru = function(err, data, tags){
                 top_page = pageNo + numberOfPosts / 20;
             }
             attemptCounter--;
-            document.getElementById("timer").textContent = attemptCounter + "|" + five;
+            document.getElementById("timer").textContent = attemptCounter + "|" + time;
             setImage();
         }
         //process page
         else if (attemptCounter > 0){
             //ALL PARAMETERS WILL BE RESET INSIDE JSON
-            document.getElementById("timer").textContent =  attemptCounter + "|" + five;
+            document.getElementById("timer").textContent =  attemptCounter + "|" + time;
             getJSON(sendURL, setImageFromDanbooru, tags);
         }
         else{
@@ -439,7 +440,7 @@ var setImageFromDanbooru = function(err, data, tags){
     else {
         JSONPage = data;
         if(timeout){
-            alert4ChanX("timeout after 5 seconds", "error");
+            alert4ChanX("timeout after " + time +" seconds", "error");
             clearInterval(counterFunction);
             document.getElementById("timer").textContent = "";
             document.getElementById("tags").removeAttribute("disabled");
@@ -510,7 +511,7 @@ var setImageFromDanbooru = function(err, data, tags){
                     document.getElementById("imageButton").removeAttribute("disabled");
                     loopOne = false;
                     clearInterval(intervalFunction);
-                    five = 5;
+                    time = time_max;
                     var counter = document.getElementById("timer");
                     while(counter.hasChildNodes())
                         document.getElementById("timer").removeChild(document.getElementById("timer").lastChild);
@@ -556,10 +557,10 @@ var urlContainterFunction = function(url){
 
 var counterFunction  = function(){
     if(!timeout){
-        five--;
-        if(five < 0){
+        time--;
+        if(time < 0){
             timeout = true;
-            five = 5;
+            time = time_max;
         }
     }
 };
