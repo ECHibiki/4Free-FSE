@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru-Image-Adder
 // @namespace    http://tampermonkey.net/
-// @version      0.8.7
+// @version      0.8.8
 // @description  Add images to posts
 // @author       ECHibiki /qa/
 // @match *://boards.4chan.org/*
@@ -60,6 +60,7 @@ var sendURL = "";
 var oldVal = "";
 
 var timeout = false;
+var fail_state = false;
 var time_max = 10;
 var time = time_max;
 var intervalFunction;
@@ -298,7 +299,8 @@ var setImage = function(){
         onload: function(data)
         {
             verifyTags(data);
-
+			if(fail_state) return;
+			
             //set the end
             var endURL = ratingURL(tags, JSONTag);
 
@@ -313,10 +315,14 @@ function verifyTags(data){
     data = data.response;
     if(tags.length == 1 && tags[0] == "") JSONTag = [{"name":""}];
     else JSONTag = data;
-
+	fail_state = false;
     if(data.length == 0){
         //TODO 4cx notification of error)
         alert4ChanX("All tags incorrect", "error");
+		fail_state = true;
+		document.getElementById("timer").textContent = "";
+		document.getElementById("tags").removeAttribute("disabled");
+		document.getElementById("imageButton").removeAttribute("disabled");
         return;
     }
     //tag size. Smallest tag is placed at bottom of JSON
