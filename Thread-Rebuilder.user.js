@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Thread Rebuilder
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.3.1
 // @description  try to take over the world!
 // @author       You
 // @match https://boards.4chan.org/*/thread/*
@@ -20,6 +20,8 @@ var semaphore_posts = 1;
 //1) CREATE INTERFACE
 
 var enhance4ChanX = function(){
+
+    var qrWindow = document.getElementById("qr");
 
     if(document.getElementById("qrRebuilder") !== null) qrWindow.removeChild(document.getElementById("qrImages"));
     document.getElementById("dump-button").click();
@@ -48,10 +50,6 @@ var enhance4ChanX = function(){
     observer.observe(dList , {attributes: true,subtree:true, childList: true, characterData: true });*/
 
     document.getElementById("qr-filerm").addEventListener("click", function(){imgURL = "";});
-
-
-
-    var qrWindow = document.getElementById("qr");
 
     var qrTable = document.createElement("TABLE");
     qrTable.setAttribute("id", "qrRebuilder");
