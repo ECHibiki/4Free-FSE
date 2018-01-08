@@ -10,4 +10,5 @@ Highlights the whole line in purple much like how greentext works<br/>
 Highlights just the word in dark gray<br/>
 
 ## Danbooru Image Adder
-Adds an image to your post taken from the danbooru's image collection.
+Adds an image to your post taken from the danbooru's image collection.<br/>
+Supply it with tags via an autocomplete, set the rating(s/q/e) and it will give an image for you to post with. 
