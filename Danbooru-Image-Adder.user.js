@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         Danbooru-Image-Adder
 // @namespace    http://tampermonkey.net/
-// @version      0.8.9
+// @version      1.0
 // @description  Add images to posts
 // @author       ECHibiki /qa/
 // @match *://boards.4chan.org/*
 // @grant         GM_xmlhttpRequest
 // @updateURL    https://github.com/ECHibiki/4chan-UserScripts/raw/master/Danbooru-Image-Adder.user.js
 // @downloadURL  https://github.com/ECHibiki/4chan-UserScripts/raw/master/Danbooru-Image-Adder.user.js
+// @run-at document-end
 // ==/UserScript==
 
 /*
@@ -46,7 +47,7 @@ function alert4ChanX(message, type){
     document.dispatchEvent(event);
 }
 
-var number_of_posts;
+var number_of_posts = 0;
 var pageNo;
 var JSONPage;
 var JSONTag;
@@ -69,6 +70,7 @@ var time_max = 10;
 var time = time_max;
 var intervalFunction;
 var timeout_functions = [];
+var tries = Array();
 
 var taggingFunction;
 
@@ -216,6 +218,8 @@ var enhance4ChanX = function(){
 };
 
 function buttonClickFunction(){
+	tries = Array();
+	primed_for_fail = false;
 	for(var i = 0 ; i < timeout_functions.length; i++){
 		clearInterval(timeout_functions[i]);
 	}
@@ -335,20 +339,36 @@ function verifyTags(data, tags){
     }
 	else if(data.length != tags.length && !tag_incorrect_state){
 		tag_incorrect_state = true;
-		alert4ChanX("One Tag Incorrect", "warning");
+		if(document.getElementById("tags").value.trim() == "") alert4ChanX("No Tags", "info");
+		else alert4ChanX("One Tag Incorrect", "warning");
 	}
     //tag size. Smallest tag is placed at bottom of JSON
     smallestTag = parseInt(data[data.length-1]["post_count"]);
 }
 
 var setPostAndPage = function(endURL, tags){
-	console.log(smallestTag);
-    number_of_posts = Math.floor(Math.random() * 100) % (smallestTag % 20 + 1);
-	console.log(number_of_posts);
-    if(top_page != top_page_max) smallestTag = top_page * 20;
-    //1000 is max page search limit
+	//posts
+	if(number_of_posts > 0)
+    number_of_posts = 0;
+   //page
+	if(top_page != top_page_max) smallestTag = top_page * 20;
     if(smallestTag == 0) smallestTag = 100;
-    pageNo = ((Math.floor(Math.random() * 10000)) % Math.ceil(smallestTag / 20)) % 1000;
+	do{	
+		escape_cond = true;
+		pageNo = ((Math.floor(Math.random() * 10000)) % Math.ceil(smallestTag / 20)) % 1000;    //1000 is max page search limit
+		tries.forEach(function(page){
+			if(page == 0){
+				primed_for_fail = true;
+				escape_cond = true;
+				return;
+			}
+			else if(page == pageNo){
+				escape_cond = false;
+				return;
+			}
+		});
+	} while(!escape_cond);
+	tries.push(pageNo);
 
     var URL = "https://danbooru.donmai.us/posts.json?page=" + pageNo + endURL;
 
@@ -397,53 +417,54 @@ var ratingURL = function(tags, data){
 };
 
 //check if valid url location
+var primed_for_fail = false;
 var checkPageFromDanbooru = function(err, data, tags){
-    if (err != null) {
-        console.log('Something went wrong: ' + err);
-        alert4ChanX("Danbooru Server Did Not Perform request -- Error: "  + err, "error");
-        top_page = top_page_max;
-        attemptCounter = attemptMax;
-        document.getElementById("timer").textContent = "";
-        document.getElementById("tags").removeAttribute("disabled");
-        document.getElementById("imageButton").removeAttribute("disabled");
-        pageNo = 1;
-        number_of_posts = 0;
-    }
-    else {
-        if(smallestTag == 0 && attemptCounter <= 0){
-            alert4ChanX("No Results", "error");
-            top_page = top_page_max;
-            attemptCounter = attemptMax;
-            document.getElementById("timer").textContent = "";
-            document.getElementById("tags").removeAttribute("disabled");
-            document.getElementById("imageButton").removeAttribute("disabled");
-            return;
-        }
-        //redo
-        else if(data.length < number_of_posts+1 && attemptCounter > 0) {
-            if(top_page > pageNo){
-                top_page = pageNo + number_of_posts / 20;
-            }
-            attemptCounter--;
-            document.getElementById("timer").textContent = attemptCounter + "|" + time;
-            setImage();
-        }
-        //process page
-        else if (attemptCounter > 0){
-            //ALL PARAMETERS WILL BE RESET INSIDE JSON
-            document.getElementById("timer").textContent =  attemptCounter + "|" + time;
-            getJSON(sendURL, setImageFromDanbooru, tags);
-        }
-        else{
-            alert4ChanX("Not found", "error");
-            top_page = top_page_max;
-            attemptCounter = attemptMax;
-            document.getElementById("timer").textContent = "";
-            document.getElementById("tags").removeAttribute("disabled");
-            document.getElementById("imageButton").removeAttribute("disabled");	
-            return;
-        }
-    }
+	if (err != null) {
+		console.log('Something went wrong: ' + err);
+		alert4ChanX("Danbooru Server Did Not Perform request -- Error: "  + err, "error");
+		top_page = top_page_max;
+		attemptCounter = attemptMax;
+		document.getElementById("timer").textContent = "";
+		document.getElementById("tags").removeAttribute("disabled");
+		document.getElementById("imageButton").removeAttribute("disabled");
+		pageNo = 0;
+		//number_of_posts = 0;
+	}
+	else {
+		if(primed_for_fail){
+			alert4ChanX("No Results", "error");
+			top_page = top_page_max;
+			attemptCounter = attemptMax;
+			document.getElementById("timer").textContent = "";
+			document.getElementById("tags").removeAttribute("disabled");
+			document.getElementById("imageButton").removeAttribute("disabled");
+			return;
+		}
+		//redo
+		else if(data.length < number_of_posts+1 && attemptCounter > 0) {
+			if(top_page > pageNo){
+				top_page = pageNo + number_of_posts / 20;
+			}
+			attemptCounter--;
+			document.getElementById("timer").textContent = attemptCounter + "|" + time;
+			setImage();
+		}
+		//process page
+		else if (attemptCounter > 0){
+			//ALL PARAMETERS WILL BE RESET INSIDE JSON
+			document.getElementById("timer").textContent =  attemptCounter + "|" + time;
+			getJSON(sendURL, setImageFromDanbooru, tags);
+		}
+		else{
+			alert4ChanX("Not found", "error");
+			top_page = top_page_max;
+			attemptCounter = attemptMax;
+			document.getElementById("timer").textContent = "";
+			document.getElementById("tags").removeAttribute("disabled");
+			document.getElementById("imageButton").removeAttribute("disabled");	
+			return;
+		}
+	}
 };
 
 var setImageFromDanbooru = function(err, data, tags){
@@ -458,115 +479,118 @@ var setImageFromDanbooru = function(err, data, tags){
 
     }
     else {
-        JSONPage = data;
-        if(timeout){
-            alert4ChanX("timeout after " + time +" seconds", "error");
-            clearInterval(counterFunction);
-            document.getElementById("timer").textContent = "";
-            document.getElementById("tags").removeAttribute("disabled");
-            document.getElementById("imageButton").removeAttribute("disabled");
-            top_page = top_page_max;
-            attemptCounter = attemptMax;
+		JSONPage = data;
+		var image_found = false;
+		for (number_of_posts = 0; number_of_posts < 20 ; number_of_posts++){
+			if(timeout){
+				alert4ChanX("timeout after " + time +" seconds", "error");
+				clearInterval(counterFunction);
+				document.getElementById("timer").textContent = "";
+				document.getElementById("tags").removeAttribute("disabled");
+				document.getElementById("imageButton").removeAttribute("disabled");
+				top_page = top_page_max;
+				attemptCounter = attemptMax;
+				return;
+			}
+			else if(JSONPage["" + number_of_posts] == undefined){
+				top_page = pageNo;
+				attemptCounter--;
+				setImage();
+				return;
+			}
 
-            return;
-        }
-        else if(JSONPage["" + number_of_posts] == undefined){
-            top_page = pageNo;
-            attemptCounter--;
-            setImage();
-            return;
-        }
+			var endURL = JSONPage["" + number_of_posts].file_url;
+			var URL = "https://danbooru.donmai.us" + endURL;
 
-        var endURL = JSONPage["" + number_of_posts].file_url;
-        var URL = "https://danbooru.donmai.us" + endURL;
+			urlContainterFunction(URL);
 
-        urlContainterFunction(URL);
+			var fail = false;
 
-        var fail = false;
+			if(endURL === undefined ||
+			   endURL.indexOf(".mp4") > -1 || endURL.indexOf(".webm") > -1 || endURL.indexOf(".swf") > -1 || endURL.indexOf(".zip") > -1){
+				// top_page = pageNo;
+				// attemptCounter--;
+				// setImage();
+				// return;
+				continue;
+			}
+			else{
+				tags.forEach(function(tag){
+					if(tag.indexOf("order:") > -1);
+					else if(tag.indexOf("rating:") > -1){
+						if(tag.charAt(7) !== JSONPage["" + number_of_posts]["rating"]){
+							fail = true;
+							return;
+						}
+					}
+					else if(JSONPage["" + number_of_posts]["tag_string"].indexOf(tag) == -1){
+						fail = true;
+						return;
+					}
+				});
+			}
+			if(fail){
+				// top_page = pageNo;
+				// attemptCounter--;
+				// setImage();
+				// return;
+				continue;
+			}
+			else{
+				if(JSONPage["" + number_of_posts].file_size >= 4000000){
+					var endURL = JSONPage["" + number_of_posts].large_file_url;
+					var URL = "https://danbooru.donmai.us" + endURL;
+				}
+				document.getElementById("timer").textContent = "...";
+				imgURL = URL;
+				var xhr = new GM_xmlhttpRequest(({
+					method: "GET",
+					url: URL,
+					responseType : "arraybuffer",
+					onload: function(response)
+					{
+						top_page = top_page_max;
+						attemptCounter = attemptMax;
+						document.getElementById("tags").removeAttribute("disabled");
+						document.getElementById("imageButton").removeAttribute("disabled");
+						loopOne = false;
+						clearInterval(intervalFunction);
+						time = time_max;
+						var counter = document.getElementById("timer");
+						while(counter.hasChildNodes())
+							document.getElementById("timer").removeChild(document.getElementById("timer").lastChild);
 
-        if(endURL === undefined ||
-           endURL.indexOf(".mp4") > -1 || endURL.indexOf(".webm") > -1 || endURL.indexOf(".swf") > -1 || endURL.indexOf(".zip") > -1){
-            top_page = pageNo;
-            attemptCounter--;
-            setImage();
-            return;
-        }
-        else{
-            tags.forEach(function(tag){
-                if(tag.indexOf("order:") > -1);
-                else if(tag.indexOf("rating:") > -1){
-                    if(tag.charAt(7) !== JSONPage["" + number_of_posts]["rating"]){
-                        fail = true;
-                        return;
-                    }
-                }
-                else if(JSONPage["" + number_of_posts]["tag_string"].indexOf(tag) == -1){
-                    fail = true;
-                    return;
-                }
-            });
-        }
-        if(fail){
-            top_page = pageNo;
-            attemptCounter--;
-            setImage();
-            return;
-        }
-        else{
-            if(JSONPage["" + number_of_posts].file_size >= 4000000){
-                var endURL = JSONPage["" + number_of_posts].large_file_url;
-                var URL = "https://danbooru.donmai.us" + endURL;
-            }
-            document.getElementById("timer").textContent = "...";
-            imgURL = URL;
-            var xhr = new GM_xmlhttpRequest(({
-                method: "GET",
-                url: URL,
-                responseType : "arraybuffer",
-                onload: function(response)
-                {
-                    top_page = top_page_max;
-                    attemptCounter = attemptMax;
-                    document.getElementById("tags").removeAttribute("disabled");
-                    document.getElementById("imageButton").removeAttribute("disabled");
-                    loopOne = false;
-                    clearInterval(intervalFunction);
-                    time = time_max;
-                    var counter = document.getElementById("timer");
-                    while(counter.hasChildNodes())
-                        document.getElementById("timer").removeChild(document.getElementById("timer").lastChild);
-
-
-                    var blob;
-                    if(endURL.indexOf(".jpg") > -1)
-                        blob = new Blob([response.response], {type:"image/jpeg"});
-                    else if(endURL.indexOf(".png") > -1)
-                        blob = new Blob([response.response], {type:"image/png"});
-                    else if(endURL.indexOf(".gif") > -1)
-                        blob = new Blob([response.response], {type:"image/gif"});
+						var blob;
+						if(endURL.indexOf(".jpg") > -1)
+							blob = new Blob([response.response], {type:"image/jpeg"});
+						else if(endURL.indexOf(".png") > -1)
+							blob = new Blob([response.response], {type:"image/png"});
+						else if(endURL.indexOf(".gif") > -1)
+							blob = new Blob([response.response], {type:"image/gif"});
 
 
-                    var name = endURL.replace(/(data|cached)/g, "");
-                    name = name.replace(/\//g, "");
+						var name = endURL.replace(/(data|cached)/g, "");
+						name = name.replace(/\//g, "");
 
-                    //SEND RESULTING RESPONSE TO 4CHANX FILES === QRSetFile
-                    var detail = {file:blob, name:name};
-                    if (typeof cloneInto === 'function') {
-                        detail  = cloneInto(detail , document.defaultView);
-                    }
-                    document.getElementById("dump-list").firstChild.click();
-                    document.dispatchEvent(new CustomEvent('QRSetFile', {bubbles:true, detail}));
-
-                    number_of_posts++;
-                    if(number_of_posts == 20){
-                        number_of_posts = 0;
-                        pageNo++;
-                    }
-                }
-            }));
-            //break condition
-            return;
-        }
+						//SEND RESULTING RESPONSE TO 4CHANX FILES === QRSetFile
+						var detail = {file:blob, name:name};
+						if (typeof cloneInto === 'function') {
+							detail  = cloneInto(detail , document.defaultView);
+						}
+						document.getElementById("dump-list").firstChild.click();
+						document.dispatchEvent(new CustomEvent('QRSetFile', {bubbles:true, detail}));
+					}
+				}));
+												//end function;
+				image_found = true;
+				number_of_posts = 9001;
+			}
+		}
+		if(!image_found){
+			top_page = pageNo;
+			attemptCounter--;
+			setImage();
+		}
     }
 };
 
