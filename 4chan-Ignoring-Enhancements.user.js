@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      1.3
+// @version      1.4
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -628,7 +628,7 @@ function modifyDOM(){
                             if(filterText === "") break;
                             var setting = filterText.substr(lastChar);
                             filterText = filterText.substr(1, lastChar-2);
-                            filterText = "(^| )" + filterText + "( |$)";
+                            filterText = "(^|[\\s!$%^&*()_+|~\\-=`{}\\[\\]:\";'<>?,\\.\\/])" + filterText + "([\\s!$%^&*()_+|~\\-=`{}\\[\\]:\";'<>?,\\.\\/]|$)";
                             try{
                                 var regex = new RegExp(filterText, setting);
                                 localNode.textContent = localNode.textContent.replace(regex, " " + replacement.value + " ");

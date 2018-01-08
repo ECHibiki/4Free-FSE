@@ -129,7 +129,7 @@ var enhance4ChanX = function(){
     qrTable.setAttribute("id", "qrImages");
     qrTable.setAttribute("style", "text-align:center");
     qrWindow.appendChild(qrTable);
-    qrWindow.appendChild(document.createElement("BR"));
+    //qrWindow.appendChild(document.createElement("BR"));
 
     var instructionRow = document.createElement("TR");
     var topRowNodes = [document.createElement("BR"),
@@ -413,6 +413,7 @@ var ratingURL = function(tags, data){
         if(data.length > 1)  URL =  "&utf8=%E2%9C%93&tags=" + data[data.length-2]["name"] + "+" + data[data.length-1]["name"];
         else  URL = "&utf8=%E2%9C%93&tags=" + data[data.length-1]["name"];
     }
+	console.log(URL);
     return URL;
 };
 
