@@ -15,8 +15,8 @@
 (function() {
     'use strict';
     document.getElementById("postPassword").setAttribute("type", "");
-    document.getElementById("postPassword").value = "_oZfG5xpuTkOsw0qEbWVtImzL9YrQ6dNg";
+    document.getElementById("postPassword").value = document.getElementById("postPassword");
     // Your code here...
     document.getElementById("delPassword").setAttribute("type", "");
-    document.getElementById("delPassword").value = "_oZfG5xpuTkOsw0qEbWVtImzL9YrQ6dNg";
+    document.getElementById("delPassword").value = document.getElementById("delPassword");
 })();
