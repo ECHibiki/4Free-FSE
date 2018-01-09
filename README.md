@@ -1,5 +1,6 @@
 # 4chan-userscripts
-Repository of ECHibiki's Greasyfork userscripts.
+Repository of ECHibiki's Greasyfork userscripts.<br/>
+All of these scripts expand upon 4chanX's quick reply feature.
 
 ## 4chan-Ignoring-Enhancements
 Gives the ability to hide images with ctrl+shift+click. Stores in browser memory for new sessions.<br/>
@@ -16,3 +17,7 @@ https://github.com/ECHibiki/4chan-UserScripts/raw/master/Kita-Yen_4chan.user.js<
 Highlights the whole line in purple much like how greentext works<br/>
 <strong>Press ctrl+k for ｷﾀ━━━(ﾟ∀ﾟ)━━━!!</strong>
 Highlights just the word in dark gray<br/>
+
+## Thread Rebuilder
+Rebuild a thread from 4chan's archive.<br/>
+Simple system that could use some additions(posts links pointing to the same thread and not the archive thread)
