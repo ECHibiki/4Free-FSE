@@ -21,3 +21,6 @@ Highlights just the word in dark gray<br/>
 ## Thread Rebuilder
 Rebuild a thread from 4chan's archive.<br/>
 Simple system that could use some additions(posts links pointing to the same thread and not the archive thread)
+
+## Visible Password
+Shows your 4chan post/delete password
