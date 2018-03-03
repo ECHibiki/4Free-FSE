@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru-Image-Adder
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.3
 // @description  Add images to posts
 // @author       ECHibiki /qa/
 // @match *://boards.4chan.org/*
@@ -488,6 +488,8 @@ var setImageFromDanbooru = function(err, data, tags){
 
 			var endURL = JSONPage["" + number_of_posts].file_url;
 			var URL = "https://danbooru.donmai.us" + endURL;
+			if(endURL.indexOf("raikou2.donmai.us") > -1)
+				URL = endURL;
 
 			urlContainterFunction(URL);
 
@@ -527,6 +529,9 @@ var setImageFromDanbooru = function(err, data, tags){
 				if(JSONPage["" + number_of_posts].file_size >= 4000000){
 					var endURL = JSONPage["" + number_of_posts].large_file_url;
 					var URL = "https://danbooru.donmai.us" + endURL;
+					if(endURL.indexOf("raikou2.donmai.us") > -1)
+						URL = endURL;
+					
 				}
 				document.getElementById("timer").textContent = "...";
 				imgURL = URL;
