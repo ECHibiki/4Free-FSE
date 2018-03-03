@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru-Image-Adder
 // @namespace    http://tampermonkey.net/
-// @version      1.3
+// @version      1.4
 // @description  Add images to posts
 // @author       ECHibiki /qa/
 // @match *://boards.4chan.org/*
@@ -44,7 +44,7 @@ var time = time_max;
 var intervalFunction;
 var timeout_functions = [];
 var tries = Array();
-
+var previous_images = [];
 var taggingFunction;
 
 var interfaceSet = false;
@@ -216,6 +216,8 @@ function clearImage(){
 var setTagInterface =  function(tagNode, autoCompleteRow, secondRowNodes){
     tags = tagNode.value;
     if(oldVal !== tags){
+		previous_images = [];
+		
         var cursorPos = tagNode.selectionStart - 1;
         var currentTag =  (function(){
             var currentChar = tags.charAt(cursorPos);
@@ -418,8 +420,22 @@ var checkPageFromDanbooru = function(err, data, tags){
 		//number_of_posts = 0;
 	}
 	else {
+					//console.log(previous_images);
+		do{
+			//console.log(data.length);
+			var duplicate = false;
+			previous_images.forEach(function(item){
+				if(item[0] == pageNo && item[1] == number_of_posts){
+					duplicate = true; 
+					number_of_posts++;
+					return;
+				}
+			});
+			//console.log(number_of_posts);
+		}
+		while(duplicate == true || data.length < number_of_posts);	
 		if(primed_for_fail){
-			alert4ChanX("No Results", "error");
+			alert4ChanX("No Results: All found for tags \"" + document.getElementById("tags").value + "\"", "error");
 			top_page = top_page_max;
 			attemptCounter = attemptMax;
 			document.getElementById("timer").textContent = "";
@@ -428,7 +444,7 @@ var checkPageFromDanbooru = function(err, data, tags){
 			return;
 		}
 		//redo
-		else if(data.length < number_of_posts+1 && attemptCounter > 0) {
+		else if((data.length < number_of_posts+1) && attemptCounter > 0) {
 			if(top_page > pageNo){
 				top_page = pageNo + number_of_posts / 20;
 			}
@@ -468,7 +484,7 @@ var setImageFromDanbooru = function(err, data, tags){
     else {
 		JSONPage = data;
 		var image_found = false;
-		for (number_of_posts = 0; number_of_posts < 20 ; number_of_posts++){
+		for (number_of_posts = number_of_posts; number_of_posts < 20 ; number_of_posts++){
 			if(timeout){
 				alert4ChanX("timeout after " + time +" seconds", "error");
 				clearInterval(counterFunction);
@@ -571,10 +587,13 @@ var setImageFromDanbooru = function(err, data, tags){
 						}
 						document.getElementById("dump-list").firstChild.click();
 						document.dispatchEvent(new CustomEvent('QRSetFile', {bubbles:true, detail}));
+						
 					}
 				}));
 												//end function;
 				image_found = true;
+								//SET PAGE&POST AS FOUND
+				previous_images.push([pageNo, number_of_posts]);
 				number_of_posts = 9001;
 			}
 		}
