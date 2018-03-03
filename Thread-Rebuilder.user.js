@@ -1,7 +1,7 @@
 	// ==UserScript==
 	// @name         Thread Rebuilder
 	// @namespace    http://tampermonkey.net/
-	// @version      0.3.1
+	// @version      0.3.2
 	// @description  try to take over the world!
 	// @author       You
 	// @match https://boards.4chan.org/*/thread/*
@@ -57,7 +57,6 @@
 		qrTable.setAttribute("id", "qrRebuilder");
 		qrTable.setAttribute("style", "text-align:center");
 		qrWindow.appendChild(qrTable);
-		qrWindow.appendChild(document.createElement("BR"));
 
 		var instructionRow = document.createElement("TR");
 		var topRowNodes = [document.createElement("BR"),
@@ -282,7 +281,7 @@
 		else if(time > 5){
 			checked = true;
 			console.log(time + "B");
-		} 
+		}
 	};
 
 

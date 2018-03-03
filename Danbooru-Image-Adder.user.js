@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru-Image-Adder
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.1
 // @description  Add images to posts
 // @author       ECHibiki /qa/
 // @match *://boards.4chan.org/*
@@ -10,33 +10,6 @@
 // @downloadURL  https://github.com/ECHibiki/4chan-UserScripts/raw/master/Danbooru-Image-Adder.user.js
 // @run-at document-end
 // ==/UserScript==
-
-/*
-I(CREATING THE POSTS)
-     1) DO JSON SEARCH FOR TAGS:
-            search[name]=TAG1,TAG2 &&&&&& search[order]=count
-     2) PICK THE SMALLEST ONES AS BASE
-     3) GENERATE A RANDOM NUMBER BETWEEN 0 AND FINAL_PAGE-1
-     4) ITTERATE THROUGH POSTS WITH TAGS UNTIL:
-            A) IT TIMESOUT
-            B) IT GOES FROM START TO END AND NOT FOUND
-     5) DO A 4CHANX CreateNotification***
-
-II(AUTO COMPLETE)
-    1) ON FIELD CHANGE READ THE CURSOR LEFT AND DO A  search[name_matches]=n* & search[order]=count
-    2) PHONE STYLED AUTO COMPLETE
-    3) CLICK ON THE GIVEN ITEM TO ADD
-    4) GETS PLACED IN THE GIVEN FIELD
-
-III(CHECKBOXES)
-   1) CHECKS FOR RATINGS
-   2) DROPDOWN FOR ORDER
-
-   3)***   (TODO)
-*/
-
-//update 0.8.9 single tag warning and number_of_posts bug.
-
 
 function alert4ChanX(message, type){
     var detail = {type: type, content: message, lifetime: 10};
@@ -80,7 +53,9 @@ var interfaceSet = false;
 window.onload = function(){
     var len = document.links.length;
     for(var i = 0 ; i < len ; i++){
-        document.links[i].addEventListener("click", enhance4ChanX);
+		var class_name = document.links[i].parentNode.className ;
+		if(class_name == "postNum desktop" || class_name == "qr-link-container")
+			document.links[i].addEventListener("click", enhance4ChanX);
     }
 
     //ENHANCE DUMP TABS (COVER, 482PX - 482PX)
@@ -272,6 +247,8 @@ var setTagInterface =  function(tagNode, autoCompleteRow, secondRowNodes){
                 while (autoCompleteRow.hasChildNodes()) {
                     autoCompleteRow.removeChild(autoCompleteRow.lastChild);
                 }
+                var qr_width = document.getElementById("qr").offsetWidth;
+				//console.log(qr_width);
                 for (var i = 0 ; i < 5 ; i++){
                     var a  = document.createElement("A");
                     a.setAttribute("style", "padding:5px;padding-top:0px;font-size:15px;font-weight:bold;border:1px solid black;");
@@ -283,6 +260,15 @@ var setTagInterface =  function(tagNode, autoCompleteRow, secondRowNodes){
 
                     autoCompleteRow.appendChild(a);
                     a.appendChild(aTxt);
+                    if(autoCompleteRow.offsetWidth > qr_width){
+						//console.log(autoCompleteRow.offsetWidth);
+						autoCompleteRow.removeChild(a);
+						var br = document.createElement("BR");
+						br.setAttribute("STYLE", "line-height:32px;");
+						autoCompleteRow.appendChild(br);
+						autoCompleteRow.appendChild(a);
+
+					}
                     a.addEventListener("click", function(evt){
                         tagArray[tagArray.indexOf(currentTag)] = this.textContent;
                         secondRowNodes[1].value = tagArray.join(" ");
@@ -312,7 +298,7 @@ var setImage = function(){
         {
             verifyTags(data, tags);
 			if(fail_state) return;
-			
+
             //set the end
             var endURL = ratingURL(tags, JSONTag);
 
@@ -353,7 +339,7 @@ var setPostAndPage = function(endURL, tags){
    //page
 	if(top_page != top_page_max) smallestTag = top_page * 20;
     if(smallestTag == 0) smallestTag = 100;
-	do{	
+	do{
 		escape_cond = true;
 		pageNo = ((Math.floor(Math.random() * 10000)) % Math.ceil(smallestTag / 20)) % 1000;    //1000 is max page search limit
 		tries.forEach(function(page){
@@ -413,7 +399,7 @@ var ratingURL = function(tags, data){
         if(data.length > 1)  URL =  "&utf8=%E2%9C%93&tags=" + data[data.length-2]["name"] + "+" + data[data.length-1]["name"];
         else  URL = "&utf8=%E2%9C%93&tags=" + data[data.length-1]["name"];
     }
-	console.log(URL);
+	//console.log(URL);
     return URL;
 };
 
@@ -462,7 +448,7 @@ var checkPageFromDanbooru = function(err, data, tags){
 			attemptCounter = attemptMax;
 			document.getElementById("timer").textContent = "";
 			document.getElementById("tags").removeAttribute("disabled");
-			document.getElementById("imageButton").removeAttribute("disabled");	
+			document.getElementById("imageButton").removeAttribute("disabled");
 			return;
 		}
 	}
