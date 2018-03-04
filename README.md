@@ -1,6 +1,6 @@
 # 4chan-userscripts
-Repository of ECHibiki's Greasyfork userscripts.<br/>
-All of these scripts expand upon 4chanX's quick reply feature.
+Repository of ECHibiki's 4chan userscripts.<br/>
+All of these scripts expand upon 4chanX's quick reply feature and require it.
 
 ## 4chan-Ignoring-Enhancements
 Gives the ability to hide images with ctrl+shift+click. Stores in browser memory for new sessions.<br/>

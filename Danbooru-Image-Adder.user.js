@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru-Image-Adder
 // @namespace    http://tampermonkey.net/
-// @version      1.5
+// @version      1.6
 // @description  Add images to posts
 // @author       ECHibiki /qa/
 // @match *://boards.4chan.org/*
@@ -54,7 +54,8 @@ window.onload = function(){
     var len = document.links.length;
     for(var i = 0 ; i < len ; i++){
 		var class_name = document.links[i].parentNode.className ;
-		if(class_name == "postNum desktop" || class_name == "qr-link-container")
+		if(class_name == "postNum desktop" || class_name == "qr-link-container"
+		   || class_name == "brackets-wrap qr-link-container-bottom")
 			document.links[i].addEventListener("click", enhance4ChanX);
     }
 
@@ -217,7 +218,7 @@ var setTagInterface =  function(tagNode, autoCompleteRow, secondRowNodes){
     tags = tagNode.value;
     if(oldVal !== tags){
 		previous_images = [];
-		
+
         var cursorPos = tagNode.selectionStart - 1;
         var currentTag =  (function(){
             var currentChar = tags.charAt(cursorPos);
@@ -426,14 +427,14 @@ var checkPageFromDanbooru = function(err, data, tags){
 			var duplicate = false;
 			previous_images.forEach(function(item){
 				if(item[0] == pageNo && item[1] == number_of_posts){
-					duplicate = true; 
+					duplicate = true;
 					number_of_posts++;
 					return;
 				}
 			});
 			//console.log(number_of_posts);
 		}
-		while(duplicate == true || data.length < number_of_posts);	
+		while(duplicate == true || data.length < number_of_posts);
 		if(primed_for_fail){
 			alert4ChanX("No Results: All found for tags \"" + document.getElementById("tags").value + "\"", "error");
 			top_page = top_page_max;
@@ -504,7 +505,7 @@ var setImageFromDanbooru = function(err, data, tags){
 
 			var endURL = JSONPage["" + number_of_posts].file_url;
 			var URL = "https://danbooru.donmai.us" + endURL;
-			if(endURL.indexOf("raikou2.donmai.us") > -1)
+			if(RegExp("raikou\d*\.").test(endURL))
 				URL = endURL;
 
 			urlContainterFunction(URL);
@@ -545,9 +546,9 @@ var setImageFromDanbooru = function(err, data, tags){
 				if(JSONPage["" + number_of_posts].file_size >= 4000000){
 					var endURL = JSONPage["" + number_of_posts].large_file_url;
 					var URL = "https://danbooru.donmai.us" + endURL;
-					if(endURL.indexOf("raikou2.donmai.us") > -1)
+					if(RegExp("raikou\d*\.").test(endURL))
 						URL = endURL;
-					
+
 				}
 				document.getElementById("timer").textContent = "...";
 				imgURL = URL;
@@ -587,7 +588,7 @@ var setImageFromDanbooru = function(err, data, tags){
 						}
 						document.getElementById("dump-list").firstChild.click();
 						document.dispatchEvent(new CustomEvent('QRSetFile', {bubbles:true, detail}));
-						
+
 					}
 				}));
 												//end function;
