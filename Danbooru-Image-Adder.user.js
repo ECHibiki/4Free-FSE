@@ -54,7 +54,8 @@ window.onload = function(){
     var len = document.links.length;
     for(var i = 0 ; i < len ; i++){
 		var class_name = document.links[i].parentNode.className ;
-		if(class_name == "postNum desktop" || class_name == "qr-link-container")
+		if(class_name == "postNum desktop" || class_name == "qr-link-container" 
+		   || class_name == "brackets-wrap qr-link-container-bottom")
 			document.links[i].addEventListener("click", enhance4ChanX);
     }
 
