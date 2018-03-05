@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru-Image-Adder
 // @namespace    http://tampermonkey.net/
-// @version      1.9
+// @version      1.10
 // @description  Add images to posts
 // @author       ECHibiki /qa/
 // @match *://boards.4chan.org/*
@@ -218,7 +218,7 @@ var enhance4ChanX = function(){
 function buttonClickFunction(){
 	json_page_numbers_used = Array();
 	//reset a failed_to_find_required_tags boolean
-	primed_for_failed_to_find_required_tags = false;
+	primed_for_fail = false;
 	for(var i = 0 ; i < timeout_functions.length; i++){
 		clearInterval(timeout_functions[i]);
 	}
@@ -423,7 +423,7 @@ var setPostAndPage = function(end_URL, tags){
 		page_number = ((Math.floor(Math.random() * 10000)) % Math.ceil(smallest_tag_size / 20)) % 1000;    //1000 is max page search limit
 		json_page_numbers_used.forEach(function(page){
 			if(page == 0){
-				primed_for_failed_to_find_required_tags = true; // no more pages to search and looped once
+				primed_for_fail = true; // no more pages to search and looped once
 				escape_cond = true;
 				return;
 			}
@@ -440,7 +440,7 @@ var setPostAndPage = function(end_URL, tags){
 };
 
 //check if valid url location
-var primed_for_failed_to_find_required_tags = false;
+var primed_for_fail = false;
 var checkPageFromDanbooru = function(err, data, tags){
 	if (err != null) {
 		console.log('Something went wrong: ' + err);
@@ -461,7 +461,7 @@ var checkPageFromDanbooru = function(err, data, tags){
 			});
 		}while(duplicate == true || data.length < number_of_posts);
 
-		if(primed_for_failed_to_find_required_tags){
+		if(primed_for_fail){
 			alert4ChanX("No Results: All found for tags \"" + document.getElementById("tags").value + "\"", "error");
 			reset_search_timer_fields();
 			return;
@@ -633,6 +633,10 @@ uploader_name:"---"
 					responseType : "arraybuffer",
 					onload: function(response)
 					{
+                        //is it a non existent image?
+                        if(response.response.byteLength <= 387){
+                            alert4ChanX("Image Does Not Exist on Danbooru(404 error)", "error");
+                        }
 						reset_search_timer_fields();
 						clearInterval(intervalFunction);
 						time = time_max;
