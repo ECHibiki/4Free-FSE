@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru-Image-Adder
 // @namespace    http://tampermonkey.net/
-// @version      1.10
+// @version      1.12.1
 // @description  Add images to posts
 // @author       ECHibiki /qa/
 // @match *://boards.4chan.org/*
@@ -455,11 +455,10 @@ var checkPageFromDanbooru = function(err, data, tags){
 			previous_images.forEach(function(item){
 				if(item[0] == page_number && item[1] == number_of_posts){
 					duplicate = true;
-					number_of_posts++;
-					return;
 				}
+				number_of_posts++;
 			});
-		}while(duplicate == true || data.length < number_of_posts);
+		}while(duplicate == false && previous_images < number_of_posts);
 
 		if(primed_for_fail){
 			alert4ChanX("No Results: All found for tags \"" + document.getElementById("tags").value + "\"", "error");
