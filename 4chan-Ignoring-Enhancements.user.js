@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      1.6
+// @version      1.7
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -75,8 +75,8 @@ function storageAvailable(type) {
 }
 
 //What Browser
-function detectBrowser() { 
-    if((navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1 ) 
+function detectBrowser() {
+    if((navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1 )
     {
         //console.log("Opera");
         return 0;
@@ -91,7 +91,7 @@ function detectBrowser() {
         //console.log("Safari");
         return 2;
     }
-    else if(navigator.userAgent.indexOf("Firefox") != -1 ) 
+    else if(navigator.userAgent.indexOf("Firefox") != -1 )
     {
         //console.log("FireFox");
         return 3;
@@ -100,8 +100,8 @@ function detectBrowser() {
     {
         //console.log("IE");
         return 4;
-    }  
-    else 
+    }
+    else
     {
         //console.log("Other");
         return -1;
@@ -169,37 +169,37 @@ function retrieveStates(){
     }
     local_store_threads = getPropertyByRegex(oJson,"f[0-9]*IMG");
 	expire_time =  localStorage.getItem("ExpirationTime");
-	
+
     local_store_threads.forEach(function callback(thread){
 		//console.log(Date.now() - oJson[thread] + " > " + expire_time);
         if(Date.now() - oJson[thread] > expire_time)
             localStorage.removeItem(thread);
-		
+
 		//set hidden threads
 		var image_node;
         image_node = document.getElementById(""+thread);
 		if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
-            image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now(); 
+            image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
             hidden_count++;
         }
-		
+
 		image_node = document.getElementById("p"+thread.substring(1));
 		if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
-            image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now(); 
+            image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
             hidden_count++;
         }
-		
+
 		image_node = document.getElementById("thread-"+thread.substring(1));
 		if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
-            image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now(); 
+            image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
             hidden_count++;
         }
 		image_node = document.getElementById("thumb-"+thread.substring(1));
 		if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
-            image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now(); 
+            image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
             hidden_count++;
         }
-		
+
 
 
     });
@@ -256,7 +256,7 @@ function hideWindow(){
         if (storageAvailable('localStorage')) {
             var time = document.getElementById("expirationTime");
             var millisecond_time = time.value * 3600000;
-            if (millisecond_time == 0 || millisecond_time === null || millisecond_time === undefined) millisecond_time = default_expire_time; 
+            if (millisecond_time == 0 || millisecond_time === null || millisecond_time === undefined) millisecond_time = default_expire_time;
             expire_time = millisecond_time;
             localStorage.setItem("ExpirationTime", millisecond_time);
             hideToggle();
@@ -279,7 +279,7 @@ function hideToggle(){
         document.getElementById("hiWindow").style.display = "inline-block";
         document.getElementById("hiBackground").style.display = "inline-block";
         window_displayed = true;
-    }     
+    }
 }
 
 function hideButton(){
@@ -328,16 +328,16 @@ function loadSettings(){
 }
 
 function saveSettings(){
-	
+
     kill = []; //Determins if a certain pattern should be used or not due to regex errors from the user
-	
+
     if(storageAvailable('localStorage')){
         window.localStorage.setItem("q", number_of_filters);
         for (var pattern_input = 0 ; pattern_input < number_of_filters; pattern_input++){
             var pattern_to_store = document.getElementById("Pattern"+pattern_input).value;
             var replacement_to_store = document.getElementById("Replacement"+pattern_input).value;
             var setting = "g";
-            if(pattern_to_store === "" || replacement_to_store === "") continue; 
+            if(pattern_to_store === "" || replacement_to_store === "") continue;
             if (pattern_to_store.charAt(0) == "/" && pattern_to_store.charAt(pattern_to_store.length - 1) == "/"){
                 pattern_to_store = pattern_to_store + setting;
             }
@@ -414,7 +414,7 @@ function filterWindow(){
     table_head_replacement.appendChild(head_text_replacement);
     filter_table.appendChild(table_head_replacement);
 
-	
+
 	//Create the pattern table
     //loop to create rows
     if (number_of_filters === 0 || isNaN(number_of_filters)) number_of_filters = 6;
@@ -519,7 +519,7 @@ function addRow(){
     var filter_table = document.getElementById("filter_table");
     filter_table.deleteRow(parseInt(number_of_filters) + 1);
     number_of_filters++;
-    
+
     var table_row_contents = document.createElement("tr");
     table_row_contents.setAttribute("id", "FilterRow" +  (number_of_filters - 1));
 
@@ -561,7 +561,7 @@ function addRow(){
     table_add_row_button.setAttribute("style", "padding: 7px 0; margin:5px 0;");
     table_add_collumn.appendChild(table_add_row_button);
     table_add_row_button.addEventListener("click", addRow);
-    
+
     table_last_contents.appendChild(table_add_collumn);
 
     var table_set_collumn =  document.createElement("td");
@@ -585,7 +585,7 @@ function addRow(){
     table_close_collumn.appendChild(table_close_button);
     table_last_contents.appendChild(table_close_collumn);
 
-    filter_table.appendChild(table_last_contents);  
+    filter_table.appendChild(table_last_contents);
 }
 
 function removeRow(){
@@ -667,10 +667,15 @@ function modifyDOM(){
                             if(filterText === "") break;
                             var setting = filterText.substr(lastChar);
                             filterText = filterText.substr(1, lastChar-2);
-                            filterText = "(^|[\\s!$%^&*()_+|~\\-=`{}\\[\\]:\";'<>?,\\.\\/])" + filterText + "([\\s!$%^&*()_+|~\\-=`{}\\[\\]:\";'<>?,\\.\\/]|$)";
-                            try{
+                            //filterText = "(^|[\\s!$%^&*()_+|~\\-=`{}\\[\\]:\";'<>?,\\.\\/])" + filterText + "([\\s!$%^&*()_+|~\\-=`{}\\[\\]:\";'<>?,\\.\\/]|$)";
+                            try{				
                                 var regex = new RegExp(filterText, setting);
-                                localNode.textContent = localNode.textContent.replace(regex, " " + replacement.value + " ");
+								var node_text = localNode.textContent;
+								if(regex.test(node_text)){
+									console.log(node_text.replace(regex, replacement.value));
+									localNode.textContent = node_text.replace(regex, replacement.value);
+																	return;
+								}
                             }
                             catch(e){
                                 alert(i + "'s regex was invalid");
