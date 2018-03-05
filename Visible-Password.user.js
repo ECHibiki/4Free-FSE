@@ -12,11 +12,18 @@
 // @downloadURL  https://github.com/ECHibiki/4chan-UserScripts/raw/master/Visible-Password.user.js
 // ==/UserScript==
 
+/*
+Displays your 4chan password in an inputbox.
+Top left is the post password, Bottom right is the delete password.
+Edit the input boxes to change them.
+
+Note: some 4chan boards don't allow custom post passwords. May require cookie manipulation, but this has not yet been tested
+*/
 (function() {
-    'use strict';
+
     document.getElementById("postPassword").setAttribute("type", "");
     document.getElementById("postPassword").value = document.getElementById("postPassword").value;
-    // Your code here...
+
     document.getElementById("delPassword").setAttribute("type", "");
     document.getElementById("delPassword").value = document.getElementById("delPassword").value;
 })();

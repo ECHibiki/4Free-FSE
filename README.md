@@ -23,4 +23,9 @@ Rebuild a thread from 4chan's archive.<br/>
 Simple system that could use some additions(posts links pointing to the same thread and not the archive thread)
 
 ## Visible Password
-Shows your 4chan post/delete password
+### Shows your 4chan post/delete password
+* Displays your 4chan password in an inputbox.
+* Top left is the post password, Bottom right is the delete password.
+* Edit the input boxes to change them.
+
+__Note:__ some 4chan boards don't allow custom post passwords. May require cookie manipulation, but this has not yet been tested...
