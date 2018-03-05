@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      1.7
+// @version      1.8
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -78,32 +78,32 @@ function storageAvailable(type) {
 function detectBrowser() {
     if((navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1 )
     {
-        //console.log("Opera");
+        console.log("Opera");
         return 0;
     }
     else if(navigator.userAgent.indexOf("Chrome") != -1 )
     {
-        //console.log("Chrome");
+        console.log("Chrome");
         return 1;
     }
     else if(navigator.userAgent.indexOf("Safari") != -1)
     {
-        //console.log("Safari");
+        console.log("Safari");
         return 2;
     }
     else if(navigator.userAgent.indexOf("Firefox") != -1 )
     {
-        //console.log("FireFox");
+        console.log("FireFox");
         return 3;
     }
     else if((navigator.userAgent.indexOf("MSIE") != -1 ) || (!!document.documentMode == true )) //IF IE > 10
     {
-        //console.log("IE");
+        console.log("IE");
         return 4;
     }
     else
     {
-        //console.log("Other");
+        console.log("Other");
         return -1;
     }
 }
@@ -121,7 +121,7 @@ function hideImage(event){
             localStorage.setItem(this.id, Date.now());
         }
         else {
-            //console.log("No Storage");
+            console.log("No Storage");
         }
 		//some browsers require a querry on the image URL to 404 it.
         this.src = this.src + ".HIDDEN" +  "?" + Date.now();
@@ -135,7 +135,7 @@ function hideImage(event){
             localStorage.removeItem(this.id);
         }
         else {
-            //console.log("No Storage");
+            console.log("No Storage");
         }
         this.src = this.src.substring(0, hide_index);
         return false;
@@ -171,7 +171,6 @@ function retrieveStates(){
 	expire_time =  localStorage.getItem("ExpirationTime");
 
     local_store_threads.forEach(function callback(thread){
-		//console.log(Date.now() - oJson[thread] + " > " + expire_time);
         if(Date.now() - oJson[thread] > expire_time)
             localStorage.removeItem(thread);
 
@@ -320,7 +319,6 @@ function loadSettings(){
         oJson[storage_key] = window.localStorage.getItem(storage_key);
     }
     number_of_filters = oJson["q"];
-    //console.log(number_of_filters);
     filters = getPropertyByRegex(oJson,"filter[0-9]*");
     filters.forEach(function(filter){
         initial_filters.push(formatSettings(oJson[filter]));
@@ -672,7 +670,6 @@ function modifyDOM(){
                                 var regex = new RegExp(filterText, setting);
 								var node_text = localNode.textContent;
 								if(regex.test(node_text)){
-									console.log(node_text.replace(regex, replacement.value));
 									localNode.textContent = node_text.replace(regex, replacement.value);
 																	return;
 								}

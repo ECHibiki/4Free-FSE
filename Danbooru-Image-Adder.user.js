@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru-Image-Adder
 // @namespace    http://tampermonkey.net/
-// @version      1.8
+// @version      1.9
 // @description  Add images to posts
 // @author       ECHibiki /qa/
 // @match *://boards.4chan.org/*
@@ -12,7 +12,6 @@
 // ==/UserScript==
 
 
-//4chanx alerts
 function alert4ChanX(message, type){
     var detail = {type: type, content: message, lifetime: 10};
     if (typeof cloneInto === 'function') {
@@ -48,23 +47,47 @@ var json_page_numbers_used = Array();
 var previous_images = [];
 var taggingFunction;
 
+
 //set listeners to build interface in 4chanX
+var loaded = false;
 document.addEventListener("4chanXInitFinished", function(e){
-    var len = document.links.length;
-	console.log("L:"+len);
-    for(var i = 0 ; i < len ; i++){
-		var class_name = document.links[i].parentNode.className ;
-		if(class_name == "postNum desktop" || class_name == "qr-link-container"
-		   || class_name == "brackets-wrap qr-link-container-bottom")
-			document.links[i].addEventListener("click", enhance4ChanX);
-    }
+	setTimeout(function(){
+		var len = document.links.length;
+		console.log("L:"+len);
+		for(var i = 0 ; i < len ; i++){
+			var class_name = document.links[i].parentNode.className ;
+			if(class_name == "postNum desktop" || class_name == "qr-link-container"
+			   || class_name == "brackets-wrap qr-link-container-bottom")
+				document.links[i].addEventListener("click", enhance4ChanX);
+		}
+        loaded = true;
+		//ENHANCE DUMP TABS (COVER, 482PX - 482PX)
+		//DUMP LIST MAX-HEIGHT TO 490
 
-    //ENHANCE DUMP TABS (COVER, 482PX - 482PX)
-    //DUMP LIST MAX-HEIGHT TO 490
-
-    document.getElementById("fourchanx-css").textContent += ".qr-preview { height: 482px; width: 482px; background-size: cover;}";
-    document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: 400px; width: 509px;}";
+            document.getElementById("fourchanx-css").textContent += ".qr-preview { height: 400px; width: 400px; left:8%;background-size: cover;}";
+            document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: 380px; width: 480px;}";
+	}, 1000);
 }, false);
+
+	setTimeout(function(){
+        if(!loaded){
+            var len = document.links.length;
+            console.log("L:"+len);
+            for(var i = 0 ; i < len ; i++){
+                var class_name = document.links[i].parentNode.className ;
+                if(class_name == "postNum desktop" || class_name == "qr-link-container"
+                   || class_name == "brackets-wrap qr-link-container-bottom")
+                    document.links[i].addEventListener("click", enhance4ChanX);
+            }
+            loaded = true;
+            //ENHANCE DUMP TABS (COVER, 482PX - 482PX)
+            //DUMP LIST MAX-HEIGHT TO 490
+
+            document.getElementById("fourchanx-css").textContent += ".qr-preview { height: 400px; width: 400px; left:8%;background-size: cover;}";
+            document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: 380px; width: 480px;}";
+        }
+	}, 3000);
+
 
 //Alter 4chanX interface
 var enhance4ChanX = function(){
@@ -170,9 +193,9 @@ var enhance4ChanX = function(){
     second_row_nodes[3].setAttribute("ID", "timer");
     second_row_nodes[3].setAttribute("style", "width:20%;margin:0 5px");
     second_row_nodes[4].setAttribute("ID", "urlContainer");
-    second_row_nodes[4].setAttribute("style", "max-width:21.0%;min-width:21.0%;margin:0 5px");
+    second_row_nodes[4].setAttribute("style", "max-width:15.5%;min-width:15.5%;margin:0 5px");
     //second_row_nodes[4].setAttribute("disabled", "");
-	
+
     var tag_input_node = second_row_nodes[1];
 
     second_row_nodes[2].setAttribute("ID", "imageButton");
@@ -183,7 +206,7 @@ var enhance4ChanX = function(){
     second_row_nodes[2].addEventListener("click", buttonClickFunction);
 
 	//textarea expansion;
-	qr_window.getElementsByTagName("TEXTAREA")[0].style.width = "100%";
+	qr_window.getElementsByTagName("TEXTAREA")[0].style.width = "110%";
     //ping every 0.5s for changes
     taggingFunction = setInterval(
         function(){setTagInterface(tag_input_node, auto_complete_row, second_row_nodes);},
@@ -272,12 +295,12 @@ var setTagInterface =  function(tag_input_node, auto_complete_row, second_row_no
 					tag_row.appendChild(tag_data);
 					tag_table.appendChild(tag_row);
 					auto_complete_row.appendChild(tag_table);
-					
+
                     if(auto_complete_row.offsetWidth > qr_width - 10){
 						tag_row.removeChild(tag_data);
 						tag_table = document.createElement("TABLE");
 						tag_row = document.createElement("TR");
-						
+
 						tag_row.appendChild(tag_data);
 						tag_table.appendChild(tag_row);
 						tag_table.setAttribute("style", "border:1px solid black;");
@@ -437,7 +460,7 @@ var checkPageFromDanbooru = function(err, data, tags){
 				}
 			});
 		}while(duplicate == true || data.length < number_of_posts);
-		
+
 		if(primed_for_failed_to_find_required_tags){
 			alert4ChanX("No Results: All found for tags \"" + document.getElementById("tags").value + "\"", "error");
 			reset_search_timer_fields();
@@ -505,15 +528,15 @@ var setImageFromDanbooru = function(err, data, tags){
 			//set the page to search
 			var end_URL = json_page["" + number_of_posts].file_url;
 			var URL = "https://danbooru.donmai.us" + end_URL;
-			if(RegExp("raikou\d*\.").test(end_URL))
+			if(RegExp("(raikou|hijiribe)\d*\.").test(end_URL))
 				URL = end_URL;
 
 			//place url in visible box
 			urlContainterFunction(URL);
 
 			/*
-			
-			
+
+
 :{id: 3038118, created_at: "2018-03-02T15:27:56.469-05:00", uploader_id: 49091, score: 6,…}
 approver_id:null
 bit_flags:0
@@ -567,9 +590,9 @@ up_score:6
 updated_at:"2018-03-03T09:09:32.357-05:00"
 uploader_id:49091
 uploader_name:"---"
-			
+
 			*/
-			
+
 			var failed_to_find_required_tags = false;
 			if(end_URL === undefined ||
 			   end_URL.indexOf(".mp4") > -1 || end_URL.indexOf(".webm") > -1 || end_URL.indexOf(".swf") > -1 || end_URL.indexOf(".zip") > -1){
@@ -583,13 +606,11 @@ uploader_name:"---"
 					else if(tag.indexOf("rating:") > -1){
 						if(tag.charAt(7) !== json_page["" + number_of_posts]["rating"]){
 							failed_to_find_required_tags = true;
-							return;
 						}
 					}
 					//otherwise check if the tagstring contains the tags
 					else if(json_page["" + number_of_posts]["tag_string"].indexOf(tag) == -1){
 						failed_to_find_required_tags = true;
-						return;
 					}
 				});
 			}
@@ -600,7 +621,7 @@ uploader_name:"---"
 				if(json_page["" + number_of_posts].file_size >= 4000000){
 					var end_URL = json_page["" + number_of_posts].large_file_url;
 					var URL = "https://danbooru.donmai.us" + end_URL;
-					if(RegExp("raikou\d*\.").test(end_URL))
+					if(RegExp("(raikou|hijiribe)\d*\.").test(end_URL))
 						URL = end_URL;
 
 				}

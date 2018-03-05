@@ -1,9 +1,9 @@
 	// ==UserScript==
 	// @name         Thread Rebuilder
 	// @namespace    http://tampermonkey.net/
-	// @version      1.2
+	// @version      1.3
 	// @description  try to take over the world!
-	// @author       You
+	// @author       ECHibiki /qa/
 	// @match https://boards.4chan.org/*/thread/*
 	// @match http://boards.4chan.org/*/thread/*
 	// @grant         GM_xmlhttpRequest
@@ -20,29 +20,51 @@
 	//1) CREATE INTERFACE
 	//set listener to build interface in 4chanX
 	//set listeners to build interface in 4chanX
-	document.addEventListener("4chanXInitFinished", function(e){
+var loaded = false;
+document.addEventListener("4chanXInitFinished", function(e){
+	setTimeout(function(){
 		var len = document.links.length;
-		for(var links = 0 ; links < len ; links++){
-			var class_name = document.links[links].parentNode.className ;
+		console.log("L:"+len);
+		for(var i = 0 ; i < len ; i++){
+			var class_name = document.links[i].parentNode.className ;
 			if(class_name == "postNum desktop" || class_name == "qr-link-container"
 			   || class_name == "brackets-wrap qr-link-container-bottom")
-				document.links[links].addEventListener("click", enhance4ChanX);
+				document.links[i].addEventListener("click", enhance4ChanX);
 		}
-
+        loaded = true;
 		//ENHANCE DUMP TABS (COVER, 482PX - 482PX)
 		//DUMP LIST MAX-HEIGHT TO 490
 
-		document.getElementById("fourchanx-css").textContent += ".qr-preview { height: 482px; width: 482px; background-size: cover;}";
-		document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: 400px; width: 509px;}";
+            document.getElementById("fourchanx-css").textContent += ".qr-preview { height: 400px; width: 400px; left:8%;background-size: cover;}";
+            document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: 380px; width: 480px;}";
+	}, 1000);
+}, false);
 
-	}, false);
+	setTimeout(function(){
+        if(!loaded){
+            var len = document.links.length;
+            console.log("L:"+len);
+            for(var i = 0 ; i < len ; i++){
+                var class_name = document.links[i].parentNode.className ;
+                if(class_name == "postNum desktop" || class_name == "qr-link-container"
+                   || class_name == "brackets-wrap qr-link-container-bottom")
+                    document.links[i].addEventListener("click", enhance4ChanX);
+            }
+            loaded = true;
+            //ENHANCE DUMP TABS (COVER, 482PX - 482PX)
+            //DUMP LIST MAX-HEIGHT TO 490
 
-	
+            document.getElementById("fourchanx-css").textContent += ".qr-preview { height: 400px; width: 400px; left:8%;background-size: cover;}";
+            document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: 380px; width: 480px;}";
+        }
+	}, 3000);
+
+
 	var enhance4ChanX = function(){
 		var qr_window = document.getElementById("qr");
 
 		if(document.getElementById("qrRebuilder") !== null) qr_window.removeChild(document.getElementById("qrRebuilder"));
-		
+
 		var thread_rebuilder_table = document.createElement("TABLE");
 		thread_rebuilder_table.setAttribute("id", "qrRebuilder");
 		thread_rebuilder_table.setAttribute("style", "text-align:center");
@@ -79,10 +101,11 @@
 		second_row_nodes[2].setAttribute("ID", "threadButton");
 		second_row_nodes[2].setAttribute("type", "button");
 		second_row_nodes[2].setAttribute("value", "Set Rebuild Queue");
-		
+
 		second_row_nodes[2].addEventListener("click", function(){
 			getThread(second_row_nodes[1].value);
 			postID = setInterval(postRoutine, 1000);
+            console.log(timeListen);
 			if(timeListen === undefined) timeListen = setInterval(timeListenerFunction, 1000);
 		});
 	};
@@ -98,7 +121,7 @@
 			stopRoutine();
 		}
 	};
-	
+
 	var stopRoutine = function(){
 		clearInterval(postID);
 	};
@@ -127,8 +150,8 @@
 			var post_no = result.toString().replace(/>/g, "");
 			link_arr.push([post_no, end_index]);
 		}
-	//hunt down the text of what it linked to		
-		var responding_text = Array();	
+	//hunt down the text of what it linked to
+		var responding_text = Array();
 		URL  = "https://a.4cdn.org/" + board + "/thread/" + document.getElementById("threadInput").value + ".json";
 			var xhr = new GM_xmlhttpRequest(({
 				method: "GET",
@@ -148,7 +171,7 @@
 								}
 							}
 						});
-						
+
 						var current_url = window.location.href;
 						var hash_index = current_url.lastIndexOf("#") != -1 ? current_url.lastIndexOf("#"):  window.location.href.length;
 						var current_thread = window.location.href.substring(current_url.lastIndexOf("/")+1, hash_index);
@@ -166,7 +189,7 @@
 								else{
 									responding_text.forEach(function(response_item){
 										for(var data_entry = 0 ; data_entry < data.length ; data_entry++){
-											if((response_item[1] == data[data_entry]["com"].replace(/(&gt;&gt;|#p)\d+/g, "") || response_item[1] == null) 
+											if((response_item[1] == data[data_entry]["com"].replace(/(&gt;&gt;|#p)\d+/g, "") || response_item[1] == null)
 												&& (response_item[2] == data[data_entry]["md5"] || response_item[2] == null)){
 												var start_index = response_item[0][0].legth - response_item[0][1];
 												text = text.substring(0, start_index) + ">>" + data[data_entry]["no"] + text.substring(response_item[0][1]);
@@ -184,7 +207,7 @@
 				}
 			}));
 	};
-	
+
 	//2) GET ARCHIVED THREAD
 	var getThread = function(threadNo){
 		thread_data = [[], [], [], []];
@@ -285,7 +308,7 @@
 	var createPostComment = function(text){
 		text = text.replace(/<a href="\/[a-zA-Z]+\/" class="quotelink">/g, "");
 		text = text.replace(/<span class="deadlink">/g, "");
-		
+
 		var quote_regex = /<a href="#p[0-9]+" class="quotelink">&gt;&gt;[0-9]+/g;
 		var find = text.match(quote_regex);
 		if(find){
@@ -325,7 +348,7 @@
 		}
 	};
 
-	
+
 document.addEventListener('QRPostSuccessful', function(e) {
 			document.getElementById("dump-list").childNodes[1].click();
 			setPropperLinking(document.getElementById("qr").getElementsByTagName("TEXTAREA")[0].value);
