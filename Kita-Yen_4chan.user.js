@@ -140,12 +140,15 @@ window.addEventListener("keyup", function(e){
     listener_obj[e.keyCode] = false;
 }, {passive:false, capture:false, once:false});
 
-function insertAtPos(node, char){
+function insertAtPos(node, buzzwords){
     var sel_start = node.selectionStart;
     var sel_end = node.selectionEnd;
 
     n_tc = node.value;
-    node.value = n_tc.substr(0, sel_start) + char + n_tc.substr(sel_end);
+    node.value = n_tc.substr(0, sel_start) + buzzwords + n_tc.substr(sel_end);
+	
+	node.selectionStart = sel_start + buzzwords.length;
+	node.selectionEnd = sel_end + buzzwords.length;
 };
 
 
