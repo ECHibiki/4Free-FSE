@@ -21,14 +21,14 @@ Highlights just the word in dark gray<br/>
 
 ### 4chan-Ignoring-Enhancements
 #### Hides images.
-Gives the ability to hide images with ctrl+shift+click. Stores in browser memory for new sessions.<br/>
+Gives the ability to hide images with ___ctrl+shift+click___. Stores in browser memory for new sessions.<br/>
 #### Word Filters
 Also includes the ability to do word replacements with a regex replacement system.<br>
 
 ### Thread Rebuilder
 #### Rebuild dead threads from scratch
 Rebuild a thread from 4chan's archive.<br/>
-Simple system that could use some additions(posts links pointing to the same thread and not the archive thread)
+Simple system that could use some additions(using 4chan's offsite archives for example)
 
 ### Visible Password
 #### Shows your 4chan post/delete password
