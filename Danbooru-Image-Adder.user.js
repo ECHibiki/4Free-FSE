@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru-Image-Adder
 // @namespace    http://tampermonkey.net/
-// @version      1.12.1
+// @version      1.13
 // @description  Add images to posts
 // @author       ECHibiki /qa/
 // @match *://boards.4chan.org/*
@@ -10,7 +10,6 @@
 // @downloadURL  https://github.com/ECHibiki/4chan-UserScripts/raw/master/Danbooru-Image-Adder.user.js
 // @run-at document-end
 // ==/UserScript==
-
 
 function alert4ChanX(message, type){
     var detail = {type: type, content: message, lifetime: 10};
@@ -296,7 +295,7 @@ var setTagInterface =  function(tag_input_node, auto_complete_row, second_row_no
 					tag_table.appendChild(tag_row);
 					auto_complete_row.appendChild(tag_table);
 
-                    if(auto_complete_row.offsetWidth > qr_width - 10){
+                    if(tag_table.offsetWidth > qr_width - 10){
 						tag_row.removeChild(tag_data);
 						tag_table = document.createElement("TABLE");
 						tag_row = document.createElement("TR");
