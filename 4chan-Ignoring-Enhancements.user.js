@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      1.10
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
 // @match https://boards.4chan.org/*
 // @include https://boards.4chan.org/*
 // @include http://boards.4chan.org/*
-// @run-at document-body
+// @run-at document-end
 // @updateURL    https://github.com/ECHibiki/4chan-UserScripts/raw/master/4chan-Ignoring-Enhancements.user.js
 // @downloadURL  https://github.com/ECHibiki/4chan-UserScripts/raw/master/4chan-Ignoring-Enhancements.user.js
 // ==/UserScript==
@@ -164,9 +164,9 @@ function retrieveStates(){
         oJson = {},
         storage_key;
     while(storage_position < window.localStorage.length) {
-        storage_position++;
         storage_key = window.localStorage.key(storage_position);
         oJson[storage_key] = window.localStorage.getItem(storage_key);
+        storage_position++;
     }
     local_store_threads = getPropertyByRegex(oJson,"f[0-9]*IMG");
 	expire_time =  localStorage.getItem("ExpirationTime");
@@ -707,16 +707,27 @@ function pkxSetup(){
     hideSetup();
     filterSetup();
 	modifyDOM();
-	retrieveStates();
+    retrieveStates();
     observeDynamicMutation();
 }
 
 //4chanX exists
+//currently has issues due to a bug in 4chanX's API
 var page_setup = false;
 document.addEventListener('IndexRefresh', function(e) {
+	setTimeout(function(){// bypass 4chanX bug
 		browser = detectBrowser();
 		pkxSetup();
 		console.log("Script loaded: 4chanPKX");
 		page_setup = true;
+	}, 1);
 }, false);
 
+setTimeout(function(){
+	if(!page_setup){
+		browser = detectBrowser();
+		pkxSetup();
+		console.log("Script loaded: 4chanPKX");
+		page_setup = true;
+	}
+}, 2000);
