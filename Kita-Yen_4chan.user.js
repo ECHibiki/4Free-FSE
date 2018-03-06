@@ -19,9 +19,10 @@ colorCharacters(document.body);
 addStyle();
 
 new MutationObserver(function(mutations){
+	//send a MutationRecord for each mutation
     mutations.forEach(function(mutation){
-		//pass along root nodes
-		/*	(element, index, array)	*/
+		//For this mutation record access the addedNode property and call a function on it.
+		/* forEach passes on the element, index and array insance	*/
         mutation.addedNodes.forEach(colorCharacters);
     });
 }).observe(document.body, {childList: true, subtree: true});
