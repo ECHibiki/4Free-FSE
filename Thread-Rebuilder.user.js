@@ -1,7 +1,7 @@
 	// ==UserScript==
 	// @name         Thread Rebuilder
 	// @namespace    http://tampermonkey.net/
-	// @version      2.0
+	// @version      2.1
 	// @description  try to take over the world!
 	// @author       ECHibiki /qa/
 	// @match https://boards.4chan.org/*/thread/*
@@ -19,11 +19,12 @@
 	
 	var use_offsite_archive = false;
 	var window_displayed = false;
-
+	var in_sequence = false;
+	var loaded = false;
+	
 	//1) CREATE INTERFACE
 	//set listener to build interface in 4chanX
 	//set listeners to build interface in 4chanX
-var loaded = false;
 document.addEventListener("4chanXInitFinished", function(e){
 	setTimeout(function(){
 		var len = document.links.length;
@@ -215,8 +216,6 @@ function rebuildButton(){
     }
 }
 
-
-
 var enhance4ChanX = function(){
 	var qr_window = document.getElementById("qr");
 
@@ -260,6 +259,8 @@ var enhance4ChanX = function(){
 	second_row_nodes[2].setAttribute("value", "Set Rebuild Queue");
 
 	second_row_nodes[2].addEventListener("click", function(){
+		in_sequence = true;
+		killAll();
 		getThread(second_row_nodes[1].value);
 		postID = setInterval(postRoutine, 1000);
 		if(timeListen === undefined) timeListen = setInterval(timeListenerFunction, 1000);
@@ -374,6 +375,7 @@ var setPropperLinking = function(text){
 		}));
 };
 
+
 //2) GET ARCHIVED THREAD
 var getThread = function(threadNo){
 	thread_data = [[], [], [], []];
@@ -387,23 +389,28 @@ var getThread = function(threadNo){
 		url: URL,
 		responseType : "json",
 		onload: function(data){
-			if(use_offsite_archive)
+			var starting_post = -1;
+			if(use_offsite_archive){
+				starting_post = 0;
 				data = data.response["" + document.getElementById("threadInput").value];
-			else
+			}		
+			else{
+				starting_post = 1;
 				data = data.response;
-
+			}
 			if(data == undefined){
 				alert("Invalid Thread ID: " + threadNo + ".\n4chan Archive ");
 			}
 			else{
 				if(use_offsite_archive) data["posts"] = Object.values(data["posts"]);
 				var len = data["posts"].length;
-				for(var i = 0 ; i < len ; i++){
+				
+				for(var post_number = starting_post ; post_number < len ; post_number++){
 					var comment = undefined;
 					if(use_offsite_archive)
-						comment = data["posts"][i]["comment"];
+						comment = data["posts"][post_number]["comment"];
 					else
-						comment = data["posts"][i]["com"];
+						comment = data["posts"][post_number]["com"];
 					if(comment !== undefined && comment !== null)
 						thread_data[0].push(comment);
 					else
@@ -411,36 +418,35 @@ var getThread = function(threadNo){
 
 					var filename = undefined;
 					if(use_offsite_archive)
-						if(data["posts"][i]["media"] !== null)
-							filename = "" + data["posts"][i]["media"]["media_filename"];
+						if(data["posts"][post_number]["media"] !== null)
+							filename = "" + data["posts"][post_number]["media"]["media_filename"];
 					else
-						filename = "" + data["posts"][i]["tim"] + data["posts"][i]["ext"];
+						filename = "" + data["posts"][post_number]["tim"] + data["posts"][post_number]["ext"];
 					
 					if(filename !== undefined && filename !== null && filename.indexOf("undefined") == -1)
 						if(use_offsite_archive)
-							if(data["posts"][i]["media"] !== null)
-								thread_data[1].push(data["posts"][i]["media"]["remote_media_link"]);
+							if(data["posts"][post_number]["media"] !== null)
+								thread_data[1].push(data["posts"][post_number]["media"]["remote_media_link"]);
 							else  thread_data[1].push(-1);
 						else
 							thread_data[1].push("https://i.4cdn.org/" + board + "/" + filename);
 					else  thread_data[1].push(-1);
 
 					if(use_offsite_archive)
-						if(data["posts"][i]["media"] !== null)
-							thread_data[2].push(data["posts"][i]["media"]["media_id"]);
+						if(data["posts"][post_number]["media"] !== null)
+							thread_data[2].push(data["posts"][post_number]["media"]["media_id"]);
 					else
-						thread_data[2].push(data["posts"][i]["filename"]);
+						thread_data[2].push(data["posts"][post_number]["filename"]);
 
 					if(use_offsite_archive)
-						thread_data[3].push(data["posts"][i]["num"]);
+						thread_data[3].push(data["posts"][post_number]["num"]);
 					else
-						thread_data[3].push(data["posts"][i]["no"]);
+						thread_data[3].push(data["posts"][post_number]["no"]);
 				}
 			}
 			semaphore--;
 		}
 	}));
-
 };
 //3) RIP POSTS AND IMAGES
 var createPost = function(text, imageURL, imageName){
@@ -559,8 +565,31 @@ var timeListenerFunction = function(){
 	}
 };
 
-
 document.addEventListener('QRPostSuccessful', function(e) {
-	document.getElementById("dump-list").childNodes[1].click();
-	setPropperLinking(document.getElementById("qr").getElementsByTagName("TEXTAREA")[0].value);
+	if(in_sequence){
+		document.getElementById("dump-list").childNodes[1].click();
+		setPropperLinking(document.getElementById("qr").getElementsByTagName("TEXTAREA")[0].value);
+	}
 }, false);
+
+
+function killAll(){
+	thread_data_length = 0;
+	posts_created = 0;
+	stopRoutine();
+	postID = "";
+	semaphore = 1;
+	semaphore_posts = 1;
+	stopFillRoutine();
+	fillID  = "";
+	thread_data = [['Comment'], ['Image URLs'], ['Image Names'] ,['Post No.']];
+	//CLEAR DUMP LIST
+	var qr_dumplist = document.getElementById("dump-list").childNodes;
+	var qr_dumplist_len = qr_dumplist.length;
+	var current_preview = 0;
+	while(qr_dumplist_len - current_preview > 1){
+		qr_dumplist[0].firstChild.click();
+		current_preview++;
+	}
+}
+
