@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      1.8
+// @version      1.9
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -157,6 +157,7 @@ function getPropertyByRegex(obj,propName) {
 //retrieve from memory the hidden images
 //Images are stored in memory as f<ID_NUMBER>IMG and recalled using the storage_key
 //Function makes a check to see if the hiding time limit for the thread has expired or not.
+//Note: Must have the DOM itterate through before retrieval
 var hidden_count = 0;
 function retrieveStates(){
     var storage_position = 0,
@@ -187,7 +188,7 @@ function retrieveStates(){
             image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
             hidden_count++;
         }
-
+		
 		image_node = document.getElementById("thread-"+thread.substring(1));
 		if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
             image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
@@ -198,7 +199,6 @@ function retrieveStates(){
             image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
             hidden_count++;
         }
-
 
 
     });
@@ -693,7 +693,6 @@ if (window.top != window.self)  //-- Don't run on frames or iframes
 
 //initial onload setup
 function hideSetup(){
-	retrieveStates();
     hideButton();
 }
 
@@ -708,6 +707,7 @@ function pkxSetup(){
     hideSetup();
     filterSetup();
 	modifyDOM();
+	retrieveStates();
     observeDynamicMutation();
 }
 

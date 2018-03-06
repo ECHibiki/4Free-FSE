@@ -561,6 +561,6 @@ var timeListenerFunction = function(){
 
 
 document.addEventListener('QRPostSuccessful', function(e) {
-			document.getElementById("dump-list").childNodes[1].click();
-			setPropperLinking(document.getElementById("qr").getElementsByTagName("TEXTAREA")[0].value);
+	document.getElementById("dump-list").childNodes[1].click();
+	setPropperLinking(document.getElementById("qr").getElementsByTagName("TEXTAREA")[0].value);
 }, false);
