@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      1.10
+// @version      2.1
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -9,7 +9,7 @@
 // @include https://boards.4chan.org/*
 // @include http://boards.4chan.org/*
 // @run-at document-end
-// @updateURL    https://github.com/ECHibiki/4chan-UserScripts/raw/master/4chan-Ignoring-Enhancements.user.js
+// @updateURL    https://github.com/CHibiki/4chan-UserScripts/raw/master/4chan-Ignoring-Enhancements.user.js
 // @downloadURL  https://github.com/ECHibiki/4chan-UserScripts/raw/master/4chan-Ignoring-Enhancements.user.js
 // ==/UserScript==
 
@@ -19,7 +19,7 @@ Gives the ability to hide images with ctrl+shift+click. Stores in browser memory
 Also includes the ability to do word replacements with a regex replacement system.
 */
 
-var local_store_threads;
+var local_store_threads = [];
 var browser;
 var finished = false;
 var window_displayed = false;
@@ -117,7 +117,7 @@ function hideImage(event){
         event.preventDefault();
         event.stopPropagation();
         if (storageAvailable('localStorage')) {
-            if(this.id.charAt(0) == "p") this.id =  "f" + this.id.substr(1);
+            this.id =  this.id.substr(1);
             localStorage.setItem(this.id, Date.now());
         }
         else {
@@ -131,7 +131,7 @@ function hideImage(event){
         event.preventDefault();
         event.stopPropagation();
         if (storageAvailable('localStorage')) {
-            if(this.id.charAt(0) == "p") this.id =  "f" + this.id.substr(1);
+            this.id = this.id.substr(1);
             localStorage.removeItem(this.id);
         }
         else {
@@ -158,7 +158,6 @@ function getPropertyByRegex(obj,propName) {
 //Images are stored in memory as f<ID_NUMBER>IMG and recalled using the storage_key
 //Function makes a check to see if the hiding time limit for the thread has expired or not.
 //Note: Must have the DOM itterate through before retrieval
-var hidden_count = 0;
 function retrieveStates(){
     var storage_position = 0,
         oJson = {},
@@ -168,42 +167,41 @@ function retrieveStates(){
         oJson[storage_key] = window.localStorage.getItem(storage_key);
         storage_position++;
     }
-    local_store_threads = getPropertyByRegex(oJson,"f[0-9]*IMG");
+    local_store_threads = getPropertyByRegex(oJson,"[0-9]+IMG");
 	expire_time =  localStorage.getItem("ExpirationTime");
 
-    local_store_threads.forEach(function callback(thread){
-        if(Date.now() - oJson[thread] > expire_time)
-            localStorage.removeItem(thread);
+	/*The commented out code is to be removed on assurance that the new, itterative hiding method working with the treewalker works better.*/
+    // local_store_threads.forEach(function callback(thread){
+        // if(Date.now() - oJson[thread] > expire_time)
+            // localStorage.removeItem(thread);
 
-		//set hidden threads
-		var image_node;
-        image_node = document.getElementById(""+thread);
-		if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
-            image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
-            hidden_count++;
-        }
+		// //set hidden threads
+		// var image_node;
+        // image_node = document.getElementById(""+thread);
+		// if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
+            // image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
+            // hidden_count++;
+        // }
 
-		image_node = document.getElementById("p"+thread.substring(1));
-		if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
-            image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
-            hidden_count++;
-        }
+		// image_node = document.getElementById("p"+thread.substring(1));
+		// if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
+            // image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
+            // hidden_count++;
+        // }
 
-		image_node = document.getElementById("thread-"+thread.substring(1));
-		if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
-            image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
-            hidden_count++;
-        }
-		image_node = document.getElementById("thumb-"+thread.substring(1));
-		if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
-            image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
-            hidden_count++;
-        }
-
-
-    });
+		// image_node = document.getElementById("thread-"+thread.substring(1));
+		// if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
+            // image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
+            // hidden_count++;
+        // }
+		// image_node = document.getElementById("thumb-"+thread.substring(1));
+		// if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
+            // image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
+            // hidden_count++;
+        // }
+    //});
 	// half the ammount because it hides both index and catalog
-    console.log("HIDDEN THREADS: " + hidden_count / 2);
+    // console.log("HIDDEN THREADS: " + hidden_count / 2);
 }
 
 
@@ -360,7 +358,6 @@ function formatSettings(input){
     });
     return rtn;
 }
-
 
 function filterWindow(){
     var style = document.createElement('style');
@@ -626,16 +623,26 @@ function setTable(){
 
 //detect page changes
 function observeDynamicMutation(node){
-    if(node === undefined)
-        node = document;
-	//on mutation event call functions
-    observer = new MutationObserver(function callBack(mutations){
-		modifyDOM();
+    document.addEventListener('PostsInserted',function(e){
+        console.log(e);
+        modifyDOM();
     });
-    var config = {subtree: true, childList:true};//Subtree checks children of node, while subtree repeats actions on the child and sets observers on them
-    observer.observe(node, config);
+
+    /*Replaced by 4chanX API calls*/
+	// if(node === undefined)
+	// node = document;
+	// //on mutation event call functions
+	// observer = new MutationObserver(function callBack(mutations){
+	// mutations.forEach(function(mutation){
+	// console.log(mutation);
+	// modifyDOM();
+	// });
+	// });
+	// var config = {subtree: true, childList:true};//Subtree checks children of node, while subtree repeats actions on the child and sets observers on them
+	// observer.observe(node, config);
 }
 
+var hidden_count = 0;
 function modifyDOM(){
 	var start = document.getElementById("delform");
     var itterator = document.createTreeWalker(start, NodeFilter.SHOW_ELEMENTS, NodeFilter.SHOW_ELEMENTS);
@@ -648,6 +655,15 @@ function modifyDOM(){
             if(!/(f|p)\d+IMG/.test(node.id) && (node.getAttribute("data-md5") !== null || node.className.indexOf("thumb") != -1)){
                 node.id = node.parentNode.parentNode.id + "IMG";
                 node.addEventListener("click", hideImage, {passive:false, capture:false, once:false});
+
+				var threadstore_len = local_store_threads.length;
+                var reduced_node_id = node.id.substring(1);
+				for(var thread = 0 ; thread < threadstore_len; thread++){
+					if(reduced_node_id == local_store_threads[thread]){
+						node.src = node.src + ".HIDDEN" +  "?" + Date.now();
+						hidden_count++;
+					}
+				}
             }
         }
         else if(cname == "postMessage"){
@@ -671,7 +687,7 @@ function modifyDOM(){
 								var node_text = localNode.textContent;
 								if(regex.test(node_text)){
 									localNode.textContent = node_text.replace(regex, replacement.value);
-																	return;
+									return;
 								}
                             }
                             catch(e){
@@ -685,6 +701,8 @@ function modifyDOM(){
             }
         }
     }
+    if(!page_setup)
+        console.log("HIDDEN THREADS: " + hidden_count);
 }
 
 
@@ -693,6 +711,7 @@ if (window.top != window.self)  //-- Don't run on frames or iframes
 
 //initial onload setup
 function hideSetup(){
+	retrieveStates();
     hideButton();
 }
 
@@ -707,7 +726,6 @@ function pkxSetup(){
     hideSetup();
     filterSetup();
 	modifyDOM();
-    retrieveStates();
     observeDynamicMutation();
 }
 
