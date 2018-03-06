@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name Kita-Yen 4Chan
 // @description Add kita to your post with ctr+"k" and Yen with ctr+"\"
-// @version 2.2
+// @version 2.3
 // @match *://boards.4chan.org/*
 // @grant none
 // @namespace https://greasyfork.org/users/125336
@@ -9,6 +9,10 @@
 // @downloadURL  https://github.com/ECHibiki/4chan-UserScripts/raw/master/Kita-Yen_4chan.user.js
 
 // ==/UserScript==
+
+
+
+
 
 //injection
 colorCharacters(document.body);
@@ -21,6 +25,9 @@ new MutationObserver(function(mutations){
         mutation.addedNodes.forEach(colorCharacters);
     });
 }).observe(document.body, {childList: true, subtree: true});
+
+
+
 
 //insertion logic
 function colorCharacters(root){

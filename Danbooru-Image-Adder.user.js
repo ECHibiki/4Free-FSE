@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru-Image-Adder
 // @namespace    http://tampermonkey.net/
-// @version      1.13
+// @version      1.14
 // @description  Add images to posts
 // @author       ECHibiki /qa/
 // @match *://boards.4chan.org/*
@@ -49,10 +49,8 @@ var taggingFunction;
 
 //set listeners to build interface in 4chanX
 var loaded = false;
-document.addEventListener("4chanXInitFinished", function(e){
-	setTimeout(function(){
+document.addEventListener("IndexRefresh", function(e){
 		var len = document.links.length;
-		console.log("L:"+len);
 		for(var i = 0 ; i < len ; i++){
 			var class_name = document.links[i].parentNode.className ;
 			if(class_name == "postNum desktop" || class_name == "qr-link-container"
@@ -63,30 +61,9 @@ document.addEventListener("4chanXInitFinished", function(e){
 		//ENHANCE DUMP TABS (COVER, 482PX - 482PX)
 		//DUMP LIST MAX-HEIGHT TO 490
 
-            document.getElementById("fourchanx-css").textContent += ".qr-preview { height: 400px; width: 400px; left:8%;background-size: cover;}";
-            document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: 380px; width: 480px;}";
-	}, 1000);
+		document.getElementById("fourchanx-css").textContent += ".qr-preview { height: 400px; width: 400px; left:8%;background-size: cover;}";
+		document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: 380px; width: 480px;}";
 }, false);
-
-	setTimeout(function(){
-        if(!loaded){
-            var len = document.links.length;
-            console.log("L:"+len);
-            for(var i = 0 ; i < len ; i++){
-                var class_name = document.links[i].parentNode.className ;
-                if(class_name == "postNum desktop" || class_name == "qr-link-container"
-                   || class_name == "brackets-wrap qr-link-container-bottom")
-                    document.links[i].addEventListener("click", enhance4ChanX);
-            }
-            loaded = true;
-            //ENHANCE DUMP TABS (COVER, 482PX - 482PX)
-            //DUMP LIST MAX-HEIGHT TO 490
-
-            document.getElementById("fourchanx-css").textContent += ".qr-preview { height: 400px; width: 400px; left:8%;background-size: cover;}";
-            document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: 380px; width: 480px;}";
-        }
-	}, 3000);
-
 
 //Alter 4chanX interface
 var enhance4ChanX = function(){
@@ -276,7 +253,7 @@ var setTagInterface =  function(tag_input_node, auto_complete_row, second_row_no
                     auto_complete_row.removeChild(auto_complete_row.lastChild);
                 }
                 var qr_width = document.getElementById("qr").offsetWidth;
-				//console.log(qr_width);
+
 				var tag_table = document.createElement("TABLE");
 				tag_table.setAttribute("style", "border:1px solid black;margin-top:5px");
 				var tag_row = document.createElement("TR");

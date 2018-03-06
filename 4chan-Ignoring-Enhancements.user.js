@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      1.9
+// @version      2.0
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -188,7 +188,7 @@ function retrieveStates(){
             image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
             hidden_count++;
         }
-		
+
 		image_node = document.getElementById("thread-"+thread.substring(1));
 		if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
             image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
@@ -666,7 +666,7 @@ function modifyDOM(){
                             var setting = filterText.substr(lastChar);
                             filterText = filterText.substr(1, lastChar-2);
                             //filterText = "(^|[\\s!$%^&*()_+|~\\-=`{}\\[\\]:\";'<>?,\\.\\/])" + filterText + "([\\s!$%^&*()_+|~\\-=`{}\\[\\]:\";'<>?,\\.\\/]|$)";
-                            try{				
+                            try{
                                 var regex = new RegExp(filterText, setting);
 								var node_text = localNode.textContent;
 								if(regex.test(node_text)){
@@ -712,22 +712,11 @@ function pkxSetup(){
 }
 
 //4chanX exists
-//currently has issues due to a bug in 4chanX's API
 var page_setup = false;
-document.addEventListener('4chanXInitFinished', function(e) {
-	setTimeout(function(){// bypass 4chanX bug
+document.addEventListener('IndexRefresh', function(e) {
 		browser = detectBrowser();
 		pkxSetup();
 		console.log("Script loaded: 4chanPKX");
 		page_setup = true;
-	}, 1000);
 }, false);
 
-setTimeout(function(){
-	if(!page_setup){
-		browser = detectBrowser();
-		pkxSetup();
-		console.log("Script loaded: 4chanPKX");
-		page_setup = true;
-	}
-}, 3000);

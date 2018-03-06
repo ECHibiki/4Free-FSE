@@ -1,7 +1,7 @@
 	// ==UserScript==
 	// @name         Thread Rebuilder
 	// @namespace    http://tampermonkey.net/
-	// @version      2.1
+	// @version      2.2
 	// @description  try to take over the world!
 	// @author       ECHibiki /qa/
 	// @match https://boards.4chan.org/*/thread/*
@@ -16,70 +16,37 @@
 	var semaphore = 1;
 	var semaphore_posts = 1;
 	var timeListen;
-	
+
 	var use_offsite_archive = false;
 	var window_displayed = false;
 	var in_sequence = false;
 	var loaded = false;
-	
+
 	//1) CREATE INTERFACE
 	//set listener to build interface in 4chanX
 	//set listeners to build interface in 4chanX
-document.addEventListener("4chanXInitFinished", function(e){
-	setTimeout(function(){
+document.addEventListener("IndexRefresh", function(e){
 		var len = document.links.length;
-		console.log("L:"+len);
 		for(var i = 0 ; i < len ; i++){
 			var class_name = document.links[i].parentNode.className ;
 			if(class_name == "postNum desktop" || class_name == "qr-link-container"
 			   || class_name == "brackets-wrap qr-link-container-bottom")
 				document.links[i].addEventListener("click", enhance4ChanX);
 		}
-		
-		console.log("rea0");
+
 		createOptionPanel();
-		
+
 		use_offsite_archive =  localStorage.getItem("ArchiveType") == 0 ? true : false;
 		if(use_offsite_archive) document.getElementById("OffsiteArchive").checked = true;
 		else document.getElementById("OnsiteArchive").checked = true;
-		
+
         loaded = true;
 		//ENHANCE DUMP TABS (COVER, 482PX - 482PX)
 		//DUMP LIST MAX-HEIGHT TO 490
 
 		document.getElementById("fourchanx-css").textContent += ".qr-preview { height: 400px; width: 400px; left:8%;background-size: cover;}";
 		document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: 380px; width: 480px;}";
-	}, 1000);
 }, false);
-
-window.onload = function(){
-	if(!loaded)
-		setTimeout(function(){
-			var len = document.links.length;
-			console.log("L:"+len);
-			for(var i = 0 ; i < len ; i++){
-				var class_name = document.links[i].parentNode.className ;
-				if(class_name == "postNum desktop" || class_name == "qr-link-container"
-				   || class_name == "brackets-wrap qr-link-container-bottom")
-					document.links[i].addEventListener("click", enhance4ChanX);
-			}
-			
-			console.log("rea1");
-			createOptionPanel();
-			
-			use_offsite_archive =  localStorage.getItem("ArchiveType") == 1 ? true : false;
-			console.log(localStorage.getItem("ArchiveType") == 1);
-			if(use_offsite_archive) document.getElementById("OffsiteArchive").checked = true;
-			else document.getElementById("OnsiteArchive").checked = true;
-			
-			loaded = true;
-			//ENHANCE DUMP TABS (COVER, 482PX - 482PX)
-			//DUMP LIST MAX-HEIGHT TO 490
-
-			document.getElementById("fourchanx-css").textContent += ".qr-preview { height: 400px; width: 400px; left:8%;background-size: cover;}";
-			document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: 380px; width: 480px;}";
-		}, 1000);
-}
 
 function createOptionPanel(){
 	rebuildWindow();
@@ -154,7 +121,7 @@ function rebuildWindow(){
     container_div.appendChild(rebuild_input_local);
     container_div.appendChild(rebuild_input_local);
     container_div.appendChild(document.createElement("br"));
-	
+
 	var rebuild_label_offsite = document.createElement("label");
     var rebuild_text_offsite = document.createTextNode("Use Offsite Archives: ");
     rebuild_label_offsite.appendChild(rebuild_text_offsite);
@@ -166,7 +133,7 @@ function rebuildWindow(){
     container_div.appendChild(rebuild_input_offsite);
     container_div.appendChild(rebuild_input_offsite);
     container_div.appendChild(document.createElement("br"));
-	
+
     var set_button = document.createElement("input");
     set_button.setAttribute("type", "button");
     set_button.setAttribute("id", "setTime");
@@ -393,7 +360,7 @@ var getThread = function(threadNo){
 			if(use_offsite_archive){
 				starting_post = 0;
 				data = data.response["" + document.getElementById("threadInput").value];
-			}		
+			}
 			else{
 				starting_post = 1;
 				data = data.response;
@@ -404,7 +371,7 @@ var getThread = function(threadNo){
 			else{
 				if(use_offsite_archive) data["posts"] = Object.values(data["posts"]);
 				var len = data["posts"].length;
-				
+
 				for(var post_number = starting_post ; post_number < len ; post_number++){
 					var comment = undefined;
 					if(use_offsite_archive)
@@ -422,7 +389,7 @@ var getThread = function(threadNo){
 							filename = "" + data["posts"][post_number]["media"]["media_filename"];
 					else
 						filename = "" + data["posts"][post_number]["tim"] + data["posts"][post_number]["ext"];
-					
+
 					if(filename !== undefined && filename !== null && filename.indexOf("undefined") == -1)
 						if(use_offsite_archive)
 							if(data["posts"][post_number]["media"] !== null)
@@ -500,9 +467,9 @@ function inputImage(response, text, imageURL, imageName){
 					blob = new Blob([response.response], {type:"video/webm"});
 					ext = ".webm";
 				}
-				
+
 				var name = imageName + ext;
-				
+
 				//SEND RESULTING RESPONSE TO 4CHANX FILES === QRSetFile
 				var detail = {file:blob, name:name};
 				if (typeof cloneInto === 'function') {
