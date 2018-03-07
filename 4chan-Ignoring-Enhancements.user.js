@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      2.3
+// @version      2.4
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -586,14 +586,6 @@ function setTable(){
 
 //Functions to set the DOM listener and observers
 
-//detect page changes
-function observeDynamicMutation(node){
-    document.addEventListener('PostsInserted',function(e){
-		retrieveStates();
-        modifyDOM();
-    });
-}
-
 var hidden_count = 0;
 function modifyDOM(){
 	var start = document.getElementById("delform");
@@ -608,11 +600,12 @@ function modifyDOM(){
                 node.id = node.parentNode.parentNode.id.substring(1) + "IMG";
                 node.addEventListener("click", hideImage, {passive:false, capture:false, once:false});
 				var threadstore_len = local_store_threads.length;
-                var node_id = node.id;
+				var node_id = node.id;
 				for(var thread = 0 ; thread < threadstore_len; thread++){
 					if(node_id == local_store_threads[thread]){
 						node.src = node.src + ".HIDDEN" +  "?" + Date.now();
 						hidden_count++;
+						break;
 					}
 				}
             }
@@ -655,9 +648,21 @@ function modifyDOM(){
         console.log("HIDDEN THREADS: " + hidden_count);
 }
 
-if (window.top != window.self)  //-- Don't run on frames or iframes
-    return;
-
+function hoverUIObserver(mutations){
+	mutations.forEach(function(mutation){
+		mutation.addedNodes.forEach(function(image_node){
+			var unprocessed_id = image_node.getAttribute("data-full-i-d");
+			var image_node_id = unprocessed_id.substring(unprocessed_id.indexOf(".") + 1) + "IMG";
+			var threadstore_len = local_store_threads.length;
+			for(var thread = 0 ; thread < threadstore_len; thread++){
+				if(image_node_id == local_store_threads[thread]){
+					image_node.src = "";
+					break;
+				}
+			}
+		});
+	});
+}
 //initial onload setup
 function hideSetup(){
 	retrieveStates();
@@ -675,7 +680,12 @@ function pkxSetup(){
     hideSetup();
     filterSetup();
 	modifyDOM();
-    observeDynamicMutation();
+    document.addEventListener('PostsInserted',function(e){
+		retrieveStates();
+        modifyDOM();
+    });
+	var hoverUI_observer = new MutationObserver(hoverUIObserver);
+	hoverUI_observer.observe(document.getElementById("hoverUI"), {childList: true });
 }
 
 //4chanX exists
