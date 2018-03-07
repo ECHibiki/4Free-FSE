@@ -8,7 +8,7 @@
 // @match https://boards.4chan.org/*
 // @include https://boards.4chan.org/*
 // @include http://boards.4chan.org/*
-// @run-at document-end
+// @run-at document-start
 // @updateURL    https://github.com/CHibiki/4chan-UserScripts/raw/master/4chan-Ignoring-Enhancements.user.js
 // @downloadURL  https://github.com/ECHibiki/4chan-UserScripts/raw/master/4chan-Ignoring-Enhancements.user.js
 // ==/UserScript==
@@ -684,7 +684,8 @@ function pkxSetup(){
 //4chanX exists
 //currently has issues due to a bug in 4chanX's API
 var page_setup = false;
-document.addEventListener('IndexRefresh', function(e) {
+document.addEventListener('4chanXInitFinished', function(e) {
+    console.log(9001);
 	setTimeout(function(){// bypass 4chanX bug
 		browser = detectBrowser();
 		pkxSetup();
@@ -692,12 +693,14 @@ document.addEventListener('IndexRefresh', function(e) {
 		page_setup = true;
 	}, 1);
 }, false);
-
-setTimeout(function(){
-	if(!page_setup){
-		browser = detectBrowser();
-		pkxSetup();
-		console.log("Script loaded: 4chanPKX");
-		page_setup = true;
-	}
-}, 2000);
+document.addEventListener('4chanXInitFinished', function(){console.log("--90001");});
+console.log(1);
+// setTimeout(function(){
+// 	if(!page_setup){
+// 		browser = detectBrowser();
+// 		pkxSetup();
+// 		console.log("Script loaded: 4chanPKX");
+// 		page_setup = true;
+// 	}
+// }, 2000);
+document.addEventListener('IndexRefresh', function(){console.log("--30001");});
