@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      2.4
+// @version      2.5
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -647,7 +647,6 @@ function modifyDOM(){
     if(!page_setup)
         console.log("HIDDEN THREADS: " + hidden_count);
 }
-
 function hoverUIObserver(mutations){
 	mutations.forEach(function(mutation){
 		mutation.addedNodes.forEach(function(image_node){
@@ -656,7 +655,7 @@ function hoverUIObserver(mutations){
 			var threadstore_len = local_store_threads.length;
 			for(var thread = 0 ; thread < threadstore_len; thread++){
 				if(image_node_id == local_store_threads[thread]){
-					image_node.src = "";
+					image_node.removeAttribute("src");
 					break;
 				}
 			}
@@ -684,8 +683,10 @@ function pkxSetup(){
 		retrieveStates();
         modifyDOM();
     });
-	var hoverUI_observer = new MutationObserver(hoverUIObserver);
-	hoverUI_observer.observe(document.getElementById("hoverUI"), {childList: true });
+	new MutationObserver(function(mutations){
+			retrieveStates();
+			hoverUIObserver(mutations);
+		}).observe(document.getElementById("hoverUI"), {childList: true });
 }
 
 //4chanX exists
