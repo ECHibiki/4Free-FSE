@@ -28,6 +28,7 @@ var expire_time;
 
 var number_of_filters = 0;
 var initial_filters = [];
+var filtered_threads = [];
 var kill = [];
 var finished = false;
 var observer;
@@ -611,37 +612,47 @@ function modifyDOM(){
             }
         }
         else if(cname == "postMessage"){
-            while((localNode = itterator.nextNode())){
-                var className = localNode.className;
-                if(className == undefined || className == "quotelink"){
-                    for(var i = 0 ; i < number_of_filters; i++){
-                        if(kill[i] == true) continue;
-                        filter = document.getElementById("Pattern"+i);
-                        replacement = document.getElementById("Replacement"+i);
-                        active = document.getElementById("Active"+i);
-                        if(active.checked){
-                            var lastChar = filter.value.length - 1;
-                            var filterText = filter.value;
-                            if(filterText === "") break;
-                            var setting = filterText.substr(lastChar);
-                            filterText = filterText.substr(1, lastChar-2);
-                            try{
-                                var regex = new RegExp(filterText, setting);
-								var node_text = localNode.textContent;
-								if(regex.test(node_text)){
-									localNode.textContent = node_text.replace(regex, replacement.value);
-									return;
+			var blockquote_id = node.id;
+			var already_filtered = false;
+			filtered_threads.forEach(function(thread_id){
+				if(thread_id == blockquote_id) {
+					already_filtered = true;
+					return;
+				}
+			});
+			if(!already_filtered){
+				while((localNode = itterator.nextNode())){
+					var className = localNode.className;
+					if(className == undefined || className == "quotelink"){
+						for(var i = 0 ; i < number_of_filters; i++){
+							if(kill[i] == true) continue;
+							filter = document.getElementById("Pattern"+i);
+							replacement = document.getElementById("Replacement"+i);
+							active = document.getElementById("Active"+i);
+							if(active.checked){
+								var lastChar = filter.value.length - 1;
+								var filterText = filter.value;
+								if(filterText === "") break;
+								var setting = filterText.substr(lastChar);
+								filterText = filterText.substr(1, lastChar-2);
+								try{
+									var regex = new RegExp(filterText, setting);
+									var node_text = localNode.textContent;
+									if(regex.test(node_text)){
+										localNode.textContent = node_text.replace(regex, replacement.value);
+										filtered_threads.push(blockquote_id);
+									}
 								}
-                            }
-                            catch(e){
-                                alert(i + "'s regex was invalid");
-                                kill[i] = true;
-                            }
-                        }
-                    }
-                }
-                else break;
-            }
+								catch(e){
+									alert(i + "'s regex was invalid");
+									kill[i] = true;
+								}
+							}
+						}
+					}
+					else break;
+				}
+			}
         }
     }
     if(!page_setup)
