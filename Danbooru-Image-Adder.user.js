@@ -67,7 +67,7 @@ document.addEventListener("QRDialogCreation", function(e){
 //Alter 4chanX interface
 var enhance4ChanX = function(){
     var qr_window = document.getElementById("qr");
-	
+
     //check if elements already exist
 	/*Probably Depreciated*/
     if(document.getElementById("qrImages") !== null){
@@ -104,13 +104,13 @@ var enhance4ChanX = function(){
     qr_image_adder_table.setAttribute("id", "qrImages");
     qr_image_adder_table.setAttribute("style", "text-align:center");
     qr_window.appendChild(qr_image_adder_table);
-	
+
 	/*Depreciated*/
     //qr_window.appendChild(document.createElement("BR"));
 
     // var instructions_row = document.createElement("TR");
 
-	
+
     // var top_row_nodes = [document.createElement("BR"),
                        // document.createTextNode(""),
                        // document.createElement("BR"),
@@ -124,11 +124,11 @@ var enhance4ChanX = function(){
         // function(top_row_node){
             // instructions_row.appendChild(top_row_node);
         // });
-		
-    // qr_image_adder_table.appendChild(instructions_row);
-	
 
-	
+    // qr_image_adder_table.appendChild(instructions_row);
+
+
+
 
     var options_row = document.createElement("TR");
     options_row.setAttribute("ID", "or");
@@ -153,7 +153,7 @@ var enhance4ChanX = function(){
     options_row.appendChild(checkbox_questionable);
     options_row.appendChild(checkbox_explicit_text);
     options_row.appendChild(checkbox_explicit);
-	
+
 	option_text_size = "18";
 
     var image_tagging_row = document.createElement("TR");
@@ -163,17 +163,17 @@ var enhance4ChanX = function(){
 	var help_icon = document.createElement("IMG");
 	help_icon.setAttribute("style", "height:" + option_text_size * 1.25 + "px;margin:-4px 10px");
 	help_icon.src = help_icon_source;
-	
+
 	help_icon_container.appendChild(help_icon);
 	image_tagging_row.appendChild(help_icon_container);
-	
+
 	var tooltip_div = document.createElement("DIV");
 	tooltip_div.innerHTML = "Insert Tags to search from danbooru in the text box to the side.<br/>The URL for the image will be bellow. Some browsers such as chrome allow you to select this text<br/>Do Not Use \"order:\" tags<br/>Do Not Use \"rating:\" tags<br/>For more speed uncheck all boxes!";
 	tooltip_div.setAttribute("style", "z-index:9;padding:5px;border:1px solid black;background-color:white;word-wrap:break-word;display:none;position:absolute;");
 	help_icon_container.addEventListener("click", function(ev){
 		if(tool_top_visible)
 			tooltip_div.setAttribute("style", "z-index:9;padding:5px;border:1px solid black;background-color:white;word-wrap:break-word;display:none;position:absolute;");
-				
+
 		else
 			tooltip_div.setAttribute("style", "z-index:9;padding:5px;border:1px solid black;background-color:white;word-wrap:break-word;display:block;position:absolute;"
 				+ "left:" +  (ev.clientX - qr_window.getBoundingClientRect().x) +
@@ -184,7 +184,7 @@ var enhance4ChanX = function(){
 		console.log(ev.clientX + " " + ev.clientY);
 	});
 	qr_window.appendChild(tooltip_div);
-	
+
     var second_row_nodes = [
         document.createTextNode("Tags: "),
         document.createElement("INPUT"),
