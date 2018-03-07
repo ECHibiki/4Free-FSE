@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      2.2
+// @version      2.3
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -117,7 +117,6 @@ function hideImage(event){
         event.preventDefault();
         event.stopPropagation();
         if (storageAvailable('localStorage')) {
-            this.id =  this.id.substr(1);
             localStorage.setItem(this.id, Date.now());
         }
         else {
@@ -131,7 +130,6 @@ function hideImage(event){
         event.preventDefault();
         event.stopPropagation();
         if (storageAvailable('localStorage')) {
-            this.id = this.id.substr(1);
             localStorage.removeItem(this.id);
         }
         else {
@@ -591,6 +589,7 @@ function setTable(){
 //detect page changes
 function observeDynamicMutation(node){
     document.addEventListener('PostsInserted',function(e){
+		retrieveStates();
         modifyDOM();
     });
 }
@@ -605,14 +604,13 @@ function modifyDOM(){
         var cname = node.className;
         var tag = node.tagName;
         if(tag  === "IMG" || tag  === "img"){
-            if(!/(f|p)\d+IMG/.test(node.id) && (node.getAttribute("data-md5") !== null || node.className.indexOf("thumb") != -1)){
-                node.id = node.parentNode.parentNode.id + "IMG";
+            if(!/\d+IMG/.test(node.id) && (node.getAttribute("data-md5") !== null || node.className.indexOf("thumb") != -1)){
+                node.id = node.parentNode.parentNode.id.substring(1) + "IMG";
                 node.addEventListener("click", hideImage, {passive:false, capture:false, once:false});
-
 				var threadstore_len = local_store_threads.length;
-                var reduced_node_id = node.id.substring(1);
+                var node_id = node.id;
 				for(var thread = 0 ; thread < threadstore_len; thread++){
-					if(reduced_node_id == local_store_threads[thread]){
+					if(node_id == local_store_threads[thread]){
 						node.src = node.src + ".HIDDEN" +  "?" + Date.now();
 						hidden_count++;
 					}
@@ -657,7 +655,6 @@ function modifyDOM(){
         console.log("HIDDEN THREADS: " + hidden_count);
 }
 
-
 if (window.top != window.self)  //-- Don't run on frames or iframes
     return;
 
@@ -682,25 +679,11 @@ function pkxSetup(){
 }
 
 //4chanX exists
-//currently has issues due to a bug in 4chanX's API
 var page_setup = false;
 document.addEventListener('4chanXInitFinished', function(e) {
-    console.log(9001);
-	setTimeout(function(){// bypass 4chanX bug
 		browser = detectBrowser();
 		pkxSetup();
 		console.log("Script loaded: 4chanPKX");
 		page_setup = true;
-	}, 1);
+
 }, false);
-document.addEventListener('4chanXInitFinished', function(){console.log("--90001");});
-console.log(1);
-// setTimeout(function(){
-// 	if(!page_setup){
-// 		browser = detectBrowser();
-// 		pkxSetup();
-// 		console.log("Script loaded: 4chanPKX");
-// 		page_setup = true;
-// 	}
-// }, 2000);
-document.addEventListener('IndexRefresh', function(){console.log("--30001");});
