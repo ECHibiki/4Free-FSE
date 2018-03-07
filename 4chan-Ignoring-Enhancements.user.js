@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      2.1
+// @version      2.2
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -169,39 +169,6 @@ function retrieveStates(){
     }
     local_store_threads = getPropertyByRegex(oJson,"[0-9]+IMG");
 	expire_time =  localStorage.getItem("ExpirationTime");
-
-	/*The commented out code is to be removed on assurance that the new, itterative hiding method working with the treewalker works better.*/
-    // local_store_threads.forEach(function callback(thread){
-        // if(Date.now() - oJson[thread] > expire_time)
-            // localStorage.removeItem(thread);
-
-		// //set hidden threads
-		// var image_node;
-        // image_node = document.getElementById(""+thread);
-		// if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
-            // image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
-            // hidden_count++;
-        // }
-
-		// image_node = document.getElementById("p"+thread.substring(1));
-		// if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
-            // image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
-            // hidden_count++;
-        // }
-
-		// image_node = document.getElementById("thread-"+thread.substring(1));
-		// if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
-            // image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
-            // hidden_count++;
-        // }
-		// image_node = document.getElementById("thumb-"+thread.substring(1));
-		// if(image_node !== null && image_node.src.indexOf(".HIDDEN") == -1){
-            // image_node.src = image_node.src + ".HIDDEN" +  "?" + Date.now();
-            // hidden_count++;
-        // }
-    //});
-	// half the ammount because it hides both index and catalog
-    // console.log("HIDDEN THREADS: " + hidden_count / 2);
 }
 
 
@@ -624,22 +591,8 @@ function setTable(){
 //detect page changes
 function observeDynamicMutation(node){
     document.addEventListener('PostsInserted',function(e){
-        console.log(e);
         modifyDOM();
     });
-
-    /*Replaced by 4chanX API calls*/
-	// if(node === undefined)
-	// node = document;
-	// //on mutation event call functions
-	// observer = new MutationObserver(function callBack(mutations){
-	// mutations.forEach(function(mutation){
-	// console.log(mutation);
-	// modifyDOM();
-	// });
-	// });
-	// var config = {subtree: true, childList:true};//Subtree checks children of node, while subtree repeats actions on the child and sets observers on them
-	// observer.observe(node, config);
 }
 
 var hidden_count = 0;
@@ -681,7 +634,6 @@ function modifyDOM(){
                             if(filterText === "") break;
                             var setting = filterText.substr(lastChar);
                             filterText = filterText.substr(1, lastChar-2);
-                            //filterText = "(^|[\\s!$%^&*()_+|~\\-=`{}\\[\\]:\";'<>?,\\.\\/])" + filterText + "([\\s!$%^&*()_+|~\\-=`{}\\[\\]:\";'<>?,\\.\\/]|$)";
                             try{
                                 var regex = new RegExp(filterText, setting);
 								var node_text = localNode.textContent;
