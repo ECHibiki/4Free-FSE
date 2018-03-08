@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      2.5
+// @version      2.6
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -662,6 +662,7 @@ function hoverUIObserver(mutations){
 	mutations.forEach(function(mutation){
 		mutation.addedNodes.forEach(function(image_node){
 			var unprocessed_id = image_node.getAttribute("data-full-i-d");
+			if (unprocessed_id === null) return;
 			var image_node_id = unprocessed_id.substring(unprocessed_id.indexOf(".") + 1) + "IMG";
 			var threadstore_len = local_store_threads.length;
 			for(var thread = 0 ; thread < threadstore_len; thread++){

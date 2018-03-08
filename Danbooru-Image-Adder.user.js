@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru-Image-Adder
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      2.1
 // @description  Add images to posts
 // @author       ECHibiki /qa/
 // @match *://boards.4chan.org/*
@@ -54,7 +54,6 @@ var help_icon_source = " data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/4QA6
 //set listeners to build interface in 4chanX
 var loaded = false;
 document.addEventListener("QRDialogCreation", function(e){
-	console.log(e);
 		//create custom interface
 		enhance4ChanX();
 		//ENHANCE DUMP TABS (COVER, 482PX - 482PX)
@@ -179,9 +178,6 @@ var enhance4ChanX = function(){
 				+ "left:" +  (ev.clientX - qr_window.getBoundingClientRect().x) +
 				"px;top:" +  (ev.clientY - qr_window.getBoundingClientRect().y ) + "px;");
 		tool_top_visible = !tool_top_visible;
-		console.log( qr_window.getBoundingClientRect() );
-		console.log( help_icon_container.getBoundingClientRect() );
-		console.log(ev.clientX + " " + ev.clientY);
 	});
 	qr_window.appendChild(tooltip_div);
 
