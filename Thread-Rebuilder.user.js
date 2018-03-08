@@ -1,7 +1,7 @@
 	// ==UserScript==
 	// @name         Thread Rebuilder
 	// @namespace    http://tampermonkey.net/
-	// @version      2.2
+	// @version      2.3
 	// @description  try to take over the world!
 	// @author       ECHibiki /qa/
 	// @match https://boards.4chan.org/*/thread/*
@@ -20,32 +20,18 @@
 	var use_offsite_archive = false;
 	var window_displayed = false;
 	var in_sequence = false;
-	var loaded = false;
 
 	//1) CREATE INTERFACE
 	//set listener to build interface in 4chanX
 	//set listeners to build interface in 4chanX
-document.addEventListener("IndexRefresh", function(e){
-		var len = document.links.length;
-		for(var i = 0 ; i < len ; i++){
-			var class_name = document.links[i].parentNode.className ;
-			if(class_name == "postNum desktop" || class_name == "qr-link-container"
-			   || class_name == "brackets-wrap qr-link-container-bottom")
-				document.links[i].addEventListener("click", enhance4ChanX);
-		}
+document.addEventListener("4chanXInitFinished", function(e){
+	document.addEventListener("QRDialogCreation", enhance4ChanX);
 
-		createOptionPanel();
+	createOptionPanel();
 
-		use_offsite_archive =  localStorage.getItem("ArchiveType") == 0 ? true : false;
-		if(use_offsite_archive) document.getElementById("OffsiteArchive").checked = true;
-		else document.getElementById("OnsiteArchive").checked = true;
-
-        loaded = true;
-		//ENHANCE DUMP TABS (COVER, 482PX - 482PX)
-		//DUMP LIST MAX-HEIGHT TO 490
-
-		document.getElementById("fourchanx-css").textContent += ".qr-preview { height: 400px; width: 400px; left:8%;background-size: cover;}";
-		document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: 380px; width: 480px;}";
+	use_offsite_archive =  localStorage.getItem("ArchiveType") == 0 ? true : false;
+	if(use_offsite_archive) document.getElementById("OffsiteArchive").checked = true;
+	else document.getElementById("OnsiteArchive").checked = true;
 }, false);
 
 function createOptionPanel(){
