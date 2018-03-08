@@ -1,7 +1,7 @@
 	// ==UserScript==
 	// @name         Thread Rebuilder
 	// @namespace    http://tampermonkey.net/
-	// @version      2.3
+	// @version      2.4
 	// @description  try to take over the world!
 	// @author       ECHibiki /qa/
 	// @match https://boards.4chan.org/*/thread/*
