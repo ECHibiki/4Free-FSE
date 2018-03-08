@@ -21,7 +21,6 @@
 	var use_offsite_archive = false;
 	var window_displayed = false;
 	var in_sequence = false;
-	var loaded = false;
 
 	//1) CREATE INTERFACE
 	//set listener to build interface in 4chanX
