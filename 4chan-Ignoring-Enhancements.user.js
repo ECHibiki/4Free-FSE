@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      2.6
+// @version      2.7
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -24,7 +24,10 @@ var browser;
 var finished = false;
 var window_displayed = false;
 var default_expire_time = 172800000;
+
 var expire_time;
+var md5_filters;
+var md5_filters_arr = [];
 
 var number_of_filters = 0;
 var initial_filters = [];
@@ -167,7 +170,19 @@ function retrieveStates(){
         storage_position++;
     }
     local_store_threads = getPropertyByRegex(oJson,"[0-9]+IMG");
-	expire_time =  localStorage.getItem("ExpirationTime");
+	expire_time =  localStorage.getItem("Expiration_Time");
+	md5_filters = localStorage.getItem("MD5_List_FSE");
+	if(md5_filters !== null)
+		md5_filters_arr = md5_filters.split("\n");
+	md5_filters_arr.forEach(function(md5, index){
+				console.log(index);
+		console.log(md5);
+		md5 = md5.trim();
+		md5_filters_arr[index] = md5.substring(1, md5.length - 1);
+		console.log(md5_filters_arr[index]);
+
+	});
+	console.log(md5_filters_arr);
 }
 
 
@@ -207,25 +222,49 @@ function hideWindow(){
     expiration_label.appendChild(expiration_text);
     container_div.appendChild(expiration_label);
     var expiration_input = document.createElement("input");
-    expiration_input.setAttribute("id", "expirationTime");
+    expiration_input.setAttribute("id", "Expiration_Time");
+	
+	expiration_input.value =  expire_time / 3600000;
+		
     container_div.appendChild(expiration_input);
     container_div.appendChild(expiration_input);
-    container_div.appendChild(document.createElement("br"));
+    container_div.appendChild(document.createElement("hr"));
+	
+	var md5_label = document.createElement("label");
+	var md5_text = document.createTextNode("MD5 Filters:");
+	var md5_textarea = document.createElement("TextArea");
+	md5_textarea.setAttribute("style", "width:98%;height:217px");
+	
+	if(md5_filters !== null)
+		md5_textarea.value = md5_filters;
+	
+	md5_textarea.setAttribute("placeholder", "Enter MD5 like on 4chanX... \n/abc123/\n/def890/");
+	md5_textarea.setAttribute("ID", "MD5_List_FSE");
+	container_div.appendChild(md5_label);
+	md5_label.appendChild(md5_text);
+	container_div.appendChild(document.createElement("br"));
+	container_div.appendChild(md5_textarea);	
+	
+	container_div.appendChild(document.createElement("hr"));
+	
     var set_button = document.createElement("input");
     set_button.setAttribute("type", "button");
     set_button.setAttribute("id", "setTime");
-    set_button.setAttribute("value", "Set Time");
+    set_button.setAttribute("value", "Set");
     set_button.addEventListener("click", function(){
-        if (storageAvailable('localStorage')) {
-            var time = document.getElementById("expirationTime");
+        if (storageAvailable('localStorage')) {		
+            var time = document.getElementById("Expiration_Time");
             var millisecond_time = time.value * 3600000;
             if (millisecond_time == 0 || millisecond_time === null || millisecond_time === undefined) millisecond_time = default_expire_time;
             expire_time = millisecond_time;
-            localStorage.setItem("ExpirationTime", millisecond_time);
-            hideToggle();
+            localStorage.setItem("Expiration_Time", millisecond_time);
+			
+			md5_filters = document.getElementById("MD5_List_FSE").value;
+			localStorage.setItem("MD5_List_FSE", md5_filters);
+            
+			hideToggle();
         }
     });
-    expiration_input.setAttribute("value", localStorage.getItem("ExpirationTime") / 3600000);
     container_div.appendChild(set_button);
 
     document.body.appendChild(window_div);
@@ -258,7 +297,6 @@ function hideButton(){
         document.body.appendChild(hide_button);
         hide_button.addEventListener("click", hideToggle);
     }
-    expire_time =  localStorage.getItem("ExpirationTime");
 }
 
 
@@ -609,6 +647,15 @@ function modifyDOM(){
 						break;
 					}
 				}
+				var node_md5 = node.getAttribute("data-md5");
+				var md5_filters_arr_len = md5_filters_arr.length;
+				for(var md5 = 0 ; md5 < md5_filters_arr_len; md5++){
+					if(node_md5 == md5_filters_arr[md5]){
+						node.src = node.src + ".HIDDEN" +  "?" + Date.now();
+						hidden_count++;
+						break;
+					}
+				}
             }
         }
         else if(cname == "postMessage"){
@@ -688,6 +735,8 @@ function filterSetup(){
 }
 
 function pkxSetup(){
+	expire_time =  localStorage.getItem("Expiration_Time");
+	md5_filters = localStorage.getItem("MD5_List_FSE");
     hideSetup();
     filterSetup();
 	modifyDOM();
