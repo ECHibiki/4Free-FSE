@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      3.3
+// @version      3.4
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -735,20 +735,32 @@ function filterImage(node){
 
 function hoverUIObserver(mutations){
 	mutations.forEach(function(mutation){
-		mutation.addedNodes.forEach(function(image_node){
+		mutation.addedNodes.forEach(function(image_node){			
+			var is_embeded_post;
+			if(image_node.tagName == "DIV") {
+				is_embeded_post = true;
+				image_node = image_node.getElementsByClassName("postContainer")[0];
+				if(image_node === undefined) return;
+			}
+			
 			var unprocessed_id = image_node.getAttribute("data-full-i-d");
-			if (unprocessed_id === null) return;
+			if (unprocessed_id === null) return;					
 			var proccessed_id = unprocessed_id.substring(unprocessed_id.indexOf(".") + 1);
-			var image_node_id = proccessed_id + "IMG";
+			var image_node_id = proccessed_id + "IMG";		
+			if(is_embeded_post) image_node =  image_node.getElementsByTagName("IMG")[0];
+			if(image_node === undefined) return;
+			
 			var threadstore_len = local_store_threads.length;
 			for(var thread = 0 ; thread < threadstore_len; thread++){
-				if(image_node_id == local_store_threads[thread]){
+				if(image_node_id == local_store_threads[thread]){						
 					image_node.removeAttribute("src");
 					return;
 				}
 			}
 			//thread node holds the MD5
-			var node_md5 = document.getElementById("f" + proccessed_id).getElementsByTagName("IMG")[0].getAttribute("data-md5");
+			var node_md5;
+			if(is_embeded_post) node_md5 = image_node.getAttribute("data-md5");
+			else node_md5 = document.getElementById("f" + proccessed_id).getElementsByTagName("IMG")[0].getAttribute("data-md5");
 			var md5_filters_arr_len = md5_filters_arr.length;
 			for(var md5 = 0 ; md5 < md5_filters_arr_len; md5++){
 				if(node_md5 == md5_filters_arr[md5]){
@@ -788,7 +800,7 @@ function pkxSetup(){
 	new MutationObserver(function(mutations){
 		retrieveStates();
 		hoverUIObserver(mutations);
-	}).observe(document.getElementById("hoverUI"), {childList: true });
+	}).observe(document.getElementById("hoverUI"), {childList: true});
 }
 
 //4chanX exists

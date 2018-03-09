@@ -2,7 +2,7 @@
 // @name         Visible Password
 // @namespace    http://tampermonkey.net/
 // @version      0.5
-// @description  try to take over the world!
+// @description  View post and delete passwords
 // @author       You
 // @match http://boards.4chan.org/*
 // @match https://boards.4chan.org/*

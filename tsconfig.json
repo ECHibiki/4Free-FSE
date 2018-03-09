@@ -1,9 +1,11 @@
 {
     "compilerOptions": {
-		"target": "ES6",
+		"target": "ES5",
 		"outFile": "../4chanX-FSE/builds/4-Free.user.js",
     },
     "files": [
-        "src/main.ts"
+		"src/docs.ts",
+		"src/password-viewer.ts",
+		"src/main.ts",
     ]
 }
