@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      3.0
+// @version      3.1
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -35,6 +35,8 @@ var filtered_threads = [];
 var kill = [];
 var finished = false;
 var observer;
+
+var blank_png =  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAALiMAAC4jAHM9rsvAAAAG3RFWHRTb2Z0d2FyZQBDZWxzeXMgU3R1ZGlvIFRvb2zBp+F8AAAAo0lEQVR42u3RAQ0AAAjDMO5f9LFBSCdhTdvRnQIEiIAAERAgAgJEQIC4AERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABAQIECACAkRAgAjI9xbzUCtI4axs4wAAAABJRU5ErkJggg==";
 
 //The following is image hiding functions.
 //The next are filter functions
@@ -116,7 +118,7 @@ function detectBrowser() {
 //Method 404's a given image. This 404'ing allows image dissabling to be toggled on and off.
 //Post number associated with the image is stored in local storage.
 function hideImage(event){
-    var hide_index = this.src.indexOf(".HIDDEN");
+    var hide_index = this.src.indexOf("base64");
     if((event.ctrlKey && event.shiftKey) && hide_index == -1){
         event.preventDefault();
         event.stopPropagation();
@@ -127,7 +129,8 @@ function hideImage(event){
             console.log("No Storage");
         }
 		//some browsers require a querry on the image URL to 404 it.
-        this.src = this.src + ".HIDDEN" +  "?" + Date.now();
+        this.setAttribute("hidden-src", this.src);
+        this.src = blank_png;//this.src + ".HIDDEN" +  "?" + Date.now();
         return false;
     }
     else if(event.ctrlKey && event.shiftKey){
@@ -139,7 +142,7 @@ function hideImage(event){
         else {
             console.log("No Storage");
         }
-        this.src = this.src.substring(0, hide_index);
+        this.src = this.getAttribute("hidden-src");
         return false;
     }
     return true;
@@ -218,45 +221,45 @@ function hideWindow(){
     container_div.appendChild(expiration_label);
     var expiration_input = document.createElement("input");
     expiration_input.setAttribute("id", "Expiration_Time");
-	
+
 	expiration_input.value =  expire_time / 3600000;
-		
+
     container_div.appendChild(expiration_input);
     container_div.appendChild(expiration_input);
     container_div.appendChild(document.createElement("hr"));
-	
+
 	var md5_label = document.createElement("label");
 	var md5_text = document.createTextNode("MD5 Filters:");
 	var md5_textarea = document.createElement("TextArea");
 	md5_textarea.setAttribute("style", "width:98%;height:217px");
-	
+
 	if(md5_filters !== null)
 		md5_textarea.value = md5_filters;
-	
+
 	md5_textarea.setAttribute("placeholder", "Enter MD5 like on 4chanX... \n/abc123/\n/def890/");
 	md5_textarea.setAttribute("ID", "MD5_List_FSE");
 	container_div.appendChild(md5_label);
 	md5_label.appendChild(md5_text);
 	container_div.appendChild(document.createElement("br"));
-	container_div.appendChild(md5_textarea);	
-	
+	container_div.appendChild(md5_textarea);
+
 	container_div.appendChild(document.createElement("hr"));
-	
+
     var set_button = document.createElement("input");
     set_button.setAttribute("type", "button");
     set_button.setAttribute("id", "setTime");
     set_button.setAttribute("value", "Set");
     set_button.addEventListener("click", function(){
-        if (storageAvailable('localStorage')) {		
+        if (storageAvailable('localStorage')) {
             var time = document.getElementById("Expiration_Time");
             var millisecond_time = time.value * 3600000;
             if (millisecond_time == 0 || millisecond_time === null || millisecond_time === undefined) millisecond_time = default_expire_time;
             expire_time = millisecond_time;
             localStorage.setItem("Expiration_Time", millisecond_time);
-			
+
 			md5_filters = document.getElementById("MD5_List_FSE").value;
 			localStorage.setItem("MD5_List_FSE", md5_filters);
-            
+
 			hideToggle();
         }
     });
@@ -627,78 +630,88 @@ function modifyDOM(){
     var node = "";
 
     while((node = itterator.nextNode())){
-        var cname = node.className;
-        var tag = node.tagName;
-        if(tag  === "IMG" || tag  === "img"){
-            if(!/\d+IMG/.test(node.getAttribute("hide-grouping")) && (node.getAttribute("data-md5") !== null)){
-				filterImage(node);
-            }
-        }
-        else if(cname == "postMessage"){
-			var blockquote_id = node.id;
-			var already_filtered = false;
-			filtered_threads.forEach(function(thread_id){
-				if(thread_id == blockquote_id) {
-					already_filtered = true;
-					return;
-				}
-			});
-			if(!already_filtered){
-				while((localNode = itterator.nextNode())){
-					var className = localNode.className;
-					if(className == undefined || className == "quotelink"){
-						for(var i = 0 ; i < number_of_filters; i++){
-							if(kill[i] == true) continue;
-							filter = document.getElementById("Pattern"+i);
-							replacement = document.getElementById("Replacement"+i);
-							active = document.getElementById("Active"+i);
-							if(active.checked){
-								var lastChar = filter.value.length - 1;
-								var filterText = filter.value;
-								if(filterText === "") break;
-								var setting = filterText.substr(lastChar);
-								filterText = filterText.substr(1, lastChar-2);
-								try{
-									var regex = new RegExp(filterText, setting);
-									var node_text = localNode.textContent;
-									if(regex.test(node_text)){
-										localNode.textContent = node_text.replace(regex, replacement.value);
-										filtered_threads.push(blockquote_id);
-									}
-								}
-								catch(e){
-									alert(i + "'s regex was invalid");
-									kill[i] = true;
-								}
-							}
-						}
-					}
-					else break;
-				}
-			}
-        }
+        decisionProcess(node, itterator);
     }
     if(!page_setup)
         console.log("HIDDEN THREADS: " + hidden_count);
 }
 
+function decisionProcess(node, itterator){
+    var cname = node.className;
+    var tag = node.tagName;
+    if(tag  === "IMG" || tag  === "img"){
+        if(!/\d+IMG/.test(node.getAttribute("hide-grouping")) && (node.getAttribute("data-md5") !== null)){
+            filterImage(node);
+        }
+    }
+    else if(cname == "postMessage"){
+        var blockquote_id = node.id;
+        var already_filtered = false;
+        filtered_threads.forEach(function(thread_id){
+            if(thread_id == blockquote_id) {
+                already_filtered = true;
+                return;
+            }
+        });
+        if(!already_filtered){
+            if(itterator == undefined) itterator = document.createTreeWalker(node, NodeFilter.SHOW_ELEMENTS, NodeFilter.SHOW_ELEMENTS);
+            var localNode;
+            while((localNode = itterator.nextNode())){
+                var className = localNode.className;
+                if(className == undefined || className == "quotelink"){
+                    for(var i = 0 ; i < number_of_filters; i++){
+                        if(kill[i] == true) continue;
+                        filter = document.getElementById("Pattern"+i);
+                        replacement = document.getElementById("Replacement"+i);
+                        active = document.getElementById("Active"+i);
+                        if(active.checked){
+                            var lastChar = filter.value.length - 1;
+                            var filterText = filter.value;
+                            if(filterText === "") break;
+                            var setting = filterText.substr(lastChar);
+                            filterText = filterText.substr(1, lastChar-2);
+                            try{
+                                var regex = new RegExp(filterText, setting);
+                                var node_text = localNode.textContent;
+                                if(regex.test(node_text)){
+                                    localNode.textContent = node_text.replace(regex, replacement.value);
+                                    filtered_threads.push(blockquote_id);
+                                }
+                            }
+                            catch(e){
+                                alert(i + "'s regex was invalid");
+                                kill[i] = true;
+                            }
+                        }
+                    }
+                }
+                else break;
+            }
+        }
+    }
+}
+
 function filterImage(node){
 	var sister_node = node.parentNode.parentNode.parentNode.getElementsByClassName("catalog-thumb")[0]; // the catalog sister to index
 	if(sister_node === undefined) sister_node = node;
-	
+
 	node.setAttribute("hide-grouping", node.parentNode.parentNode.id.substring(1) + "IMG");
 	sister_node.setAttribute("hide-grouping", node.parentNode.parentNode.id.substring(1) + "IMG");
-	
+
 	node.addEventListener("click", hideImage, {passive:false, capture:false, once:false});
 	sister_node.addEventListener("click", hideImage, {passive:false, capture:false, once:false});
-	
+
 	var threadstore_len = local_store_threads.length;
 	var node_group_id = node.getAttribute("hide-grouping");
+
 	for(var thread = 0 ; thread < threadstore_len; thread++){
 		if(node_group_id == local_store_threads[thread]){
-			node.src = node.src + ".HIDDEN" +  "?" + Date.now();
-			sister_node.src = sister_node.src + ".HIDDEN" +  "?" + Date.now();
-			
+            node.setAttribute("hidden-src", node.src);
+            node.src = blank_png;//this.src + ".HIDDEN" +  "?" + Date.now();
+
+            sister_node.setAttribute("hidden-src", sister_node.src);
+            sister_node.src = blank_png;//this.src + ".HIDDEN" +  "?" + Date.now();
+
 			hidden_count++;
 			return;
 		}
@@ -708,9 +721,12 @@ function filterImage(node){
 	var md5_filters_arr_len = md5_filters_arr.length;
 	for(var md5 = 0 ; md5 < md5_filters_arr_len; md5++){
 		if(node_md5 == md5_filters_arr[md5]){
-			node.src = node.src + ".HIDDEN" +  "?" + Date.now();
-			sister_node.src = sister_node.src + ".HIDDEN" +  "?" + Date.now();
-			
+            node.setAttribute("hidden-src", node.src);
+            node.src = blank_png;//this.src + ".HIDDEN" +  "?" + Date.now();
+
+            sister_node.setAttribute("hidden-src", sister_node.src);
+            sister_node.src = blank_png;//this.src + ".HIDDEN" +  "?" + Date.now();
+
 			hidden_count++;
 			return;
 		}
@@ -750,9 +766,10 @@ function filterSetup(){
 function pkxSetup(){
 	expire_time =  localStorage.getItem("Expiration_Time");
 	md5_filters = localStorage.getItem("MD5_List_FSE");
-	
+
     hideSetup();
     filterSetup();
+    // initial_setup_observer.disconnect();
 	modifyDOM();
     document.addEventListener('PostsInserted',function(e){
 		retrieveStates();
