@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      3.1
+// @version      3.2
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -287,7 +287,7 @@ function hideButton(){
     hide_button.setAttribute("Value", "Hide Image Settings");
     hide_button.setAttribute("type", "button");
     hide_button.setAttribute("style", "position:absolute;top:45px");
-    hide_button.addEventListener("click", hideWindow);
+    hideWindow();
     if(document.body === null){
         setTimeout(hideButton, 30);
     }
