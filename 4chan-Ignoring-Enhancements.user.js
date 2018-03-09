@@ -763,24 +763,6 @@ function filterSetup(){
     setTable();
 }
 
-
-// var initial_setup_observer;
-// document.onreadystatechange = function(e)
-// {
-//     if (document.readyState === 'interactive')
-//     {
-//         initial_setup_observer = new MutationObserver(function(mutations){
-//             mutations.forEach(function(mutation){
-//                 mutation.addedNodes.forEach(function(node){
-//                     //decisionProcess(node);
-//                 });
-//             });
-//         });
-//         initial_setup_observer.observe(document.all[0], {childList: true, subtree: true });
-//     }
-//     if(document.readyState == "complete")    console.log("Complete Time: " + (Date.now() - start));
-// };
-
 function pkxSetup(){
 	expire_time =  localStorage.getItem("Expiration_Time");
 	md5_filters = localStorage.getItem("MD5_List_FSE");
@@ -806,7 +788,4 @@ document.addEventListener('4chanXInitFinished', function(e) {
 		pkxSetup();
 		console.log("Script loaded: 4chanPKX");
 		page_setup = true;
-    //console.log("InitFinished Time: " + (Date.now() - start));
 }, false);
-
-var start = Date.now();
