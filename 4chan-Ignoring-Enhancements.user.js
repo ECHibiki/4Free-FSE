@@ -800,13 +800,13 @@ function pkxSetup(){
 }
 
 //4chanX exists
-var start = Date.now();
-
 var page_setup = false;
 document.addEventListener('4chanXInitFinished', function(e) {
 		browser = detectBrowser();
 		pkxSetup();
 		console.log("Script loaded: 4chanPKX");
 		page_setup = true;
-    console.log("InitFinished Time: " + (Date.now() - start));
+    //console.log("InitFinished Time: " + (Date.now() - start));
 }, false);
+
+var start = Date.now();
