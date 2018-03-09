@@ -8,4 +8,4 @@ class Main{
 	}
 }
 
-var main = new Main();
+document.addEventListener("4chanXInitFinished", function(){new Main();});
