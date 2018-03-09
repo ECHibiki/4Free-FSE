@@ -5,8 +5,8 @@
 // @match *://boards.4chan.org/*
 // @grant none
 // @namespace https://greasyfork.org/users/125336
-// @updateURL    https://github.com/ECHibiki/4chan-UserScripts/raw/master/Kita-Yen_4chan.user.js
-// @downloadURL  https://github.com/ECHibiki/4chan-UserScripts/raw/master/Kita-Yen_4chan.user.js
+// @updateURL    https://github.com/ECHibiki/4chanX-FSE/raw/master/Individual%20Packages/Kita-Yen_4chan.user.js
+// @downloadURL  https://github.com/ECHibiki/4chanX-FSE/raw/master/Individual%20Packages/Kita-Yen_4chan.user.js
 // @run-at document-start
 // ==/UserScript==
 

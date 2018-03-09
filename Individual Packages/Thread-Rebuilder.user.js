@@ -7,8 +7,8 @@
 	// @match https://boards.4chan.org/*/thread/*
 	// @match http://boards.4chan.org/*/thread/*
 	// @grant         GM_xmlhttpRequest
-	// @updateURL    https://github.com/ECHibiki/4chan-UserScripts/raw/master/Thread-Rebuilder.user.js
-	// @downloadURL  https://github.com/ECHibiki/4chan-UserScripts/raw/master/Thread-Rebuilder.user.js
+	// @updateURL   https://github.com/ECHibiki/4chanX-FSE/raw/master/Individual%20Packages/Thread-Rebuilder.user.js
+	// @downloadURL https://github.com/ECHibiki/4chanX-FSE/raw/master/Individual%20Packages/Thread-Rebuilder.user.js
 	// @run-at document-start
 	// ==/UserScript==
 

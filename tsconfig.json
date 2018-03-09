@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+		"target": "ES6",
+		"outFile": "../4chanX-FSE/builds/4-Free.user.js",
+    },
+    "files": [
+        "src/main.ts"
+    ]
+}

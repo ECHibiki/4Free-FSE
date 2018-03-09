@@ -9,8 +9,8 @@
 // @include https://boards.4chan.org/*
 // @include http://boards.4chan.org/*
 // @run-at document-start
-// @updateURL    https://github.com/CHibiki/4chan-UserScripts/raw/master/4chan-Ignoring-Enhancements.user.js
-// @downloadURL  https://github.com/ECHibiki/4chan-UserScripts/raw/master/4chan-Ignoring-Enhancements.user.js
+// @updateURL  https://github.com/ECHibiki/4chanX-FSE/raw/master/Individual%20Packages/4chan-Ignoring-Enhancements.user.js
+// @downloadURL https://github.com/ECHibiki/4chanX-FSE/raw/master/Individual%20Packages/4chan-Ignoring-Enhancements.user.js
 // ==/UserScript==
 
 /*

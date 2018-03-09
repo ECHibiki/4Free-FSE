@@ -8,8 +8,8 @@
 // @match https://boards.4chan.org/*
 // @include https://boards.4chan.org/*
 // @include http://boards.4chan.org/*
-// @updateURL    https://github.com/ECHibiki/4chan-UserScripts/raw/master/Visible-Password.user.js
-// @downloadURL  https://github.com/ECHibiki/4chan-UserScripts/raw/master/Visible-Password.user.js
+// @updateURL    https://github.com/ECHibiki/4chanX-FSE/raw/master/Individual%20Packages/Visible-Password.user.js
+// @downloadURL  https://github.com/ECHibiki/4chanX-FSE/raw/master/Individual%20Packages/Visible-Password.user.js
 // ==/UserScript==
 
 /*

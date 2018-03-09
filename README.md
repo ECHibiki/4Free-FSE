@@ -1,6 +1,6 @@
 # 4chanX-FSE
 ## Navigation
-Visit the folder "Individual Packages" to see and download individual scripts. This folder contains QAJPYOtGo's MD5 filters for 4chanX and FSE, and will contain files and folders relating to the Typescript combination of my userscripts.
+Visit the folder "Individual Packages" to see and download individual scripts. This folder contains QAJPYOtGo's MD5 filters for 4chanX, the .ts src folder, and the built user.js file in builds.
 ## Future Developement
 	Combine all into one master script relying entirely on 4chanX and it's API.
 ## About 4chanX-FSE

@@ -6,8 +6,8 @@
 // @author       ECHibiki /qa/
 // @match *://boards.4chan.org/*
 // @grant         GM_xmlhttpRequest
-// @updateURL    https://github.com/ECHibiki/4chan-UserScripts/raw/master/Danbooru-Image-Adder.user.js
-// @downloadURL  https://github.com/ECHibiki/4chan-UserScripts/raw/master/Danbooru-Image-Adder.user.js
+// @updateURL    https://github.com/ECHibiki/4chanX-FSE/raw/master/Individual%20Packages/Danbooru-Image-Adder.user.js
+// @downloadURL  https://github.com/ECHibiki/4chanX-FSE/raw/master/Individual%20Packages/Danbooru-Image-Adder.user.js
 // @run-at document-start
 // ==/UserScript==
 
