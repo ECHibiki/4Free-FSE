@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru-Image-Adder
 // @namespace    http://tampermonkey.net/
-// @version      3.0
+// @version      3.1
 // @description  Add images to posts
 // @author       ECHibiki /qa/
 // @match *://boards.4chan.org/*
@@ -145,6 +145,7 @@ var enhance4ChanX = function(){
 	option_text_size = "18";
 
     var image_tagging_row = document.createElement("TR");
+	
 	var help_icon_container = document.createElement("A");
 	help_icon_container.href = "javascript:void(0)";
 	help_icon_container.title = "Click to View Help!";
@@ -161,7 +162,6 @@ var enhance4ChanX = function(){
 	help_icon_container.addEventListener("click", function(ev){
 		if(tool_top_visible)
 			tooltip_div.setAttribute("style", "z-index:9;padding:5px;border:1px solid black;background-color:white;word-wrap:break-word;display:none;position:absolute;");
-
 		else
 			tooltip_div.setAttribute("style", "z-index:9;padding:5px;border:1px solid black;background-color:white;word-wrap:break-word;display:block;position:absolute;"
 				+ "left:" +  (ev.clientX - qr_window.getBoundingClientRect().x) +
@@ -211,7 +211,7 @@ var enhance4ChanX = function(){
     taggingFunction = setInterval(
         function(){setTagInterface(tag_input_node, auto_complete_row, second_row_nodes);},
         500);
-
+	qr_window.appendChild(document.createElement("hr"));
 };
 
 //settings for time expiration on image hiding
