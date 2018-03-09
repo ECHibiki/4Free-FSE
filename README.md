@@ -22,6 +22,7 @@ Highlights just the word in dark gray<br/>
 ### 4chan-Ignoring-Enhancements
 #### Hides images.
 Gives the ability to hide images with ___ctrl+shift+click___. Stores in browser memory for new sessions.<br/>
+Also includes over 20,000 MD5 filters of things like frogs, goldface, guro done by from QAJPYOtGo
 #### Word Filters
 Also includes the ability to do word replacements with a regex replacement system.<br>
 

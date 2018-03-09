@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      2.7
+// @version      3.0
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -121,7 +121,7 @@ function hideImage(event){
         event.preventDefault();
         event.stopPropagation();
         if (storageAvailable('localStorage')) {
-            localStorage.setItem(this.id, Date.now());
+            localStorage.setItem(this.getAttribute("hide-grouping"), Date.now());
         }
         else {
             console.log("No Storage");
@@ -134,7 +134,7 @@ function hideImage(event){
         event.preventDefault();
         event.stopPropagation();
         if (storageAvailable('localStorage')) {
-            localStorage.removeItem(this.id);
+            localStorage.removeItem(this.getAttribute("hide-grouping"));
         }
         else {
             console.log("No Storage");
@@ -175,14 +175,9 @@ function retrieveStates(){
 	if(md5_filters !== null)
 		md5_filters_arr = md5_filters.split("\n");
 	md5_filters_arr.forEach(function(md5, index){
-				console.log(index);
-		console.log(md5);
 		md5 = md5.trim();
 		md5_filters_arr[index] = md5.substring(1, md5.length - 1);
-		console.log(md5_filters_arr[index]);
-
 	});
-	console.log(md5_filters_arr);
 }
 
 
@@ -218,7 +213,7 @@ function hideWindow(){
     window_div.appendChild(container_div);
 
     var expiration_label = document.createElement("label");
-    var expiration_text = document.createTextNode("Expiration Time(hours): ");
+    var expiration_text = document.createTextNode("Non-MD5 Expiration Time(hours): ");
     expiration_label.appendChild(expiration_text);
     container_div.appendChild(expiration_label);
     var expiration_input = document.createElement("input");
@@ -635,27 +630,8 @@ function modifyDOM(){
         var cname = node.className;
         var tag = node.tagName;
         if(tag  === "IMG" || tag  === "img"){
-            if(!/\d+IMG/.test(node.id) && (node.getAttribute("data-md5") !== null || node.className.indexOf("thumb") != -1)){
-                node.id = node.parentNode.parentNode.id.substring(1) + "IMG";
-                node.addEventListener("click", hideImage, {passive:false, capture:false, once:false});
-				var threadstore_len = local_store_threads.length;
-				var node_id = node.id;
-				for(var thread = 0 ; thread < threadstore_len; thread++){
-					if(node_id == local_store_threads[thread]){
-						node.src = node.src + ".HIDDEN" +  "?" + Date.now();
-						hidden_count++;
-						break;
-					}
-				}
-				var node_md5 = node.getAttribute("data-md5");
-				var md5_filters_arr_len = md5_filters_arr.length;
-				for(var md5 = 0 ; md5 < md5_filters_arr_len; md5++){
-					if(node_md5 == md5_filters_arr[md5]){
-						node.src = node.src + ".HIDDEN" +  "?" + Date.now();
-						hidden_count++;
-						break;
-					}
-				}
+            if(!/\d+IMG/.test(node.getAttribute("hide-grouping")) && (node.getAttribute("data-md5") !== null)){
+				filterImage(node);
             }
         }
         else if(cname == "postMessage"){
@@ -705,6 +681,42 @@ function modifyDOM(){
     if(!page_setup)
         console.log("HIDDEN THREADS: " + hidden_count);
 }
+
+function filterImage(node){
+	var sister_node = node.parentNode.parentNode.parentNode.getElementsByClassName("catalog-thumb")[0]; // the catalog sister to index
+	if(sister_node === undefined) sister_node = node;
+	
+	node.setAttribute("hide-grouping", node.parentNode.parentNode.id.substring(1) + "IMG");
+	sister_node.setAttribute("hide-grouping", node.parentNode.parentNode.id.substring(1) + "IMG");
+	
+	node.addEventListener("click", hideImage, {passive:false, capture:false, once:false});
+	sister_node.addEventListener("click", hideImage, {passive:false, capture:false, once:false});
+	
+	var threadstore_len = local_store_threads.length;
+	var node_group_id = node.getAttribute("hide-grouping");
+	for(var thread = 0 ; thread < threadstore_len; thread++){
+		if(node_group_id == local_store_threads[thread]){
+			node.src = node.src + ".HIDDEN" +  "?" + Date.now();
+			sister_node.src = sister_node.src + ".HIDDEN" +  "?" + Date.now();
+			
+			hidden_count++;
+			return;
+		}
+	}
+	//index node holds the MD5
+	var node_md5 = node.getAttribute("data-md5");
+	var md5_filters_arr_len = md5_filters_arr.length;
+	for(var md5 = 0 ; md5 < md5_filters_arr_len; md5++){
+		if(node_md5 == md5_filters_arr[md5]){
+			node.src = node.src + ".HIDDEN" +  "?" + Date.now();
+			sister_node.src = sister_node.src + ".HIDDEN" +  "?" + Date.now();
+			
+			hidden_count++;
+			return;
+		}
+	}
+}
+
 function hoverUIObserver(mutations){
 	mutations.forEach(function(mutation){
 		mutation.addedNodes.forEach(function(image_node){
@@ -721,6 +733,7 @@ function hoverUIObserver(mutations){
 		});
 	});
 }
+
 //initial onload setup
 function hideSetup(){
 	retrieveStates();
@@ -737,6 +750,7 @@ function filterSetup(){
 function pkxSetup(){
 	expire_time =  localStorage.getItem("Expiration_Time");
 	md5_filters = localStorage.getItem("MD5_List_FSE");
+	
     hideSetup();
     filterSetup();
 	modifyDOM();
@@ -745,9 +759,9 @@ function pkxSetup(){
         modifyDOM();
     });
 	new MutationObserver(function(mutations){
-			retrieveStates();
-			hoverUIObserver(mutations);
-		}).observe(document.getElementById("hoverUI"), {childList: true });
+		retrieveStates();
+		hoverUIObserver(mutations);
+	}).observe(document.getElementById("hoverUI"), {childList: true });
 }
 
 //4chanX exists
@@ -757,5 +771,4 @@ document.addEventListener('4chanXInitFinished', function(e) {
 		pkxSetup();
 		console.log("Script loaded: 4chanPKX");
 		page_setup = true;
-
 }, false);
