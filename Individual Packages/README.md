@@ -1,12 +1,9 @@
-# 4chanX-FSE
-## Navigation
-Visit the folder "Individual Packages" to see and download individual scripts. This folder contains QAJPYOtGo's MD5 filters for 4chanX and FSE, and will contain files and folders relating to the Typescript combination of my userscripts.
-## Future Developement
-	Combine all into one master script relying entirely on 4chanX and it's API.
-## About 4chanX-FSE
-4chanX-Free Stuff Enhancements is a userscript that operates with 4chanX to give it additional features. These enhancements were written by me from early 2017 up to 2018 as a way to teach myself how to work with JavaScript while giving something back to the community I took part in.
-Some of these features are simple, like the password viewer, others are more complex using multiple concurent AJAX calls such as the thread rebuilder or the image adder. <br/>
-Below is a description of the features this package has to offer.
+# 4chan-userscripts
+## Individual Packages
+These are most certainly out of date. No updates are planned of individual packages.
+## About The Features
+Repository of ECHibiki's 4chan userscripts.<br/>
+Most all of these scripts expand upon 4chanX's quick reply feature and require it.
 
 ### Danbooru Image Adder
 #### Adds images to your posts

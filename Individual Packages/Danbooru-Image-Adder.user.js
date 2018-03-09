@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru-Image-Adder
 // @namespace    http://tampermonkey.net/
-// @version      3.1
+// @version      3.2
 // @description  Add images to posts
 // @author       ECHibiki /qa/
 // @match *://boards.4chan.org/*
@@ -11,8 +11,9 @@
 // @run-at document-start
 // ==/UserScript==
 
-function alert4ChanX(message, type){
-    var detail = {type: type, content: message, lifetime: 10};
+function alert4ChanX(message, type, time){
+	if(time == undefined) time = 10;
+    var detail = {type: type, content: message, lifetime: time};
     if (typeof cloneInto === 'function') {
         detail = cloneInto(detail, document.defaultView);
     }
@@ -157,7 +158,7 @@ var enhance4ChanX = function(){
 	image_tagging_row.appendChild(help_icon_container);
 
 	var tooltip_div = document.createElement("DIV");
-	tooltip_div.innerHTML = "Insert Tags to search from danbooru in the text box to the side.<br/>The URL for the image will be bellow. Some browsers such as chrome allow you to select this text<br/>Do Not Use \"order:\" tags<br/>Do Not Use \"rating:\" tags<br/>For more speed uncheck all boxes!";
+	tooltip_div.innerHTML = "Insert Tags to search from danbooru in the text box to the side.<br/>The URL for the image will be bellow. Some browsers such as chrome allow you to select this text<br/>Do Not Use \"order:\" tags<br/>Do Not Use \"rating:\" tags<br/>For more speed uncheck all boxes!<hr/>Submit bugs to <a href='https://github.com/ECHibiki/4chan-UserScripts'>my Github</a>";
 	tooltip_div.setAttribute("style", "z-index:9;padding:5px;border:1px solid black;background-color:white;word-wrap:break-word;display:none;position:absolute;");
 	help_icon_container.addEventListener("click", function(ev){
 		if(tool_top_visible)
@@ -640,7 +641,7 @@ function verifyTags(data, tags){
     }
 	else if(data.length != tags.length && !tag_incorrect_state){
 		tag_incorrect_state = true;
-		if(document.getElementById("tags").value.trim() == "") alert4ChanX("No Tags", "info");
+		if(document.getElementById("tags").value.trim() == "") alert4ChanX("No Tags", "info", 2);
 		else alert4ChanX("One Tag Incorrect", "warning");
 	}
     //tag size. Smallest tag is placed at bottom of JSON
@@ -936,7 +937,6 @@ uploader_name:"---"
 						if (typeof cloneInto === 'function') {
 							detail  = cloneInto(detail , document.defaultView);
 						}
-						document.getElementById("dump-list").firstChild.click();
 						document.dispatchEvent(new CustomEvent('QRSetFile', {bubbles:true, detail}));
 
 					}
