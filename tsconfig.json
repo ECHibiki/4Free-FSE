@@ -1,11 +1,13 @@
 {
     "compilerOptions": {
 		"target": "ES5",
-		"outFile": "../4chanX-FSE/builds/4-Free.user.js",
+		"outFile": "../4Free-FSE/builds/4-Free.user.js",
     },
     "files": [
 		"src/docs.ts",
+		"src/topbar.ts",
 		"src/password-viewer.ts",
+		"src/settings-window.ts",
 		"src/main.ts",
     ]
 }

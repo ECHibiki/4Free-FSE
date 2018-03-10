@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         4-FSE
+// @name         4Free-FSE
 // @author       ECHibiki - /qa/
-// @description  4chanX - Free Stuff Enhancments
-// @version      0.1
+// @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
+// @version      0.2
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4-FSE/master/builds/4-Free.user.js
@@ -53,39 +53,175 @@
     __Note:__ some 4chan boards don't allow custom post passwords. May require cookie manipulation, but this has not yet been tested...
 
 */ 
+var TopBar = /** @class */ (function () {
+    function TopBar() {
+        this.shortcuts_container = document.getElementById("shortcuts");
+        this.shortcuts_menu = document.getElementById("shortcut-menu");
+        this.fse_icon_container = document.createElement("SPAN");
+        this.fse_icon_node = document.createElement("A");
+        this.fse_style_node = document.createElement("STYLE");
+        this.fa_fse_style = ".fa_jpy::before{content:'\f157'}";
+        this.fse_style_node.innerHTML = this.fa_fse_style;
+        this.fse_icon_container.setAttribute("class", "shortcut brackets-wrap");
+        this.fse_icon_node.setAttribute("class", "fa fa-jpy");
+        this.fse_icon_node.setAttribute("href", "javascript:void(0);");
+        this.fse_icon_node.setAttribute("title", "4F-FSE Settings");
+        this.fse_icon_node.textContent = "4F-FSE Settings";
+        this.settings_window = new SettingsWindow();
+    }
+    TopBar.prototype.build = function () {
+        var _this = this;
+        document.head.appendChild(this.fse_style_node);
+        this.fse_icon_container.appendChild(this.fse_icon_node);
+        this.shortcuts_container.insertBefore(this.fse_icon_container, this.shortcuts_menu);
+        //https://stackoverflow.com/questions/44606399/typescript-how-to-access-the-class-instance-from-event-handler-method
+        this.fse_icon_node.addEventListener("click", function (evt) { return _this.open4FSettings(_this.settings_window); });
+    };
+    TopBar.prototype.open4FSettings = function (settings_window) {
+        settings_window.displayWindow();
+    };
+    TopBar.prototype.getSettingsArr = function () {
+        return this.settings_window.getSettingsArr();
+    };
+    return TopBar;
+}());
 var Password = /** @class */ (function () {
     function Password() {
         this.post_id = "postPassword";
         this.del_id = "delPassword";
+        this.label_post = document.createElement("LABEL");
+        this.label_del = document.createElement("LABEL");
         this.node_post = document.getElementById(this.post_id);
-        this.label_post = document.createElement("P");
-        this.label_post.textContent = "Post: ";
-        this.node_post_parent = this.node_post.parentNode;
-        this.post_pass = this.node_post.value;
         this.node_del = document.getElementById(this.del_id);
-        this.label_del = document.createElement("P");
-        this.label_del.textContent = "| Delete: ";
+        this.node_post_parent = this.node_post.parentNode;
         this.node_del_parent = this.node_del.parentNode;
-        this.del_pass = this.node_del.value;
+        this.label_post.textContent = "Post: ";
+        this.label_del.textContent = "Delete: ";
     }
     Password.prototype.display = function () {
-        this.node_post.removeAttribute("type");
-        this.node_del.removeAttribute("type");
         this.node_post_parent.insertBefore(this.label_post, this.node_post);
         this.node_del_parent.insertBefore(this.label_del, this.node_del);
-        this.node_del.style.display = "block";
-        this.label_del.style.display = "block";
-        document.getElementsByClassName("deleteform")[0].style.display = "block";
+        this.node_post.removeAttribute("type");
+        this.node_del.removeAttribute("type");
+        document.getElementsByClassName("deleteform")[0].style.display = "inline";
+        this.node_del.style.display = "inline";
+        this.label_del.style.display = "inline";
+        this.label_del.style.paddingLeft = "10px";
     };
     return Password;
+}());
+var SettingsWindow = /** @class */ (function () {
+    function SettingsWindow() {
+        var _this = this;
+        this.background_div = document.createElement("DIV");
+        this.settings_div = document.createElement("DIV");
+        this.close_div = document.createElement("DIV");
+        this.contents_div = document.createElement("DIV");
+        this.close_link = document.createElement("A");
+        this.title_para = document.createElement("P");
+        this.title_text = document.createTextNode("4F-FSE Settings");
+        this.end_para = document.createElement("P");
+        this.end_text = document.createTextNode("Refresh to view changes");
+        this.list_items = [
+            "View 『Danbooru Image Adder』 Settings",
+            "View 『¥ Text』 Settings [Long Coloring]",
+            "View 『Kita』 Settings [Character Coloring]",
+            "View 『Image Hiding』 Settings",
+            "View 『Word Replacement』 Settings",
+            "View 『Threaad Rebuilder』 Settings",
+            "Set 『Visible Password』 : ",
+        ];
+        this.setting_items = [];
+        this.settings_style = document.createElement("STYLE");
+        this.settings_style.innerHTML = ".inputs{background-color:rgb(200,200,200);margin:5px 7px;width:100px;}\n\t\t\t\t\t\t\t\t\t\t.SettingsBackground{position:fixed;width:100%;height:100%;background-color:rgba(200,200,200,0.3);top:0;left:0; z-index:9}\n\t\t\t\t\t\t\t\t\t\t.settingsMain{border:solid 1px black;position:fixed;background-color:rgb(200,200,200);left:40%;top:20%;margin-bottom:0; z-index:10}\n\t\t\t\t\t\t\t\t\t\t.closeIcon{border:solid 1px black;position:absolute;width:25px;height:25px;background-color:rgba(255,100,90,0.9); right:3px;top:3px; z-index:10}\n\t\t\t\t\t\t\t\t\t\t.titleStyle{margin-left:5px;margin-top:5px}\n\t\t\t\t\t\t\t\t\t\t.contentStyle{background-color:white;margin:0 0;padding:5px;}";
+        document.body.appendChild(this.settings_style);
+        this.background_div.setAttribute("class", "SettingsBackground");
+        this.background_div.setAttribute("id", "SettingsBackground");
+        this.background_div.setAttribute("style", "display:none");
+        this.background_div.addEventListener("click", function (evt) { return _this.hideWindow(); });
+        document.body.appendChild(this.background_div);
+        this.settings_div.setAttribute("class", "settingsMain");
+        this.settings_div.setAttribute("id", "settingsWindow");
+        this.settings_div.setAttribute("style", "display:none;width:400px");
+        this.close_link.setAttribute("href", "javascript:void(0)");
+        this.settings_div.appendChild(this.close_link);
+        this.close_div.setAttribute("class", "closeIcon");
+        this.close_div.addEventListener("click", function (evt) { return _this.hideWindow(); });
+        this.close_link.appendChild(this.close_div);
+        this.title_para.setAttribute("class", "titleStyle");
+        this.title_para.appendChild(this.title_text);
+        this.settings_div.appendChild(this.title_para);
+        this.contents_div.setAttribute("class", "contentStyle");
+        this.settings_div.appendChild(this.contents_div);
+        this.generateList(this.list_items, this.contents_div);
+        this.end_para.setAttribute("class", "");
+        this.end_para.appendChild(this.end_text);
+        this.settings_div.appendChild(this.end_para);
+        document.body.appendChild(this.settings_div);
+    }
+    SettingsWindow.prototype.generateList = function (list_items, head_node) {
+        var _this = this;
+        var start = document.createElement("UL");
+        list_items.forEach(function (item, index) {
+            var li = document.createElement("LI");
+            if (item.indexOf("View") > -1) {
+                var a = document.createElement("A");
+                a.setAttribute("href", "javascript:void(0)");
+                a.textContent = item;
+                a.setAttribute("ID", "tab-settings" + index);
+                a.addEventListener("click", function () { });
+                li.appendChild(a);
+                start.appendChild(li);
+                var a_settings = JSON.parse('{"ID":"0", "VALUE":"1"}');
+                _this.setting_items.push(a_settings);
+            }
+            else {
+                var label = document.createElement("LABEL");
+                label.textContent = item;
+                li.appendChild(label);
+                var input = document.createElement("INPUT");
+                var input_id = "check-settings" + index;
+                input.setAttribute("TYPE", "checkbox");
+                input.setAttribute("ID", "check-settings" + index);
+                li.appendChild(input);
+                start.appendChild(li);
+                input.checked = localStorage.getItem(input_id) == "true";
+                label.addEventListener("click", function () {
+                    var is_check = !input.checked;
+                    input.checked = is_check;
+                    localStorage.setItem(input_id, "" + is_check);
+                });
+                var check_settings = JSON.parse("{\"ID\":\"" + input_id + "\", \"VALUE\":\"" + input.checked + "\"}");
+                _this.setting_items.push(check_settings);
+            }
+        });
+        head_node.appendChild(start);
+    };
+    SettingsWindow.prototype.getSettingsArr = function () {
+        return this.setting_items;
+    };
+    SettingsWindow.prototype.displayWindow = function () {
+        this.background_div.style.display = "block";
+        this.settings_div.style.display = "block";
+    };
+    SettingsWindow.prototype.hideWindow = function () {
+        this.background_div.style.display = "none";
+        this.settings_div.style.display = "none";
+    };
+    return SettingsWindow;
 }());
 var Main = /** @class */ (function () {
     function Main() {
         this.init();
     }
     Main.prototype.init = function () {
-        var password = new Password();
-        password.display();
+        var top_bar = new TopBar();
+        top_bar.build();
+        var settings = top_bar.getSettingsArr();
+        if (settings[6].VALUE == "true") {
+            var password = new Password();
+            password.display();
+        }
     };
     return Main;
 }());

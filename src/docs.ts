@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         4-FSE
+// @name         4Free-FSE
 // @author       ECHibiki - /qa/
-// @description  4chanX - Free Stuff Enhancments
-// @version      0.1
+// @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
+// @version      0.2
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4-FSE/master/builds/4-Free.user.js

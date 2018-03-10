@@ -1,9 +1,9 @@
-# 4chan-userscripts
+# 4F-FSE Userscripts
 ## Individual Packages
 These are most certainly out of date. No updates are planned of individual packages.
 ## About The Features
-Repository of ECHibiki's 4chan userscripts.<br/>
-Most all of these scripts expand upon 4chanX's quick reply feature and require it.
+Repository of ECHibiki's 4chanX userscripts.<br/>
+These scripts expand upon 4chanX's quick reply feature and require it.
 
 ### Danbooru Image Adder
 #### Adds images to your posts
