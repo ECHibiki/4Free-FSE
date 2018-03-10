@@ -1,4 +1,4 @@
-# 4ChanX - Free Stuff Enhancements[4-FSE]
+# 4Free- Free Stuff Enhancements[4Free-FSE]
 ## Navigation
 Visit the folder "Individual Packages" to see and download individual scripts. This folder contains QAJPYOtGo's MD5 filters for 4chanX, the .ts src folder, and the built user.js file in builds.
 ## Future Developement
