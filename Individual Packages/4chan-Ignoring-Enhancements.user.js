@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         4chan-Ignoring-Enhancements
 // @namespace    http://tampermonkey.net/
-// @version      3.4
+// @version      3.6
 // @description  4chan Pain Kill Extension
 // @author       ECHibiki-/qa/
 // @match http://boards.4chan.org/*
@@ -129,8 +129,13 @@ function hideImage(event){
             console.log("No Storage");
         }
 		//some browsers require a querry on the image URL to 404 it.
-        this.setAttribute("hidden-src", this.src);
-        this.src = blank_png;//this.src + ".HIDDEN" +  "?" + Date.now();
+		var nodes = document.querySelectorAll('img[hide-grouping="'+this.getAttribute("hide-grouping")+'"]');
+		nodes.forEach(function(node){
+			if(node.getAttribute("hide-grouping") == event.target.getAttribute("hide-grouping")){
+				node.setAttribute("hidden-src", node.src);
+				node.src = blank_png;//this.src + ".HIDDEN" +  "?" + Date.now();
+			}
+		});
         return false;
     }
     else if(event.ctrlKey && event.shiftKey){
@@ -142,7 +147,12 @@ function hideImage(event){
         else {
             console.log("No Storage");
         }
-        this.src = this.getAttribute("hidden-src");
+		var nodes = document.querySelectorAll('img[hide-grouping="'+this.getAttribute("hide-grouping")+'"]');
+		nodes.forEach(function(node){
+			if(node.getAttribute("hide-grouping") == event.target.getAttribute("hide-grouping")){
+				node.src = node.getAttribute("hidden-src");
+			}
+		});
         return false;
     }
     return true;
@@ -693,7 +703,7 @@ function decisionProcess(node, itterator){
 
 function filterImage(node){
 	var sister_node = node.parentNode.parentNode.parentNode.getElementsByClassName("catalog-thumb")[0]; // the catalog sister to index
-	if(sister_node === undefined) sister_node = node;
+	if(sister_node === undefined) sister_node = document.createElement("IMG");
 
 	node.setAttribute("hide-grouping", node.parentNode.parentNode.id.substring(1) + "IMG");
 	sister_node.setAttribute("hide-grouping", node.parentNode.parentNode.id.substring(1) + "IMG");
@@ -735,24 +745,24 @@ function filterImage(node){
 
 function hoverUIObserver(mutations){
 	mutations.forEach(function(mutation){
-		mutation.addedNodes.forEach(function(image_node){			
+		mutation.addedNodes.forEach(function(image_node){
 			var is_embeded_post;
 			if(image_node.tagName == "DIV") {
 				is_embeded_post = true;
 				image_node = image_node.getElementsByClassName("postContainer")[0];
 				if(image_node === undefined) return;
 			}
-			
+
 			var unprocessed_id = image_node.getAttribute("data-full-i-d");
-			if (unprocessed_id === null) return;					
+			if (unprocessed_id === null) return;
 			var proccessed_id = unprocessed_id.substring(unprocessed_id.indexOf(".") + 1);
-			var image_node_id = proccessed_id + "IMG";		
+			var image_node_id = proccessed_id + "IMG";
 			if(is_embeded_post) image_node =  image_node.getElementsByTagName("IMG")[0];
 			if(image_node === undefined) return;
-			
+
 			var threadstore_len = local_store_threads.length;
 			for(var thread = 0 ; thread < threadstore_len; thread++){
-				if(image_node_id == local_store_threads[thread]){						
+				if(image_node_id == local_store_threads[thread]){
 					image_node.removeAttribute("src");
 					return;
 				}

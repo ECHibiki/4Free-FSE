@@ -16,7 +16,6 @@ class TopBar{
 		this.fse_icon_node.setAttribute("title", "4F-FSE Settings");
 		this.fse_icon_node.textContent = "4F-FSE Settings";
 		this.settings_window = new SettingsWindow();
-		
 	}
 	build():void{
 		document.head.appendChild(this.fse_style_node)
@@ -29,7 +28,7 @@ class TopBar{
 		settings_window.displayWindow();
 	}
 	
-	getSettingsArr():Object[]{
+	getSettingsArr():Object{
 		return this.settings_window.getSettingsArr();
 	}
 }
