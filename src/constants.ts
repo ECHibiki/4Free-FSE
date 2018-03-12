@@ -1,4 +1,0 @@
-class Constants{
-	static DEFAULT_HIDE_EXPIRATION_TIME:number = 172800000;
-	static MILLISECONDS_TO_THE_HOUR = 3600000;
-}
