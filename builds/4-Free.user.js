@@ -545,78 +545,9 @@ var SettingsWindow = /** @class */ (function (_super) {
                     var disposable_container = document.createElement("DIV");
                     disposable_container.setAttribute("id", "disposable_container");
                     _this.contents_div.appendChild(disposable_container);
-                    disposable_container.innerHTML = "\n\t\t\t<table style=\"text-align:center;margin-left:5px\">\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Very Large: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"v_large\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Large: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"large\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Medium: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"medium\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Very Large: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"small\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Width: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"width_DIA\" name=\"preivew-size\" style=\"width:20%\" value=\"400\" type=\"text\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Height: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"height_DIA\" name=\"preivew-size\" style=\"width:20%\" value=\"400\" type=\"text\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t</table>\t\n\t\t\n\t\t\t<hr>\n\t\t\t\n\t\t\t<label>Quick Reply Min Width: </label>\n\t\t\t<input id=\"qr_width_DIA\" name=\"preivew-size\" style=\"width:20%\" value=\"480\" type=\"text\">\n\t\t\n\t\t\t<hr>\n\t\t\n\t\t\t<input id=\"setTime\" value=\"Set Preview Size\" type=\"button\">\n\t\t\t";
-                    /*
-                            
-                v_large_input.addEventListener("click", function(){
-                    document.getElementById("width_DIA").value = 489;
-                    document.getElementById("height_DIA").value = 489;
-                });
-        
-            
-                large_input.addEventListener("click", function(){
-                    document.getElementById("width_DIA").value = 400;
-                    document.getElementById("height_DIA").value = 400;
-                });
-                
-            
-                medium_input.addEventListener("click", function(){
-                    document.getElementById("width_DIA").value = 300;
-                    document.getElementById("height_DIA").value = 300;
-                });
-        
-                
-                small_input.addEventListener("click", function(){
-                    document.getElementById("width_DIA").value = 200;
-                    document.getElementById("height_DIA").value = 200;
-                });
-                
-        
-                var width = localStorage.getItem("width_DIA");
-                if(width === null) width = 400;
-                width_input.setAttribute("value", width);
-                    
-                var height = localStorage.getItem("height_DIA");
-                if(height === null) height = 400;
-                height_input.setAttribute("value", height);
-                
-                radio_table.appendChild(height_row);
-                
-                container_div.appendChild(radio_table);
-                container_div.appendChild(document.createElement("hr"));
-                
-                var qr_width = localStorage.getItem("qr_width_DIA");
-                if(qr_width === null) qr_width = 480;
-                qr_width_input.setAttribute("value", qr_width);
-                
-                set_button.addEventListener("click", function(){
-                    if (storageAvailable('localStorage')) {
-                        var width = parseInt(document.getElementById("width_DIA").value);
-                        localStorage.setItem("width_DIA", width);
-                        
-                        var qr_width = parseInt(document.getElementById("qr_width_DIA").value);
-                        localStorage.setItem("qr_width_DIA", qr_width);
-                        
-                        var height = parseInt(document.getElementById("height_DIA").value);
-                        localStorage.setItem("height_DIA", height);
-                
-                        if(width === null) width = 400;
-                        if(qr_width === null) qr_width = 480;
-                        if(height === null) height = 400;
-        
-                        document.getElementById("fourchanx-css").textContent += ".qr-preview { height:" +  height + "px; width: " + width +  "px; left:8%;background-size: cover;}";
-                        document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: " + (width - 20) +  "px; width: " + (qr_width) + "px;}";
-        
-                        imageAdderToggle();
-                    }
-                });
-        
-                if(document.getElementById("width_DIA").value == "489") v_large_input.checked = true;
-                if(document.getElementById("width_DIA").value == "400") large_input.checked = true;
-                if(document.getElementById("width_DIA").value == "300") medium_input.checked = true;
-                if(document.getElementById("width_DIA").value == "200") small_input.checked = true;
-        
-            */
+                    disposable_container.innerHTML = "\n\t\t\t<table style=\"text-align:center;margin-left:5px\">\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Very Large: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"v_large_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Large: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"large_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Medium: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"medium_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Very Large: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"small_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Width: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"width_DIA\" name=\"preivew-size\" style=\"width:20%\"  type=\"text\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Height: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"height_DIA\" name=\"preivew-size\" style=\"width:20%\"  type=\"text\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t</table>\t\n\t\t\n\t\t\t<hr>\n\t\t\t\n\t\t\t<label>Quick Reply Min Width: </label>\n\t\t\t<input id=\"qr_width_DIA\" name=\"preivew-size\" style=\"width:20%\" type=\"text\">\n\t\t\n\t\t\t<hr>\n\t\t\n\t\t\t<input id=\"setQRProperties\" value=\"Set Preview Size\" type=\"button\">\n\t\t\t";
+                    _this.setImageAdderFields();
+                    _this.setImageAdderEventListeners();
                 }
             },
             { Text: "View 『Thread Rebuilder』 Settings", ListenerFunc: function (a_id) {
@@ -667,8 +598,55 @@ var SettingsWindow = /** @class */ (function (_super) {
         _this.activate();
         return _this;
     }
+    SettingsWindow.prototype.setImageAdderFields = function () {
+        document.getElementById("width_DIA").value = this.setting_items.image_adder_settings.Width;
+        document.getElementById("height_DIA").value = this.setting_items.image_adder_settings.Height;
+        document.getElementById("qr_width_DIA").value = this.setting_items.image_adder_settings.QR_Width;
+        if (document.getElementById("width_DIA").value == "489")
+            document.getElementById("v_large_DIA").checked = true;
+        else if (document.getElementById("width_DIA").value == "400")
+            document.getElementById("large_DIA").checked = true;
+        else if (document.getElementById("width_DIA").value == "300")
+            document.getElementById("medium_DIA").checked = true;
+        else if (document.getElementById("width_DIA").value == "200")
+            document.getElementById("small_DIA").checked = true;
+    };
+    SettingsWindow.prototype.setImageAdderEventListeners = function () {
+        var _this = this;
+        document.getElementById("v_large_DIA").addEventListener("click", function () {
+            document.getElementById("width_DIA").value = "489";
+            document.getElementById("height_DIA").value = "489";
+        });
+        document.getElementById("large_DIA").addEventListener("click", function () {
+            document.getElementById("width_DIA").value = "400";
+            document.getElementById("height_DIA").value = "400";
+        });
+        document.getElementById("medium_DIA").addEventListener("click", function () {
+            document.getElementById("width_DIA").value = "300";
+            document.getElementById("height_DIA").value = "300";
+        });
+        document.getElementById("small_DIA").addEventListener("click", function () {
+            document.getElementById("width_DIA").value = "200";
+            document.getElementById("height_DIA").value = "200";
+        });
+        document.getElementById("setQRProperties").addEventListener("click", function (evt) {
+            _this.storeStates();
+            _this.clearContainer();
+            _this.rebuildContainer();
+        });
+    };
     //*...THIS
     SettingsWindow.prototype.retrieveStates = function () {
+        //values used to fill out data fields
+        this.setting_items.image_hiding_settings = { Expiration_Time: localStorage.getItem("Expiration_Time"), MD5_List_FSE: localStorage.getItem("MD5_List_FSE") };
+        this.retrieveWordReplaceStates();
+        this.retrieveImageAdderStates();
+        this.setting_items.thread_rebuild_settings = (localStorage.getItem("tab-settings4") == 'true');
+        this.setting_items.yen_settings = (localStorage.getItem("tab-settings5") == 'true');
+        this.setting_items.kita_settings = (localStorage.getItem("tab-settings6") == 'true');
+        this.setting_items.password_settings = (localStorage.getItem("pw_active"));
+    };
+    SettingsWindow.prototype.retrieveWordReplaceStates = function () {
         //acquire text filter representation
         var storage_index = 0;
         var JSON_storage = {};
@@ -684,25 +662,36 @@ var SettingsWindow = /** @class */ (function (_super) {
         filters.forEach(function (filter) {
             text_filters.push(TextReplacer.formatFilterSettings(JSON_storage[filter]));
         });
-        //values used to fill out data fields
-        this.setting_items.image_hiding_settings = { Expiration_Time: localStorage.getItem("Expiration_Time"), MD5_List_FSE: localStorage.getItem("MD5_List_FSE") };
+        var width = localStorage.getItem("width_DIA");
+        var height = localStorage.getItem("height_DIA");
+        var qr_width = localStorage.getItem("qr_width_DIA");
         this.setting_items.word_replace_settings = { Number_of_filters: localStorage.getItem("filter_quantity"), Text_Filter_List: text_filters };
-        this.setting_items.image_adder_settings = (localStorage.getItem("tab-settings3") == 'true');
-        this.setting_items.thread_rebuild_settings = (localStorage.getItem("tab-settings4") == 'true');
-        this.setting_items.yen_settings = (localStorage.getItem("tab-settings5") == 'true');
-        this.setting_items.kita_settings = (localStorage.getItem("tab-settings6") == 'true');
-        this.setting_items.password_settings = (localStorage.getItem("pw_active"));
+    };
+    SettingsWindow.prototype.retrieveImageAdderStates = function () {
+        this.setting_items.image_adder_settings = { Width: localStorage.getItem("width_DIA"),
+            Height: localStorage.getItem("height_DIA"),
+            QR_Width: localStorage.getItem("qr_width_DIA") };
+        if (this.setting_items.image_adder_settings.Height === null)
+            this.setting_items.image_adder_settings.Height = 400;
+        if (this.setting_items.image_adder_settings.Width === null)
+            this.setting_items.image_adder_settings.Width = 400;
+        if (this.setting_items.image_adder_settings.QR_Width === null)
+            this.setting_items.image_adder_settings.QR_Width = 480;
+        document.getElementById("fourchanx-css").textContent += ".qr-preview { height:" + this.setting_items.image_adder_settings.Height + "px; width: " + this.setting_items.image_adder_settings.Width + "px; left:8%;background-size: cover;}";
+        document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: " + (this.setting_items.image_adder_settings.Width - 20) + "px; width: " + (this.setting_items.image_adder_settings.QR_Width) + "px;}";
     };
     SettingsWindow.prototype.storeStates = function () {
         //image settings
-        this.storeImageStates();
+        this.storeImageFilterStates();
         //Text replace settings
-        this.storeFilterStates();
+        this.storeTextFilterStates();
+        //Image Adder settings
+        this.storeImageAdderStates();
         //Password replace settings
         this.storePasswordStates();
         this.retrieveStates();
     };
-    SettingsWindow.prototype.storeImageStates = function () {
+    SettingsWindow.prototype.storeImageFilterStates = function () {
         if (document.getElementById("Expiration_Time") !== null) {
             var time = document.getElementById("Expiration_Time");
             var millisecond_time = parseInt(time.value) * Constants.MILLISECONDS_TO_THE_HOUR;
@@ -714,7 +703,7 @@ var SettingsWindow = /** @class */ (function (_super) {
             Generics.alert4ChanX("Image Settings Saved", "success", 3);
         }
     };
-    SettingsWindow.prototype.storeFilterStates = function () {
+    SettingsWindow.prototype.storeTextFilterStates = function () {
         if (document.getElementById("FilterRow0") !== null) {
             var f_row_moving = document.getElementById("FilterRow0");
             var number_of_filters = 0;
@@ -755,6 +744,14 @@ var SettingsWindow = /** @class */ (function (_super) {
             }
             Generics.alert4ChanX("Wordfilters Updated!", "success", 3);
         }
+    };
+    SettingsWindow.prototype.storeImageAdderStates = function () {
+        var width = document.getElementById("width_DIA").value;
+        localStorage.setItem("width_DIA", width);
+        var height = document.getElementById("height_DIA").value;
+        localStorage.setItem("height_DIA", height);
+        var qr_width = document.getElementById("qr_width_DIA").value;
+        localStorage.setItem("qr_width_DIA", qr_width);
     };
     SettingsWindow.prototype.storePasswordStates = function () {
         //password view settings

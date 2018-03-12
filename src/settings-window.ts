@@ -59,7 +59,7 @@ class SettingsWindow  extends FeatureInterface{
 		{Text : "View 『Danbooru Image Adder』 Settings", ListenerFunc :		(a_id) => {		
 			this.clearContainer();
 			
-			var disposable_container = document.createElement("DIV");
+			var disposable_container:Element = document.createElement("DIV");
 			disposable_container.setAttribute("id", "disposable_container");
 			this.contents_div.appendChild(disposable_container);	
 			disposable_container.innerHTML = `
@@ -69,7 +69,7 @@ class SettingsWindow  extends FeatureInterface{
 						<label>Very Large: </label>
 					</td>
 					<td>
-						<input id="v_large" name="preivew-size" style="display:inline" type="radio">
+						<input id="v_large_DIA" name="preivew-size" style="display:inline" type="radio">
 					</td>
 				</tr>
 				<tr>
@@ -77,7 +77,7 @@ class SettingsWindow  extends FeatureInterface{
 						<label>Large: </label>
 					</td>
 					<td>
-						<input id="large" name="preivew-size" style="display:inline" type="radio">
+						<input id="large_DIA" name="preivew-size" style="display:inline" type="radio">
 					</td>
 				</tr>
 				<tr>
@@ -85,7 +85,7 @@ class SettingsWindow  extends FeatureInterface{
 						<label>Medium: </label>
 					</td>
 					<td>
-						<input id="medium" name="preivew-size" style="display:inline" type="radio">
+						<input id="medium_DIA" name="preivew-size" style="display:inline" type="radio">
 					</td>
 				</tr>
 				<tr>
@@ -93,7 +93,7 @@ class SettingsWindow  extends FeatureInterface{
 						<label>Very Large: </label>
 					</td>
 					<td>
-						<input id="small" name="preivew-size" style="display:inline" type="radio">
+						<input id="small_DIA" name="preivew-size" style="display:inline" type="radio">
 					</td>
 				</tr>
 				<tr>
@@ -101,7 +101,7 @@ class SettingsWindow  extends FeatureInterface{
 						<label>Width: </label>
 					</td>
 					<td>
-						<input id="width_DIA" name="preivew-size" style="width:20%" value="400" type="text">
+						<input id="width_DIA" name="preivew-size" style="width:20%"  type="text">
 					</td>
 				</tr>
 				<tr>
@@ -109,7 +109,7 @@ class SettingsWindow  extends FeatureInterface{
 						<label>Height: </label>
 					</td>
 					<td>
-						<input id="height_DIA" name="preivew-size" style="width:20%" value="400" type="text">
+						<input id="height_DIA" name="preivew-size" style="width:20%"  type="text">
 					</td>
 				</tr>
 			</table>	
@@ -117,84 +117,14 @@ class SettingsWindow  extends FeatureInterface{
 			<hr>
 			
 			<label>Quick Reply Min Width: </label>
-			<input id="qr_width_DIA" name="preivew-size" style="width:20%" value="480" type="text">
+			<input id="qr_width_DIA" name="preivew-size" style="width:20%" type="text">
 		
 			<hr>
 		
-			<input id="setTime" value="Set Preview Size" type="button">
-			`			
-			
-			/*
-					
-		v_large_input.addEventListener("click", function(){
-			document.getElementById("width_DIA").value = 489;
-			document.getElementById("height_DIA").value = 489;
-		});
-
-	
-		large_input.addEventListener("click", function(){
-			document.getElementById("width_DIA").value = 400;
-			document.getElementById("height_DIA").value = 400;
-		});
-		
-	
-		medium_input.addEventListener("click", function(){
-			document.getElementById("width_DIA").value = 300;
-			document.getElementById("height_DIA").value = 300;
-		});
-
-		
-		small_input.addEventListener("click", function(){
-			document.getElementById("width_DIA").value = 200;
-			document.getElementById("height_DIA").value = 200;
-		});
-		
-
-		var width = localStorage.getItem("width_DIA");
-		if(width === null) width = 400;
-		width_input.setAttribute("value", width);
-			
-		var height = localStorage.getItem("height_DIA");
-		if(height === null) height = 400;
-		height_input.setAttribute("value", height);
-		
-		radio_table.appendChild(height_row);
-		
-		container_div.appendChild(radio_table);	
-		container_div.appendChild(document.createElement("hr"));
-		
-		var qr_width = localStorage.getItem("qr_width_DIA");
-		if(qr_width === null) qr_width = 480;
-		qr_width_input.setAttribute("value", qr_width);
-		
-		set_button.addEventListener("click", function(){
-			if (storageAvailable('localStorage')) {
-				var width = parseInt(document.getElementById("width_DIA").value);	
-				localStorage.setItem("width_DIA", width);
-				
-				var qr_width = parseInt(document.getElementById("qr_width_DIA").value);	
-				localStorage.setItem("qr_width_DIA", qr_width);
-				
-				var height = parseInt(document.getElementById("height_DIA").value);	
-				localStorage.setItem("height_DIA", height);
-		
-				if(width === null) width = 400;
-				if(qr_width === null) qr_width = 480;
-				if(height === null) height = 400;
-
-				document.getElementById("fourchanx-css").textContent += ".qr-preview { height:" +  height + "px; width: " + width +  "px; left:8%;background-size: cover;}";
-				document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: " + (width - 20) +  "px; width: " + (qr_width) + "px;}";
-
-				imageAdderToggle();
-			}
-		});
-
-		if(document.getElementById("width_DIA").value == "489") v_large_input.checked = true;	
-		if(document.getElementById("width_DIA").value == "400") large_input.checked = true;
-		if(document.getElementById("width_DIA").value == "300") medium_input.checked = true;
-		if(document.getElementById("width_DIA").value == "200") small_input.checked = true;
-
-	*/
+			<input id="setQRProperties" value="Set Preview Size" type="button">
+			`;
+		this.setImageAdderFields();
+		this.setImageAdderEventListeners();
 		}
 																						},
 		{Text : "View 『Thread Rebuilder』 Settings", ListenerFunc : 			(a_id) => {
@@ -281,8 +211,63 @@ document.getElementById("SelectColorYen").addEventListener("input", (evt) => {
 		this.activate();
 	}
 	
+	setImageAdderFields(){
+		(<HTMLInputElement>document.getElementById("width_DIA")).value = this.setting_items.image_adder_settings.Width;
+		(<HTMLInputElement>document.getElementById("height_DIA")).value = this.setting_items.image_adder_settings.Height;
+		(<HTMLInputElement>document.getElementById("qr_width_DIA")).value = this.setting_items.image_adder_settings.QR_Width;
+
+		if		((<HTMLInputElement>document.getElementById("width_DIA")).value == "489") (<HTMLInputElement>document.getElementById("v_large_DIA")).checked = true;	
+		else if((<HTMLInputElement>document.getElementById("width_DIA")).value == "400") (<HTMLInputElement>document.getElementById("large_DIA")).checked = true;
+		else if((<HTMLInputElement>document.getElementById("width_DIA")).value == "300") (<HTMLInputElement>document.getElementById("medium_DIA")).checked = true;
+		else if((<HTMLInputElement>document.getElementById("width_DIA")).value == "200") (<HTMLInputElement>document.getElementById("small_DIA")).checked = true;
+	}
+	
+	setImageAdderEventListeners():void{
+		(<HTMLInputElement>document.getElementById("v_large_DIA")).addEventListener("click", function(){
+			(<HTMLInputElement>document.getElementById("width_DIA")).value = "489";
+			(<HTMLInputElement>document.getElementById("height_DIA")).value = "489";
+		});
+
+		(<HTMLInputElement>document.getElementById("large_DIA")).addEventListener("click", function(){
+			(<HTMLInputElement>document.getElementById("width_DIA")).value = "400";
+			(<HTMLInputElement>document.getElementById("height_DIA")).value = "400";
+		});
+			
+		(<HTMLInputElement>document.getElementById("medium_DIA")).addEventListener("click", function(){
+			(<HTMLInputElement>document.getElementById("width_DIA")).value = "300";
+			(<HTMLInputElement>document.getElementById("height_DIA")).value = "300";
+		});
+
+		
+		(<HTMLInputElement>document.getElementById("small_DIA")).addEventListener("click", function(){
+			(<HTMLInputElement>document.getElementById("width_DIA")).value = "200";
+			(<HTMLInputElement>document.getElementById("height_DIA")).value = "200";
+		});
+		
+		
+		(<HTMLInputElement>document.getElementById("setQRProperties")).addEventListener("click", (evt) => {
+			this.storeStates();
+			this.clearContainer();
+			this.rebuildContainer();
+		});
+
+
+
+	}
+
 		//*...THIS
 	retrieveStates():void{
+		//values used to fill out data fields
+		this.setting_items.image_hiding_settings  = {Expiration_Time: localStorage.getItem("Expiration_Time"), MD5_List_FSE: localStorage.getItem("MD5_List_FSE")};
+		this.retrieveWordReplaceStates();
+		this.retrieveImageAdderStates();
+		this.setting_items.thread_rebuild_settings = (localStorage.getItem("tab-settings4") == 'true');
+		this.setting_items.yen_settings = (localStorage.getItem("tab-settings5") == 'true');
+		this.setting_items.kita_settings  = (localStorage.getItem("tab-settings6") == 'true');
+		this.setting_items.password_settings=(localStorage.getItem("pw_active"));
+	}
+	
+	retrieveWordReplaceStates():void{
 		//acquire text filter representation
 		var storage_index:number = 0;
 		var JSON_storage:any = {};
@@ -298,29 +283,41 @@ document.getElementById("SelectColorYen").addEventListener("input", (evt) => {
 		filters.forEach((filter) => {
 			text_filters.push(TextReplacer.formatFilterSettings(JSON_storage[filter]));
 		});
+		
+		var width = localStorage.getItem("width_DIA");
+		var height = localStorage.getItem("height_DIA");
+		var qr_width = localStorage.getItem("qr_width_DIA");
 
-		//values used to fill out data fields
-		this.setting_items.image_hiding_settings  = {Expiration_Time: localStorage.getItem("Expiration_Time"), MD5_List_FSE: localStorage.getItem("MD5_List_FSE")};
 		this.setting_items.word_replace_settings = {Number_of_filters: localStorage.getItem("filter_quantity"), Text_Filter_List: text_filters};
-		this.setting_items.image_adder_settings = (localStorage.getItem("tab-settings3") == 'true');
-		this.setting_items.thread_rebuild_settings = (localStorage.getItem("tab-settings4") == 'true');
-		this.setting_items.yen_settings = (localStorage.getItem("tab-settings5") == 'true');
-		this.setting_items.kita_settings  = (localStorage.getItem("tab-settings6") == 'true');
-		this.setting_items.password_settings=(localStorage.getItem("pw_active"));
+	}
+	
+	retrieveImageAdderStates():void{
+		this.setting_items.image_adder_settings =  {Width: localStorage.getItem("width_DIA"),
+													Height: localStorage.getItem("height_DIA"), 
+													QR_Width: localStorage.getItem("qr_width_DIA")};
+		
+		if(this.setting_items.image_adder_settings.Height === null) this.setting_items.image_adder_settings.Height = 400;
+		if(this.setting_items.image_adder_settings.Width === null) this.setting_items.image_adder_settings.Width = 400;
+		if(this.setting_items.image_adder_settings.QR_Width === null) this.setting_items.image_adder_settings.QR_Width = 480;
+		
+		(<HTMLInputElement>document.getElementById("fourchanx-css")).textContent += ".qr-preview { height:" +  this.setting_items.image_adder_settings.Height + "px; width: " + this.setting_items.image_adder_settings.Width +  "px; left:8%;background-size: cover;}";
+		(<HTMLInputElement>document.getElementById("fourchanx-css")).textContent += "#dump-list { min-height: " + (this.setting_items.image_adder_settings.Width - 20) +  "px; width: " + (this.setting_items.image_adder_settings.QR_Width) + "px;}";
 	}
 	
 	storeStates():void{
 		//image settings
-		this.storeImageStates();	
+		this.storeImageFilterStates();	
 		//Text replace settings
-		this.storeFilterStates();	
+		this.storeTextFilterStates();	
+		//Image Adder settings
+		this.storeImageAdderStates();
 		//Password replace settings
 		this.storePasswordStates()
-		
+	
 		this.retrieveStates();
 	}
 	
-	storeImageStates():void{
+	storeImageFilterStates():void{
 		if(document.getElementById("Expiration_Time") !== null){
 			var time:any = document.getElementById("Expiration_Time");
 			var millisecond_time:number = parseInt((<HTMLInputElement>time).value) * Constants.MILLISECONDS_TO_THE_HOUR;
@@ -333,7 +330,7 @@ document.getElementById("SelectColorYen").addEventListener("input", (evt) => {
 		
 	}
 	
-	storeFilterStates():void{
+	storeTextFilterStates():void{
 		if(document.getElementById("FilterRow0") !== null){		
 			var f_row_moving:any = document.getElementById("FilterRow0");
 			var number_of_filters:number = 0;
@@ -377,6 +374,19 @@ document.getElementById("SelectColorYen").addEventListener("input", (evt) => {
 			}
 			Generics.alert4ChanX("Wordfilters Updated!", "success", 3);
 		}
+	}
+	
+	storeImageAdderStates():void{
+		var width:string = (<HTMLInputElement>document.getElementById("width_DIA")).value;	
+		localStorage.setItem("width_DIA", width);
+		
+		var height:string = (<HTMLInputElement>document.getElementById("height_DIA")).value;	
+		localStorage.setItem("height_DIA", height);
+		
+		var qr_width:string = (<HTMLInputElement>document.getElementById("qr_width_DIA")).value;	
+		localStorage.setItem("qr_width_DIA", qr_width);
+		
+
 	}
 	
 	storePasswordStates():void{

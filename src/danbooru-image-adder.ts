@@ -4,6 +4,7 @@ class DanbooruImageAdder extends FeatureInterface{
 
 	constructor(){
 		super();
+		
 	}
 	init():void{}
 	retrieveStates():void{}
