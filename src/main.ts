@@ -4,7 +4,7 @@ class Main extends FeatureInterface{
 	
 	constructor(){
 		super();
-		if(!storageAvailable('localStorage')) {alert("4F-FSE: local storage error"); return;}
+		if(!Generics.storageAvailable('localStorage')) {alert("4F-FSE: local storage error"); return;}
 		else this.activate();	
 		this.retrieveStates();
 		this.init();

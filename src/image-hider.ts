@@ -1,3 +1,4 @@
+
 class ImageHider extends FeatureInterface{
 	blank_png:string = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAALiMAAC4jAHM9rsvAAAA
 												G3RFWHRTb2Z0d2FyZQBDZWxzeXMgU3R1ZGlvIFRvb2zBp+F8AAAAo0lEQVR42u3RAQ0AAAjDMO5
@@ -6,7 +7,6 @@ class ImageHider extends FeatureInterface{
 												IEAEBIiBABERAgAgIEAEBIiBABAQIECACAkRAgAjI9xbzUCtI4axs4wAAAABJRU5ErkJggg==`;
 
 	hide_expiration_time:number;
-	
 	threads_to_hide:string[];
 	md5_filters_arr:string[];
 	
@@ -23,19 +23,20 @@ class ImageHider extends FeatureInterface{
 	//Note: Must have the DOM itterate through before retrieval
 	retrieveStates():void{
 		var storage_position:number = 0;
-        var JSON_data:any = {}/*;any bypasses dot notation issues on objects*/, storage_key:string;
+        var JSON_storage:any = {};/*;any bypasses dot notation issues on objects*/
+		var storage_key:string;
 		var local_store_size = window.localStorage.length;
 		while(storage_position < local_store_size) {
 			storage_key = window.localStorage.key(storage_position);
-			JSON_data[storage_key] = window.localStorage.getItem(storage_key);
+			JSON_storage[storage_key] = window.localStorage.getItem(storage_key);
 			storage_position++;
 		}
-		this.threads_to_hide = this.getJSONPropertiesByKeyName(JSON_data,'[0-9]+IMG');
+		this.threads_to_hide = Generics.getJSONPropertiesByKeyName(JSON_storage,'[0-9]+IMG');
 		//aquire each time to check for changes
-		this.hide_expiration_time =  parseInt(JSON_data.Expiration_Time);
-		if(this.hide_expiration_time === null) this.hide_expiration_time = DEFAULT_HIDE_EXPIRATION_TIME;
-		var md5_filters = JSON_data.MD5_List_FSE;	
-		if(md5_filters !== null){
+		this.hide_expiration_time =  parseInt(JSON_storage.Expiration_Time);
+		if(this.hide_expiration_time === null) this.hide_expiration_time = Constants.DEFAULT_HIDE_EXPIRATION_TIME;
+		var md5_filters = JSON_storage.MD5_List_FSE;	
+		if(md5_filters !== undefined && md5_filters !== null){
 			this.md5_filters_arr = md5_filters.split('\n');
 			//remove trailing and starting slash
 			this.md5_filters_arr.forEach((md5, index) => {
@@ -49,19 +50,7 @@ class ImageHider extends FeatureInterface{
 		window.localStorage.setItem(item_pairs[0], item_pairs[1]);	
 	}
 	
-	init():void{	
-
-	}
-	
-	//gets json keys by regex test
-	getJSONPropertiesByKeyName(JSON_obj:object, regex_string:string):string[]{
-		var regex = new RegExp("^" + regex_string + "$");
-		var rtnArray:string[] = Array();
-		for (let key in JSON_obj)
-			if (regex.test(key))
-				rtnArray.push(key);
-		return rtnArray;
-	}
+	init():void{	}
 	
 	//hide image onclick listener.
 	//Method 404's a given image. This 404'ing allows image dissabling to be toggled on and off.
@@ -138,16 +127,18 @@ class ImageHider extends FeatureInterface{
 		}
 		//index node holds the MD5
 		var node_md5:string = image_node.getAttribute('data-md5');
-		var md5_filters_arr_len = this.md5_filters_arr.length;
-		for(var md5:number = 0 ; md5 < md5_filters_arr_len; md5++){
-			if(node_md5 == this.md5_filters_arr[md5]){
-				image_node.setAttribute('hidden-src', image_node.src);
-				image_node.src = this.blank_png;
+		if(this.md5_filters_arr !== undefined){
+			var md5_filters_arr_len = this.md5_filters_arr.length;
+			for(var md5:number = 0 ; md5 < md5_filters_arr_len; md5++){
+				if(node_md5 == this.md5_filters_arr[md5]){
+					image_node.setAttribute('hidden-src', image_node.src);
+					image_node.src = this.blank_png;
 
-				sister_node.setAttribute('hidden-src', sister_node.src);
-				sister_node.src = this.blank_png;
+					sister_node.setAttribute('hidden-src', sister_node.src);
+					sister_node.src = this.blank_png;
 
-				return;
+					return;
+				}
 			}
 		}
 	}
@@ -179,10 +170,12 @@ class ImageHider extends FeatureInterface{
 				var node_md5:string;
 				if(is_embeded_post) node_md5 = image_node.getAttribute('data-md5');
 				else node_md5 = document.getElementById('f' + proccessed_id).getElementsByTagName('IMG')[0].getAttribute('data-md5');
-				for(var md5:number = 0 , md5_filters_arr_len:number = this.md5_filters_arr.length; md5 < md5_filters_arr_len; md5++){
-					if(node_md5 == this.md5_filters_arr[md5]){
-						image_node.removeAttribute('src');
-						return;
+				if(this.md5_filters_arr !== undefined){
+					for(var md5:number = 0 , md5_filters_arr_len:number = this.md5_filters_arr.length; md5 < md5_filters_arr_len; md5++){
+						if(node_md5 == this.md5_filters_arr[md5]){
+							image_node.removeAttribute('src');
+							return;
+						}
 					}
 				}
 			});

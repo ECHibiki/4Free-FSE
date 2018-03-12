@@ -17,9 +17,8 @@ class SettingsWindow  extends FeatureInterface{
 	list_items:any[] = 
 	[
 		{Text : "View 『Image Hiding』 Settings", ListenerFunc : 				(a_id) => {
-			var item_container = document.getElementById(a_id).parentNode.parentNode.parentNode;
 			this.clearContainer();
-			(<Element>item_container).innerHTML = 
+			(<Element>this.contents_div).innerHTML = 
 				`
 				<div id="disposable_container">
 								 <label>Non-MD5 Expiration Time(hours): </label>
@@ -33,7 +32,7 @@ class SettingsWindow  extends FeatureInterface{
 								<hr>
 				</div>
 				`;
-				(<HTMLInputElement>document.getElementById("Expiration_Time")).value = "" + (this.setting_items.image_hiding_settings.Expiration_Time / MILLISECONDS_TO_THE_HOUR);
+				(<HTMLInputElement>document.getElementById("Expiration_Time")).value = "" + (this.setting_items.image_hiding_settings.Expiration_Time / Constants.MILLISECONDS_TO_THE_HOUR);
 				(<HTMLInputElement>document.getElementById("MD5_List_FSE")).value = this.setting_items.image_hiding_settings.MD5_List_FSE; 
 				var set_button = document.createElement('INPUT');
 				document.getElementById("disposable_container").appendChild(set_button);	
@@ -47,7 +46,15 @@ class SettingsWindow  extends FeatureInterface{
 			}
 
 																						},
-		{Text : "View 『Word Replacement』 Settings", ListenerFunc : 			() => {}
+		{Text : "View 『Word Replacement』 Settings", ListenerFunc : 			(a_id) => {
+			this.clearContainer();
+			
+			var disposable_container:any = document.createElement("DIV");
+			disposable_container.setAttribute("ID", "disposable_container");
+			this.contents_div.appendChild(disposable_container);
+			this.filterWindow(disposable_container);
+			this.filterSetTable();				
+		}
 																						},
 		{Text : "View 『Danbooru Image Adder』 Settings", ListenerFunc :		() => {}
 																						},
@@ -78,8 +85,25 @@ class SettingsWindow  extends FeatureInterface{
 	
 		//*...THIS
 	retrieveStates():void{
+		//acquire text filter representation
+		var storage_index:number = 0;
+		var JSON_storage:any = {};
+		var storage_key:string;
+		var text_filters:any[] = [];
+		while(storage_index < window.localStorage.length) {
+			storage_index++;
+			storage_key = window.localStorage.key(storage_index);
+			JSON_storage[storage_key] = window.localStorage.getItem(storage_key);
+		}
+		var filters:string[] = Generics.getJSONPropertiesByKeyName(JSON_storage,"[0-9]+FLT");
+		filters.sort();
+		filters.forEach((filter) => {
+			text_filters.push(TextReplacer.formatFilterSettings(JSON_storage[filter]));
+		});
+
+		//values used to fill out data fields
 		this.setting_items.image_hiding_settings  = {Expiration_Time: localStorage.getItem("Expiration_Time"), MD5_List_FSE: localStorage.getItem("MD5_List_FSE")};
-		this.setting_items.word_replace_settings = (localStorage.getItem("tab-settings2") == 'true');
+		this.setting_items.word_replace_settings = {Number_of_filters: localStorage.getItem("filter_quantity"), Text_Filter_List: text_filters};
 		this.setting_items.image_adder_settings = (localStorage.getItem("tab-settings3") == 'true');
 		this.setting_items.thread_rebuild_settings = (localStorage.getItem("tab-settings4") == 'true');
 		this.setting_items.yen_settings = (localStorage.getItem("tab-settings5") == 'true');
@@ -89,26 +113,84 @@ class SettingsWindow  extends FeatureInterface{
 	
 	storeStates():void{
 		//image settings
-		if(document.getElementById("Expiration_Time") !== null){
-			var time:any = document.getElementById("Expiration_Time");
-			var millisecond_time:number = parseInt((<HTMLInputElement>time).value) * MILLISECONDS_TO_THE_HOUR;
-			if (millisecond_time == 0 || millisecond_time === null || millisecond_time === undefined) millisecond_time = DEFAULT_HIDE_EXPIRATION_TIME;
-			localStorage.setItem("Expiration_Time", `${millisecond_time}`);
-			var md5_filters = (<HTMLInputElement>document.getElementById("MD5_List_FSE")).value;
-			localStorage.setItem("MD5_List_FSE", md5_filters);
-		}
-		
-		//password view settings
-		if(document.getElementById("check-settings6") !== null)
-		localStorage.setItem("pw_active", `${(<HTMLInputElement>document.getElementById("check-settings6")).checked}`);
+		this.storeImageStates();	
+		//Text replace settings
+		this.storeFilterStates();	
+		//Password replace settings
+		this.storePasswordStates()
 		
 		this.retrieveStates();
+	}
+	
+	storeImageStates():void{
+		if(document.getElementById("Expiration_Time") !== null){
+			var time:any = document.getElementById("Expiration_Time");
+			var millisecond_time:number = parseInt((<HTMLInputElement>time).value) * Constants.MILLISECONDS_TO_THE_HOUR;
+			if (millisecond_time == 0 || millisecond_time === null || millisecond_time === undefined) millisecond_time = Constants.DEFAULT_HIDE_EXPIRATION_TIME;
+			localStorage.setItem("Expiration_Time", millisecond_time.toString());
+			var md5_filters = (<HTMLInputElement>document.getElementById("MD5_List_FSE")).value;
+			localStorage.setItem("MD5_List_FSE", md5_filters);
+			Generics.alert4ChanX("Image Settings Saved", "success", 3);
+		}
+		
+	}
+	
+	storeFilterStates():void{
+		if(document.getElementById("FilterRow0") !== null){		
+			var f_row_moving:any = document.getElementById("FilterRow0");
+			var number_of_filters:number = 0;
+			var number_of_filters_actual:number = 0;
+			while(f_row_moving.nextSibling !== null){
+				if((<HTMLInputElement>document.getElementById("Pattern" + number_of_filters)).value !== "") number_of_filters_actual++;
+				number_of_filters++;
+				f_row_moving = f_row_moving.nextSibling;
+			}		
+			window.localStorage.setItem("filter_quantity", number_of_filters_actual.toString());
+			
+			for (var pattern_input:number = 0 ; pattern_input < number_of_filters; pattern_input++){
+				var pattern_to_store:string = (<HTMLInputElement>document.getElementById("Pattern"+pattern_input)).value;
+				var replacement_to_store:string = (<HTMLInputElement>document.getElementById("Replacement"+pattern_input)).value;
+				var setting:string = 'g';
+				try{
+					if(pattern_to_store === "") {
+						localStorage.removeItem(pattern_input + "FLT");
+						continue;
+					}
+					else if(new RegExp("^\/.*\/\\D+$").test(pattern_to_store)){}
+					else if (new RegExp("^\/.*\/$").test(pattern_to_store)){
+						pattern_to_store = pattern_to_store + setting;
+					}
+					else if(!new RegExp("^/.*\/\\D$").test(pattern_to_store)){
+						pattern_to_store = "/" + pattern_to_store + "/" + setting;
+					} 
+					 //test for breakages, try to cause error
+					 var error_test:any = new RegExp(
+								pattern_to_store.substring(0, pattern_to_store.lastIndexOf("/") + 1),
+								pattern_to_store.substring(pattern_to_store.lastIndexOf("/") + 1)
+								);
+				 }
+				 catch(e){
+					Generics.alert4ChanX("Unrecoverable Regex error on pattern " + pattern_input + " for " + pattern_to_store, "error", undefined);
+					continue;
+				 }
+				pattern_to_store = encodeURIComponent(pattern_to_store);
+				var save_string:string = (<HTMLInputElement>document.getElementById("Active"+pattern_input)).checked + '=' + pattern_to_store + '=' + replacement_to_store;
+				window.localStorage.setItem(pattern_input + "FLT", save_string);
+			}
+			Generics.alert4ChanX("Wordfilters Updated!", "success", 3);
+		}
+	}
+	
+	storePasswordStates():void{
+			//password view settings
+		if(document.getElementById("check-settings6") !== null)
+		localStorage.setItem("pw_active", `${(<HTMLInputElement>document.getElementById("check-settings6")).checked}`);		
 	}
 	
 	clearContainer():void{
 		var disposable = document.getElementById("disposable_container");
 		if(disposable !== null) this.contents_div.removeChild(disposable);
-		this.contents_div.appendChild(this.ul_selection_start);
+		else this.contents_div.removeChild(this.ul_selection_start);
 	}
 	
 	rebuildContainer(){
@@ -123,7 +205,7 @@ class SettingsWindow  extends FeatureInterface{
 											position:fixed;width:100%;height:100%;background-color:rgba(200,200,200,0.3);top:0;left:0; z-index:9
 										}
 										.settingsItem{
-											font-size:18px;list-style:katakana outside;padding:2px;color:#2e2345;
+											font-size:18px;list-style:katakana-iroha outside;padding:2px;color:#2e2345;
 										}
 										.settingsItem input{
 											transform: scale(1.2);
@@ -135,7 +217,10 @@ class SettingsWindow  extends FeatureInterface{
 											border:solid 1px black;position:absolute;width:25px;height:25px;background-color:rgba(255,100,90,0.9); right:3px;top:3px; z-index:10
 										}
 										.titleStyle{
-											margin-left:5px;margin-top:5px
+											font-size: 20px;padding: 12px 0px 9px 22px
+										}
+										.footerStyle{
+											padding-left: 12px;
 										}
 										.contentStyle{
 											background-color:white;margin:0 0;padding:5px 25px;
@@ -158,7 +243,7 @@ class SettingsWindow  extends FeatureInterface{
 
 		this.contents_div.setAttribute('class','contentStyle');
 
-		this.end_para.setAttribute('class', '');
+		this.end_para.setAttribute('class', 'footerStyle');
 				
 		this.generateList(this.contents_div);
 	}
@@ -224,11 +309,230 @@ class SettingsWindow  extends FeatureInterface{
 		this.settings_div.style.display = 'block';
 		this.rebuildContainer();
 	}
+	
 	hideWindow():void{
 		this.background_div.style.display = 'none';
 		this.settings_div.style.display = 'none';
 		this.clearContainer();
 	}
+		
+	filterWindow(disposable_container:any):void{
+		var filter_table:any = document.createElement("table");
+		filter_table.setAttribute("style", "text-align:center;");
+		filter_table.setAttribute("id", "filter_table");
+		disposable_container.appendChild(filter_table);
+
+		var table_row:any = document.createElement("tr");
+		filter_table.appendChild(table_row);
+		var table_head_active:any =  document.createElement("th");
+		var head_text_active:any = document.createTextNode("Active");
+		table_head_active.appendChild(head_text_active);
+		filter_table.appendChild(table_head_active);
+		var table_head_pattern:any =  document.createElement("th");
+		var headTextPattern:any = document.createTextNode("Pattern");
+		table_head_pattern.appendChild(headTextPattern);
+		filter_table.appendChild(table_head_pattern);
+		var table_head_replacement:any =  document.createElement("th");
+		var head_text_replacement:any = document.createTextNode("Replacement");
+		table_head_replacement.appendChild(head_text_replacement);
+		filter_table.appendChild(table_head_replacement);
+
+		//Create the pattern table
+		//loop to create rows
+		var number_of_filters:number = parseInt(this.setting_items.word_replace_settings.number_of_filters);
+		if (number_of_filters === 0 || isNaN(number_of_filters)) number_of_filters = 6;
+		for (var i = 0; i <  number_of_filters ; i++){
+			var table_row_contents:any = document.createElement("tr");
+			table_row_contents.setAttribute("id", "FilterRow" + i);
+
+			var table_data_active:any =  document.createElement("td");
+			var table_checkbox_active:any = document.createElement("input");
+			table_checkbox_active.setAttribute("type", "checkbox");
+			table_checkbox_active.setAttribute("id", "Active" + i);
+			table_data_active.appendChild(table_checkbox_active);
+			table_row_contents.appendChild(table_data_active);
+
+			var table_data_pattern:any =  document.createElement("td");
+			var table_input_pattern:any = document.createElement("input");
+			table_input_pattern.setAttribute("class", "inputs");
+			table_input_pattern.setAttribute("id", "Pattern" + i);
+			table_data_pattern.appendChild(table_input_pattern);
+			table_row_contents.appendChild(table_data_pattern);
+
+			var table_data_replacement:any =  document.createElement("td");
+			var table_input_replacement:any =  document.createElement("input");
+			table_input_replacement.setAttribute("class", "inputs");
+			table_input_replacement.setAttribute("id", "Replacement" + i);
+			table_data_replacement.appendChild(table_input_replacement);
+			table_row_contents.appendChild(table_data_replacement);
+
+			filter_table.appendChild(table_row_contents);
+		}
+
+		var table_last_contents:any = document.createElement("tr");
+
+		var table_add_collumn:any =  document.createElement("td");
+		var table_add_row_button:any = document.createElement("input");
+		var table_subtract_row_button:any = document.createElement("input");
+		table_subtract_row_button.setAttribute("type", "button");
+		table_subtract_row_button.setAttribute("value", "-");
+		table_subtract_row_button.setAttribute("style", "padding: 7px 0; margin:5px 0;");
+		table_add_collumn.appendChild(table_subtract_row_button);
+		table_subtract_row_button.addEventListener("click", (evt) => this.filterRemoveRow());
+		table_add_row_button.setAttribute("type", "button");
+		table_add_row_button.setAttribute("value", "+");
+		table_add_row_button.setAttribute("style", "padding: 7px 0; margin:5px 0;");
+		table_add_collumn.appendChild(table_add_row_button);
+		table_add_row_button.addEventListener("click", (evt) => this.filterAddRow());
+
+		table_last_contents.appendChild(table_add_collumn);
+
+		var table_set_collumn:any =  document.createElement("td");
+		var table_confirm_button:any = document.createElement("input");
+		table_confirm_button.setAttribute("type", "button");
+		table_confirm_button.setAttribute("id", "table_confirm_button");
+		table_confirm_button.setAttribute("value", "Set Replacements");
+		table_confirm_button.setAttribute("style", "padding: 7px 0; margin:5px 0;");
+		
+		//event listeners
+		table_confirm_button.addEventListener("click", (evt) => {
+			this.storeStates();
+			this.clearContainer();
+			this.rebuildContainer();
+		});
+		
+		table_set_collumn.appendChild(table_confirm_button);
+		table_last_contents.appendChild(table_set_collumn);
+
+		var table_close_collumn:any = document.createElement("td");
+		var table_close_button:any = document.createElement("input");
+		table_close_button.setAttribute("type", "button");
+		table_close_button.setAttribute("value", "Close Without Saving");
+		table_close_button.setAttribute("style", "padding: 7px 0; margin:5px 0;");
+		table_close_button.addEventListener("click", (evt) => {
+			this.clearContainer();
+			this.rebuildContainer();
+		});
+		table_close_collumn.appendChild(table_close_button);
+		table_last_contents.appendChild(table_close_collumn);
+
+		filter_table.appendChild(table_last_contents);
+	}
 	
+	filterAddRow():void{
+		var number_of_filters:number = parseInt(this.setting_items.word_replace_settings.number_of_filters);
+			
+		var filter_table:any = document.getElementById("filter_table");
+		filter_table.deleteRow(number_of_filters + 1);
+		number_of_filters++;
+
+		var table_row_contents:any = document.createElement("tr");
+		table_row_contents.setAttribute("id", "FilterRow" +  (number_of_filters - 1));
+
+		var table_data_active:any =  document.createElement("td");
+		var table_checkbox_active:any = document.createElement("input");
+		table_checkbox_active.setAttribute("type", "checkbox");
+		table_checkbox_active.setAttribute("id", "Active" + (number_of_filters - 1));
+		table_data_active.appendChild(table_checkbox_active);
+		table_row_contents.appendChild(table_data_active);
+
+		var table_data_pattern:any =  document.createElement("td");
+		var table_input_pattern:any = document.createElement("input");
+		table_input_pattern.setAttribute("class", "inputs");
+		table_input_pattern.setAttribute("id", "Pattern" + (number_of_filters - 1));
+		table_data_pattern.appendChild(table_input_pattern);
+		table_row_contents.appendChild(table_data_pattern);
+
+		var table_data_replacement:any =  document.createElement("td");
+		var table_input_replacement:any =  document.createElement("input");
+		table_input_replacement.setAttribute("class", "inputs");
+		table_input_replacement.setAttribute("id", "Replacement" + (number_of_filters - 1));
+		table_data_replacement.appendChild(table_input_replacement);
+		table_row_contents.appendChild(table_data_replacement);
+
+		filter_table.appendChild(table_row_contents);
+
+		var table_last_contents:any = document.createElement("tr");
+
+		var table_add_collumn:any =  document.createElement("td");
+		var table_add_row_button:any = document.createElement("input");
+		var table_subtract_row_button:any = document.createElement("input");
+		table_subtract_row_button.setAttribute("type", "button");
+		table_subtract_row_button.setAttribute("value", "-");
+		table_subtract_row_button.setAttribute("style", "padding: 7px 0; margin:5px 0;");
+		table_add_collumn.appendChild(table_subtract_row_button);
+		table_subtract_row_button.addEventListener("click", (evt) => this.filterRemoveRow());
+		table_add_row_button.setAttribute("type", "button");
+		table_add_row_button.setAttribute("value", "+");
+		table_add_row_button.setAttribute("style", "padding: 7px 0; margin:5px 0;");
+		table_add_collumn.appendChild(table_add_row_button);
+		table_add_row_button.addEventListener("click", (evt) => this.filterAddRow());
+
+		table_last_contents.appendChild(table_add_collumn);
+
+		var table_set_collumn:any =  document.createElement("td");
+		var table_confirm_button:any = document.createElement("input");
+		table_confirm_button.setAttribute("type", "button");
+		table_confirm_button.setAttribute("id", "table_confirm_button");
+		table_confirm_button.setAttribute("value", "Set Replacements");
+		table_confirm_button.setAttribute("style", "padding: 7px 0; margin:5px 0;");
+		//event listeners
+		table_confirm_button.addEventListener("click", (evt) => {
+			this.storeStates();
+			this.clearContainer();
+			this.rebuildContainer();
+		});
+		
+		table_set_collumn.appendChild(table_confirm_button);
+		table_last_contents.appendChild(table_set_collumn);
+
+		var table_close_collumn:any = document.createElement("td");
+		var table_close_button:any = document.createElement("input");
+		table_close_button.setAttribute("type", "button");
+		table_close_button.setAttribute("value", "Close Menu");
+		table_close_button.setAttribute("style", "padding: 7px 0; margin:5px 0;");
+		table_close_button.addEventListener("click", (evt) => {
+			this.clearContainer();
+			this.rebuildContainer();
+		});
+		table_close_collumn.appendChild(table_close_button);
+		table_last_contents.appendChild(table_close_collumn);
+
+		filter_table.appendChild(table_last_contents);
+	}
+
+	filterRemoveRow():void{
+		var number_of_filters:number = parseInt(this.setting_items.word_replace_settings.number_of_filters);
+			
+		var filter_table:any = document.getElementById("filter_table");
+		if(number_of_filters != 0){
+			filter_table.deleteRow(number_of_filters);
+			number_of_filters--;
+		}
+	}
+
+	filterSetTable():void{
+		var filter_length = this.setting_items.word_replace_settings.Text_Filter_List.length; 
+		for (var filter_count:number = 0 ; filter_count < filter_length ; filter_count++){
+			if(
+				this.setting_items.word_replace_settings.Text_Filter_List[filter_count].Active === null || 
+				this.setting_items.word_replace_settings.Text_Filter_List[filter_count].Regex === null ||
+				this.setting_items.word_replace_settings.Text_Filter_List[filter_count].Replacement === null) return;
+				
+			if(this.setting_items.word_replace_settings.Text_Filter_List[filter_count].Active === "true"){
+				(<HTMLInputElement>document.getElementById("Active"+filter_count)).checked = true;
+			}
+			else{
+				(<HTMLInputElement>document.getElementById("Active"+filter_count)).checked = false;
+			}
+			(<HTMLInputElement>document.getElementById("Pattern"+filter_count)).value = 
+											this.setting_items.word_replace_settings.Text_Filter_List[filter_count].Regex;
+			(<HTMLInputElement>document.getElementById("Replacement"+filter_count)).value = 
+											this.setting_items.word_replace_settings.Text_Filter_List[filter_count].Replacement;
+		}
+	}
+
+
+
 
 }
