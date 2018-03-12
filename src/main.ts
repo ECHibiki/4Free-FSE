@@ -26,6 +26,9 @@ class Main extends FeatureInterface{
 		if(true){
 			this.features.image_replacer = new TextReplacer();
 		}
+		if(true){
+			this.features.danbooru_image_adder = new DanbooruImageAdder();
+		}
 		if(this.settings.password_settings == 'true'){
 			this.features.text_replacer = new PasswordViewer();
 		}

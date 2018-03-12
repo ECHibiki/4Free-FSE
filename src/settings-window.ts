@@ -56,15 +56,213 @@ class SettingsWindow  extends FeatureInterface{
 			this.filterSetTable();				
 		}
 																						},
-		{Text : "View 『Danbooru Image Adder』 Settings", ListenerFunc :		() => {}
-																						},
-		{Text : "View 『Thread Rebuilder』 Settings", ListenerFunc : 			() => {}
-																						},
-		{Text : "View 『¥ Text』 Settings [Long Coloring]", ListenerFunc : 	() => {
+		{Text : "View 『Danbooru Image Adder』 Settings", ListenerFunc :		(a_id) => {		
+			this.clearContainer();
 			
-																					}
+			var disposable_container = document.createElement("DIV");
+			disposable_container.setAttribute("id", "disposable_container");
+			this.contents_div.appendChild(disposable_container);	
+			disposable_container.innerHTML = `
+			<table style="text-align:center;margin-left:5px">
+				<tr>
+					<td>
+						<label>Very Large: </label>
+					</td>
+					<td>
+						<input id="v_large" name="preivew-size" style="display:inline" type="radio">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>Large: </label>
+					</td>
+					<td>
+						<input id="large" name="preivew-size" style="display:inline" type="radio">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>Medium: </label>
+					</td>
+					<td>
+						<input id="medium" name="preivew-size" style="display:inline" type="radio">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>Very Large: </label>
+					</td>
+					<td>
+						<input id="small" name="preivew-size" style="display:inline" type="radio">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>Width: </label>
+					</td>
+					<td>
+						<input id="width_DIA" name="preivew-size" style="width:20%" value="400" type="text">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>Height: </label>
+					</td>
+					<td>
+						<input id="height_DIA" name="preivew-size" style="width:20%" value="400" type="text">
+					</td>
+				</tr>
+			</table>	
+		
+			<hr>
+			
+			<label>Quick Reply Min Width: </label>
+			<input id="qr_width_DIA" name="preivew-size" style="width:20%" value="480" type="text">
+		
+			<hr>
+		
+			<input id="setTime" value="Set Preview Size" type="button">
+			`			
+			
+			/*
+					
+		v_large_input.addEventListener("click", function(){
+			document.getElementById("width_DIA").value = 489;
+			document.getElementById("height_DIA").value = 489;
+		});
+
+	
+		large_input.addEventListener("click", function(){
+			document.getElementById("width_DIA").value = 400;
+			document.getElementById("height_DIA").value = 400;
+		});
+		
+	
+		medium_input.addEventListener("click", function(){
+			document.getElementById("width_DIA").value = 300;
+			document.getElementById("height_DIA").value = 300;
+		});
+
+		
+		small_input.addEventListener("click", function(){
+			document.getElementById("width_DIA").value = 200;
+			document.getElementById("height_DIA").value = 200;
+		});
+		
+
+		var width = localStorage.getItem("width_DIA");
+		if(width === null) width = 400;
+		width_input.setAttribute("value", width);
+			
+		var height = localStorage.getItem("height_DIA");
+		if(height === null) height = 400;
+		height_input.setAttribute("value", height);
+		
+		radio_table.appendChild(height_row);
+		
+		container_div.appendChild(radio_table);	
+		container_div.appendChild(document.createElement("hr"));
+		
+		var qr_width = localStorage.getItem("qr_width_DIA");
+		if(qr_width === null) qr_width = 480;
+		qr_width_input.setAttribute("value", qr_width);
+		
+		set_button.addEventListener("click", function(){
+			if (storageAvailable('localStorage')) {
+				var width = parseInt(document.getElementById("width_DIA").value);	
+				localStorage.setItem("width_DIA", width);
+				
+				var qr_width = parseInt(document.getElementById("qr_width_DIA").value);	
+				localStorage.setItem("qr_width_DIA", qr_width);
+				
+				var height = parseInt(document.getElementById("height_DIA").value);	
+				localStorage.setItem("height_DIA", height);
+		
+				if(width === null) width = 400;
+				if(qr_width === null) qr_width = 480;
+				if(height === null) height = 400;
+
+				document.getElementById("fourchanx-css").textContent += ".qr-preview { height:" +  height + "px; width: " + width +  "px; left:8%;background-size: cover;}";
+				document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: " + (width - 20) +  "px; width: " + (qr_width) + "px;}";
+
+				imageAdderToggle();
+			}
+		});
+
+		if(document.getElementById("width_DIA").value == "489") v_large_input.checked = true;	
+		if(document.getElementById("width_DIA").value == "400") large_input.checked = true;
+		if(document.getElementById("width_DIA").value == "300") medium_input.checked = true;
+		if(document.getElementById("width_DIA").value == "200") small_input.checked = true;
+
+	*/
+		}
 																						},
-		{Text : "View 『Kita』 Settings [Character Coloring]", ListenerFunc :	() => {}																						
+		{Text : "View 『Thread Rebuilder』 Settings", ListenerFunc : 			(a_id) => {
+			this.clearContainer();
+			
+			var disposable_container = document.createElement("DIV");
+			disposable_container.setAttribute("id", "disposable_container");
+			this.contents_div.appendChild(disposable_container);	
+			disposable_container.innerHTML = 
+			`
+				<label>Use 4chan Archives: </label>
+				<input name="ArchiveSettings" id="OnsiteArchive" type="text">
+				<br>
+				<label>Use Offsite Archives: </label>
+				<input name="ArchiveSettings" id="OffsiteArchive" type="text">
+				<br>
+				<input id="setTime" value="Set Archive" type="button">
+			`;
+		}
+																						},
+		{Text : "View 『¥ Text』 Settings [Customizable]", ListenerFunc : 	(a_id) => {
+			this.clearContainer();
+			
+			var disposable_container = document.createElement("DIV");
+			disposable_container.setAttribute("id", "disposable_container");
+			this.contents_div.appendChild(disposable_container);			
+			disposable_container.innerHTML = 
+			`
+				<label>¥Quote Character: </label>
+				<input name="quoteCharacter" id="quoteCharacter" type="text">
+				<br>
+				<label>RGB Hex Color: </label>
+				<input name="HexColorYen" id="hexColorYen" type="text">
+				<input name="HexColorYen" id="SelectColorYen" type="color">
+				<br>
+				<input id="setQuote" value="Set Quote Settings" type="button">
+			`;			
+document.getElementById("SelectColorYen").addEventListener("input", (evt) => {
+			(<HTMLInputElement>document.getElementById("hexColorYen")).value = 
+				((<HTMLInputElement>document.getElementById("SelectColorYen")).value);
+});			
+
+													
+		}
+																						},
+		{Text : "View 『Kita』 Settings [Customizable]", ListenerFunc :		(a_id) => {
+			this.clearContainer();
+			
+			var disposable_container = document.createElement("DIV");
+			disposable_container.setAttribute("id", "disposable_container");
+			this.contents_div.appendChild(disposable_container);	
+			disposable_container.innerHTML = 
+			`								
+				<script src="http://jscolor.js"></script>
+				<label>Kita Characters: </label>
+				<input name="selectiveCharacter" id="selectiveCharacters" type="text">
+				<br>
+				<label>RGB Hex Color: </label>
+				<input name="HexColorKita" id="HexColorKita" type="text">
+				<input name="HexColorKita" id="SelectColorKita" type="color">
+				<br>
+				<input id="setCharacter" value="Set Quote Settings" type="button">
+			`;
+			document.getElementById("SelectColorKita").addEventListener("input", (evt) => {
+			(<HTMLInputElement>document.getElementById("HexColorKita")).value = 
+				((<HTMLInputElement>document.getElementById("SelectColorKita")).value);
+			});
+		}																						
 																						},
 		{Text : "Set 『Visible Password』 : ", ListenerFunc : 				(input_id) => {
 			var input = document.getElementById(input_id);
@@ -531,8 +729,5 @@ class SettingsWindow  extends FeatureInterface{
 											this.setting_items.word_replace_settings.Text_Filter_List[filter_count].Replacement;
 		}
 	}
-
-
-
-
+						
 }

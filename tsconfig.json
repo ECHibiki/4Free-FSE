@@ -11,6 +11,7 @@
 		"src/top-bar.ts",
 		"src/image-hider.ts",
 		"src/text-replacer.ts",
+		"src/danbooru-image-adder.ts",
 		"src/password-viewer.ts",
 		"src/settings-window.ts",
 		"src/main.ts",

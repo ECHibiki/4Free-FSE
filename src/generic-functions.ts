@@ -64,5 +64,21 @@ class Generics{
 		document.dispatchEvent(event);
 	}
 	
+	static getJSON = function(url, callback, extra) {
+		var xhr:any = new XMLHttpRequest();
+		xhr.open('GET', url, true);
+		xhr.responseType = 'json';
+		xhr.onload = function() {
+			var status = xhr.status;
+			if (status == 200) {
+				callback(null, xhr.response, extra);
+			} else {
+				callback(status);
+			}
+		};
+		xhr.send();
+	};
+
+	
 }
 
