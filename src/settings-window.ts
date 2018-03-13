@@ -427,6 +427,12 @@ document.getElementById("SelectColorYen").addEventListener("input", (evt) => {
 										.titleStyle{
 											font-size: 20px;padding: 12px 0px 9px 22px
 										}
+										.tooltip-4F{
+											z-index:9;padding:5px;border:1px solid black;background-color:white;word-wrap:break-word;display:none;position:absolute;
+										}
+										.help_icon{
+											height:22.5px;margin:-4px 10px
+										}
 										.footerStyle{
 											padding-left: 12px;
 										}

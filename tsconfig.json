@@ -2,6 +2,7 @@
     "compilerOptions": {
 		"target": "ES5",
 		"outFile": "../4Free-FSE/builds/4-Free.user.js",
+		"lib":["DOM","ES5","ScriptHost"]
     },
     "files": [
 		"src/docs.ts",

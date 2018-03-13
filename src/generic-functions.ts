@@ -58,20 +58,20 @@ class Generics{
 	}
 	
 	//send alert to 4chanx
-	static alert4ChanX(message:string, type:string, time:number):void{
+	static alert4ChanX(message:string, type:string, time?:number):void{
 		var detail:object = {type: type, content: message, lifetime: time};
 		var event:any = new CustomEvent('CreateNotification', {bubbles: true, detail: detail});
 		document.dispatchEvent(event);
 	}
 	
-	static getJSON = function(url, callback, extra) {
+	static getJSON = function(url, callback, extra, ...all_extra) {
 		var xhr:any = new XMLHttpRequest();
 		xhr.open('GET', url, true);
 		xhr.responseType = 'json';
 		xhr.onload = function() {
 			var status = xhr.status;
 			if (status == 200) {
-				callback(null, xhr.response, extra);
+				callback(null, xhr.response, extra, ...all_extra);
 			} else {
 				callback(status);
 			}
