@@ -1,7 +1,7 @@
 	// ==UserScript==
 	// @name         Thread Rebuilder
 	// @namespace    http://tampermonkey.net/
-	// @version      3.0
+	// @version      3.1
 	// @description  try to take over the world!
 	// @author       ECHibiki /qa/
 	// @match https://boards.4chan.org/*/thread/*
@@ -182,7 +182,7 @@ var enhance4ChanX = function(){
 	qr_window.appendChild(thread_rebuilder_table);
 
 	var thread_row = document.createElement("TR");
-
+	var option_text_size = 18;
 	var help_icon_container = document.createElement("A");
 	help_icon_container.href = "javascript:void(0)";
 	help_icon_container.title = "Click to View Help!";
