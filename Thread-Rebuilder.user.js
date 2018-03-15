@@ -1,7 +1,7 @@
 	// ==UserScript==
 	// @name         Thread Rebuilder
 	// @namespace    http://tampermonkey.net/
-	// @version      3.5
+	// @version      3.6
 	// @description  try to take over the world!
 	// @author       ECHibiki /qa/
 	// @match https://boards.4chan.org/*/thread/*
@@ -281,6 +281,7 @@ var setPropperLinking = function(text){
 	}
 //hunt down the text of what it linked to
 //Get the links inside of the origonal message to show text contents
+
 	var responding_text = Array();
 	if(use_offsite_archive)
 		URL  = "https://www.archived.moe/_/api/chan/thread/?board=" + board + "&num=" + document.getElementById("threadInput").value;
@@ -306,6 +307,7 @@ var setPropperLinking = function(text){
 									responding_text.push([ [post_no, end_index], data[data_entry]["comment_processed"].replace(/(&gt;&gt;|https:\/\/www\.archived\.moe\/.*\/thread\/.*\/#)\d+/g, ""), link_item["media"]["safe_media_hash"] ]);
 								else if(data[data_entry]["com"] !== undefined)
 									responding_text.push([ [post_no, end_index], data[data_entry]["com"].replace(/(&gt;&gt;|#p)\d+/g, ""), data[data_entry]["md5"] ]);
+								else responding_text.push([ [post_no, end_index], undefined, data[data_entry]["md5"] ]);
 								break;
 							}
 						}
@@ -334,6 +336,11 @@ var setPropperLinking = function(text){
 											text = text.substring(0, start_index) + ">>" + data[data_entry]["no"] + text.substring(response_item[0][1]);
 												break;
 										}
+										else if(response_item[2] !== undefined && response_item[2] == data[data_entry]["md5"]){
+																						var start_index = response_item[0][0].legth - response_item[0][1];
+											text = text.substring(0, start_index) + ">>" + data[data_entry]["no"] + text.substring(response_item[0][1]);
+												break;
+										}
 									}
 								});
 											document.getElementById("qr").getElementsByTagName("TEXTAREA")[0].value = text;
@@ -345,6 +352,7 @@ var setPropperLinking = function(text){
 				}
 			}
 		}));
+
 };
 
 
