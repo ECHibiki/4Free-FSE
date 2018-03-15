@@ -1,7 +1,7 @@
 	// ==UserScript==
 	// @name         Thread Rebuilder
 	// @namespace    http://tampermonkey.net/
-	// @version      3.2
+	// @version      3.4
 	// @description  try to take over the world!
 	// @author       ECHibiki /qa/
 	// @match https://boards.4chan.org/*/thread/*
@@ -34,10 +34,12 @@ document.addEventListener("4chanXInitFinished", function(e){
 	rebuildWindow();
 	rebuildButton();
 
-	use_offsite_archive =  localStorage.getItem("ArchiveType") == 0 ? true : false;
-	if(use_offsite_archive) document.getElementById("OffsiteArchive").checked = true;
-	else document.getElementById("OnsiteArchive").checked = true;
-
+	use_offsite_archive =  localStorage.getItem("ArchiveType") == 0  ? true : false;
+	//console.log(localStorage.getItem("ArchiveType"));
+	if(use_offsite_archive) document.getElementById("OffsiteArchive").checked = "true";
+	else document.getElementById("OnsiteArchive").checked = "true";
+//console.log(document.getElementById("OnsiteArchive"));
+//console.log(document.getElementById("OffsiteArchive"));
 	loaded = true;
 }, false);
 
@@ -124,14 +126,15 @@ function rebuildWindow(){
 
     var set_button = document.createElement("input");
     set_button.setAttribute("type", "button");
-    set_button.setAttribute("id", "setTime");
+    set_button.setAttribute("id", "setArchive");
     set_button.setAttribute("value", "Set Archive");
     set_button.addEventListener("click", function(){
         if (storageAvailable('localStorage')) {
 			var radio_options = document.getElementsByName("ArchiveSettings");
 			for (var radio_input = 0 ; radio_input < radio_options.length; radio_input++)
 				if(radio_options[radio_input].checked){
-					localStorage.setItem("ArchiveType", radio_input);
+					//console.log(1 - radio_input);
+					localStorage.setItem("ArchiveType", 1 - radio_input);
 					if(radio_input == 0) use_offsite_archive = true;
 				}
             rebuildToggle();
@@ -226,6 +229,7 @@ var enhance4ChanX = function(){
 	second_row_nodes[2].setAttribute("value", "Set Rebuild Queue");
 
 	second_row_nodes[2].addEventListener("click", function(){
+			//console.log(use_offsite_archive);
 		in_sequence = true;
 		killAll();
 		getThread(second_row_nodes[1].value);
@@ -375,7 +379,7 @@ var getThread = function(threadNo){
 
 				for(var post_number = starting_post ; post_number < len ; post_number++){
 					var comment = undefined;
-					//console.log(data["posts"][post_number]);
+					////console.log(data["posts"][post_number]);
 					if(use_offsite_archive)
 						comment = data["posts"][post_number]["comment"];
 					else
@@ -386,9 +390,10 @@ var getThread = function(threadNo){
 						thread_data[0].push("");
 
 					var filename = undefined;
-					if(use_offsite_archive)
+					if(use_offsite_archive){
 						if(data["posts"][post_number]["media"] !== null)
 							filename = "" + data["posts"][post_number]["media"]["media_filename"];
+					}
 					else
 						filename = "" + data["posts"][post_number]["tim"] + data["posts"][post_number]["ext"];
 
@@ -400,7 +405,8 @@ var getThread = function(threadNo){
 						else
 							thread_data[1].push("https://i.4cdn.org/" + board + "/" + filename);
 					else  thread_data[1].push("");
-
+//console.log(data["posts"][post_number]["tim"]); //console.log(data["posts"][post_number]["ext"]); //console.log(data["posts"][post_number]);
+//console.log(filename); //console.log("0000");
 					if(use_offsite_archive)
 						if(data["posts"][post_number]["media"] !== null)
 							thread_data[2].push(data["posts"][post_number]["media"]["media_id"]);
@@ -419,7 +425,7 @@ var getThread = function(threadNo){
 };
 //3) RIP POSTS AND IMAGES
 var createPost = function(text, imageURL, imageName){
-	//console.log(text + "," + imageURL + "," + imageName)
+	////console.log(text + "," + imageURL + "," + imageName)
 	if(imageURL != ""){
 		var response_type = "arraybuffer";
 		if(use_offsite_archive) response_type = "text"
@@ -435,11 +441,13 @@ var createPost = function(text, imageURL, imageName){
 					var redirect_url = content_attribute.substring(content_attribute.indexOf("http"));
 					var xhr = new GM_xmlhttpRequest(({method:"GET", url: redirect_url, responseType:"arraybuffer",
 						onload:function(response){
+							//console.log(text + " " + imageURL);
 							inputImage(response, text,  imageURL, imageName);
 						}
 					}));
 				}
 				else{
+					//console.log(text + " " + imageURL);
 					inputImage(response, text, imageURL, imageName);
 				}
 			}
