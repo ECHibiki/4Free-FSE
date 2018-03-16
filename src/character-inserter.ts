@@ -88,13 +88,6 @@ else this.kita_hash_color = localStorage.getItem("Kita_Color");
 		if(root.nodeType !== Node.ELEMENT_NODE){
 			return;
 		}
-
-		// var nodes = [].slice(root.getElementsByClassName('postMessage'));
-		// if(root.classList.contains('postmessage')){
-			// //insert above nodes, the root.
-			// nodes.unshift(root);
-		// }
-		console.log(root);
 			
 			if(root.textContent.indexOf(this.yen_character) <= -1 && root.textContent.indexOf(this.kita_character) <= -1){
 				return;

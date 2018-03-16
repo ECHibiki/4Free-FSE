@@ -29,6 +29,9 @@ class Main extends FeatureInterface{
 		if(true){
 			this.features.danbooru_image_adder = new DanbooruImageAdder();
 		}
+		if(true){
+			this.features.thread_rebuilder = new ThreadRebuilder();
+		}
 		if(true || true){
 			this.features.character_inserter = new CharacterInserter(true, true);
 		}

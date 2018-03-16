@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 // @name         4Free-FSE
 // @author       ECHibiki - /qa/
 // @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
-// @version      0.5
+// @version      1.0
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4Free-FSE/master/builds/4-Free.user.js
@@ -245,7 +245,6 @@ var ImageHider = /** @class */ (function (_super) {
     ImageHider.prototype.hideOnClick = function (event) {
         var _this = this;
         var is_hidden = event.target.src.substring(21, 29) == ",iVBORw0";
-        console.log(event.target.src.substring(21, 29) + " " + ",iVBORw0");
         var hide_group_id;
         if ((event.ctrlKey && event.shiftKey) && !is_hidden) {
             event.preventDefault();
@@ -1057,6 +1056,402 @@ var DanbooruImageAdder = /** @class */ (function (_super) {
     };
     return DanbooruImageAdder;
 }(FeatureInterface));
+var ThreadRebuilder = /** @class */ (function (_super) {
+    __extends(ThreadRebuilder, _super);
+    function ThreadRebuilder() {
+        var _this = _super.call(this) || this;
+        _this.board = "qa";
+        _this.thread_data = [['Comment'], ['Image URLs'], ['Image Names'], ['Post No.']];
+        _this.semaphore = 1;
+        _this.semaphore_posts = 1;
+        _this.use_offsite_archive = false;
+        _this.window_displayed = false;
+        _this.in_sequence = false;
+        _this.tool_top_visible = false;
+        _this.thread_data_length = 0;
+        _this.posts_created = 0;
+        _this.checked = false;
+        _this.init();
+        return _this;
+    }
+    ThreadRebuilder.prototype.init = function () {
+        this.activate();
+    };
+    ThreadRebuilder.prototype.retrieveStates = function () {
+        this.use_offsite_archive = localStorage.getItem("ArchiveType") == "0" ? true : false;
+    };
+    ThreadRebuilder.prototype.storeStates = function () {
+        var items = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            items[_i] = arguments[_i];
+        }
+    };
+    ThreadRebuilder.prototype.activate = function () {
+        var _this = this;
+        document.addEventListener("QRDialogCreation", function (e) { return _this.enhance4ChanX(); });
+        document.addEventListener('QRPostSuccessful', function (e) {
+            if (_this.in_sequence) {
+                document.getElementById("dump-list").childNodes[1].click();
+                _this.setPropperLinking(document.getElementById("qr").getElementsByTagName("TEXTAREA")[0].value);
+            }
+        }, false);
+    };
+    ThreadRebuilder.prototype.decideAction = function (node) { };
+    ThreadRebuilder.prototype.enhance4ChanX = function () {
+        var _this = this;
+        var qr_window = document.getElementById("qr");
+        if (document.getElementById("qrRebuilder") !== null)
+            qr_window.removeChild(document.getElementById("qrRebuilder"));
+        var thread_rebuilder_table = document.createElement("TABLE");
+        thread_rebuilder_table.setAttribute("id", "qrRebuilder");
+        thread_rebuilder_table.setAttribute("style", "text-align:center");
+        qr_window.appendChild(thread_rebuilder_table);
+        var thread_row = document.createElement("TR");
+        var option_text_size = 18;
+        var help_icon_container = document.createElement("A");
+        help_icon_container.href = "javascript:void(0)";
+        help_icon_container.title = "Click to View Help!";
+        var help_icon = document.createElement("IMG");
+        help_icon.setAttribute("style", "height:" + option_text_size * 1.25 + "px;margin:-4px 10px");
+        help_icon.src = Constants.HELP_ICON_SOURCE;
+        help_icon_container.appendChild(help_icon);
+        thread_row.appendChild(help_icon_container);
+        var tooltip_div = document.createElement("DIV");
+        tooltip_div.innerHTML = "Insert the thread number of the post to rebuild<br/>Must be in either the 4chan archives or archived.moe<hr/>Submit bugs to <a href='https://github.com/ECHibiki/4chan-UserScripts'>my Github</a>";
+        tooltip_div.setAttribute("style", "z-index:9;padding:5px;border:1px solid black;background-color:white;word-wrap:break-word;display:none;position:absolute;");
+        help_icon_container.addEventListener("click", function (evt) {
+            if (_this.tool_top_visible)
+                tooltip_div.setAttribute("style", "z-index:9;padding:5px;border:1px solid black;background-color:white;word-wrap:break-word;display:none;position:absolute;");
+            else
+                tooltip_div.setAttribute("style", "z-index:9;padding:5px;border:1px solid black;background-color:white;word-wrap:break-word;display:block;position:absolute;"
+                    + "left:" + (evt.clientX - qr_window.getBoundingClientRect().x) +
+                    "px;top:" + (evt.clientY - qr_window.getBoundingClientRect().y) + "px;");
+            _this.tool_top_visible = !_this.tool_top_visible;
+        });
+        qr_window.appendChild(tooltip_div);
+        var second_row_nodes = [
+            document.createTextNode("Thread: "),
+            document.createElement("INPUT"),
+            document.createElement("INPUT"),
+        ];
+        second_row_nodes.forEach(function (node) {
+            thread_row.appendChild(node);
+        });
+        thread_rebuilder_table.appendChild(thread_row);
+        second_row_nodes[1].setAttribute("ID", "threadInput");
+        second_row_nodes[1].setAttribute("style", "width:35.0%");
+        second_row_nodes[2].setAttribute("ID", "threadButton");
+        second_row_nodes[2].setAttribute("type", "button");
+        second_row_nodes[2].setAttribute("value", "Set Rebuild Queue");
+        second_row_nodes[2].addEventListener("click", function () {
+            _this.in_sequence = true;
+            _this.killAll();
+            _this.getThread(second_row_nodes[1].value);
+            _this.postID = setInterval(function () { return _this.postRoutine(); }, 1000);
+            if (_this.timeListen === undefined)
+                _this.timeListen = setInterval(function () { return _this.timeListenerFunction(); }, 1000);
+        });
+        qr_window.appendChild(document.createElement("hr"));
+    };
+    ;
+    ThreadRebuilder.prototype.postRoutine = function () {
+        var _this = this;
+        if (this.semaphore == 0) {
+            this.semaphore++;
+            this.thread_data_length = this.thread_data[0].length;
+            this.fillID = setInterval(function () { return _this.fillRoutine(); }, 10);
+            this.stopRoutine();
+        }
+    };
+    ;
+    ThreadRebuilder.prototype.stopRoutine = function () {
+        clearInterval(this.postID);
+    };
+    ;
+    ThreadRebuilder.prototype.fillRoutine = function () {
+        if (this.posts_created >= this.thread_data_length) {
+            this.semaphore_posts = 0;
+            this.stopFillRoutine();
+        }
+        else if (this.semaphore_posts == 1) {
+            this.semaphore_posts--;
+            this.createPost(this.thread_data[0][this.posts_created], this.thread_data[1][this.posts_created], this.thread_data[2][this.posts_created]);
+            this.posts_created++;
+        }
+    };
+    ;
+    ThreadRebuilder.prototype.stopFillRoutine = function () {
+        clearInterval(this.fillID);
+    };
+    ThreadRebuilder.prototype.setPropperLinking = function (text) {
+        var _this = this;
+        var search_regex = RegExp(">>\\d+", "g");
+        var result;
+        var index_old = -1;
+        var link_arr = Array();
+        while ((result = search_regex.exec(text)) != null) {
+            var end_index = search_regex.lastIndex;
+            var post_no = result.toString().replace(/>/g, "");
+            link_arr.push([post_no, end_index]);
+        }
+        //hunt down the text of what it linked to
+        //Get the links inside of the origonal message to show text contents
+        var responding_text = Array();
+        if (this.use_offsite_archive)
+            var URL = "https://www.archived.moe/_/api/chan/thread/?board=" + this.board + "&num=" + document.getElementById("threadInput").value;
+        else
+            var URL = "https://a.4cdn.org/" + this.board + "/thread/" + document.getElementById("threadInput").value + ".json";
+        var xhr = new GM_xmlhttpRequest(({
+            method: "GET",
+            url: URL,
+            responseType: "json",
+            onload: function (data) {
+                if (_this.use_offsite_archive)
+                    data = data.response["" + document.getElementById("threadInput").value]["posts"];
+                else
+                    data = data.response["posts"];
+                if (data == undefined) {
+                    alert("Invalid Thread ID: " + document.getElementById("threadInput").value + ". ");
+                }
+                else {
+                    link_arr.forEach(function (link_item) {
+                        for (var data_entry = 0; data_entry < data.length; data_entry++) {
+                            if (parseInt(link_item[0]) == parseInt(data[data_entry]["no"])) {
+                                if (_this.use_offsite_archive && data[data_entry]["comment_processed"] !== undefined)
+                                    responding_text.push([[post_no, end_index], data[data_entry]["comment_processed"].replace(/(&gt;&gt;|https:\/\/www\.archived\.moe\/.*\/thread\/.*\/#)\d+/g, ""), link_item["media"]["safe_media_hash"]]);
+                                else if (data[data_entry]["com"] !== undefined)
+                                    responding_text.push([[post_no, end_index], data[data_entry]["com"].replace(/(&gt;&gt;|#p)\d+/g, ""), data[data_entry]["md5"]]);
+                                else
+                                    responding_text.push([[post_no, end_index], undefined, data[data_entry]["md5"]]);
+                                break;
+                            }
+                        }
+                    });
+                    var current_url = window.location.href;
+                    var hash_index = current_url.lastIndexOf("#") != -1 ? current_url.lastIndexOf("#") : window.location.href.length;
+                    var current_thread = window.location.href.substring(current_url.lastIndexOf("/") + 1, hash_index);
+                    var current_url = "https://a.4cdn.org/" + _this.board + "/thread/" + current_thread + ".json";
+                    //open current thread to hunt down the text found in links
+                    var xhr = new GM_xmlhttpRequest(({
+                        method: "GET",
+                        url: current_url,
+                        responseType: "json",
+                        onload: function (data) {
+                            data = data.response["posts"];
+                            if (data == undefined) {
+                                alert("Invalid Thread ID: " + document.getElementById("threadInput").value + ". ");
+                            }
+                            else {
+                                responding_text.forEach(function (response_item) {
+                                    for (var data_entry = 0; data_entry < data.length; data_entry++) {
+                                        if (data[data_entry]["com"] !== undefined && (response_item[1] == data[data_entry]["com"].replace(/(&gt;&gt;|#p)\d+/g, "") || response_item[1] == null)
+                                            && (response_item[2] == data[data_entry]["md5"] || response_item[2] == null)) {
+                                            var start_index = response_item[0][0].legth - response_item[0][1];
+                                            text = text.substring(0, start_index) + ">>" + data[data_entry]["no"] + text.substring(response_item[0][1]);
+                                            break;
+                                        }
+                                        else if (response_item[2] !== undefined && response_item[2] == data[data_entry]["md5"]) {
+                                            var start_index = response_item[0][0].legth - response_item[0][1];
+                                            text = text.substring(0, start_index) + ">>" + data[data_entry]["no"] + text.substring(response_item[0][1]);
+                                            break;
+                                        }
+                                    }
+                                });
+                                document.getElementById("qr").getElementsByTagName("TEXTAREA")[0].value = text;
+                                document.getElementById("add-post").click();
+                                _this.semaphore_posts++;
+                            }
+                        }
+                    }));
+                }
+            }
+        }));
+    };
+    ;
+    //2) GET ARCHIVED THREAD
+    ThreadRebuilder.prototype.getThread = function (threadNo) {
+        var _this = this;
+        this.thread_data = [[], [], [], []];
+        if (this.use_offsite_archive)
+            var URL = "https://www.archived.moe/_/api/chan/thread/?board=" + this.board + "&num=" + document.getElementById("threadInput").value;
+        else
+            var URL = "https://a.4cdn.org/" + this.board + "/thread/" + document.getElementById("threadInput").value + ".json";
+        var xhr = new GM_xmlhttpRequest(({
+            method: "GET",
+            url: URL,
+            responseType: "json",
+            onload: function (data) {
+                var starting_post = -1;
+                if (_this.use_offsite_archive) {
+                    starting_post = 0;
+                    data = data.response["" + document.getElementById("threadInput").value];
+                }
+                else {
+                    starting_post = 1;
+                    data = data.response;
+                }
+                if (data == undefined) {
+                    alert("Invalid Thread ID: " + threadNo + ".\n4chan Archive ");
+                }
+                else {
+                    if (_this.use_offsite_archive)
+                        data["posts"] = data.values(data["posts"]);
+                    var len = data["posts"].length;
+                    for (var post_number = starting_post; post_number < len; post_number++) {
+                        var comment = undefined;
+                        if (_this.use_offsite_archive)
+                            comment = data["posts"][post_number]["comment"];
+                        else
+                            comment = data["posts"][post_number]["com"];
+                        if (comment !== undefined && comment !== null)
+                            _this.thread_data[0].push(comment);
+                        else
+                            _this.thread_data[0].push("");
+                        var filename = undefined;
+                        if (_this.use_offsite_archive) {
+                            if (data["posts"][post_number]["media"] !== null)
+                                filename = "" + data["posts"][post_number]["media"]["media_filename"];
+                        }
+                        else
+                            filename = "" + data["posts"][post_number]["tim"] + data["posts"][post_number]["ext"];
+                        if (filename !== undefined && filename !== null && filename.indexOf("undefined") == -1)
+                            if (_this.use_offsite_archive)
+                                if (data["posts"][post_number]["media"] !== null)
+                                    _this.thread_data[1].push(data["posts"][post_number]["media"]["remote_media_link"]);
+                                else
+                                    _this.thread_data[1].push("");
+                            else
+                                _this.thread_data[1].push("https://i.4cdn.org/" + _this.board + "/" + filename);
+                        else
+                            _this.thread_data[1].push("");
+                        if (_this.use_offsite_archive) {
+                            if (data["posts"][post_number]["media"] !== null)
+                                _this.thread_data[2].push(data["posts"][post_number]["media"]["media_id"]);
+                        }
+                        else
+                            _this.thread_data[2].push(data["posts"][post_number]["filename"]);
+                        if (_this.use_offsite_archive)
+                            _this.thread_data[3].push(data["posts"][post_number]["num"]);
+                        else
+                            _this.thread_data[3].push(data["posts"][post_number]["no"]);
+                    }
+                }
+                _this.semaphore--;
+            }
+        }));
+    };
+    ;
+    //3) RIP POSTS AND IMAGES
+    ThreadRebuilder.prototype.createPost = function (text, imageURL, imageName) {
+        var _this = this;
+        if (imageURL != "") {
+            var response_type = "arraybuffer";
+            if (this.use_offsite_archive)
+                response_type = "text";
+            var xhr = new GM_xmlhttpRequest(({
+                method: "GET",
+                url: imageURL,
+                responseType: response_type,
+                onload: function (response) {
+                    if (_this.use_offsite_archive) {
+                        var parser = new DOMParser();
+                        var content_attribute = parser.parseFromString(response.response, "text/html").getElementsByTagName("META")[0].getAttribute("content");
+                        var redirect_url = content_attribute.substring(content_attribute.indexOf("http"));
+                        var xhr = new GM_xmlhttpRequest(({ method: "GET", url: redirect_url, responseType: "arraybuffer",
+                            onload: function (response) {
+                                _this.inputImage(response, text, imageURL, imageName);
+                            }
+                        }));
+                    }
+                    else {
+                        _this.inputImage(response, text, imageURL, imageName);
+                    }
+                }
+            }));
+        }
+        else {
+            text = this.createPostComment(text);
+            this.setPropperLinking(text);
+        }
+    };
+    ThreadRebuilder.prototype.inputImage = function (response, text, imageURL, imageName) {
+        var blob;
+        var ext = ".jpg";
+        if (imageURL.indexOf(".jpg") > -1) {
+            blob = new Blob([response.response], { type: "image/jpeg" });
+            ext = ".jpg";
+        }
+        else if (imageURL.indexOf(".png") > -1) {
+            blob = new Blob([response.response], { type: "image/png" });
+            ext = ".png";
+        }
+        else if (imageURL.indexOf(".gif") > -1) {
+            blob = new Blob([response.response], { type: "image/gif" });
+            ext = ".gif";
+        }
+        else if (imageURL.indexOf(".webm") > -1) {
+            blob = new Blob([response.response], { type: "video/webm" });
+            ext = ".webm";
+        }
+        var name = imageName + ext;
+        //SEND RESULTING RESPONSE TO 4CHANX FILES === QRSetFile
+        var detail = { file: blob, name: name };
+        detail = cloneInto(detail, document.defaultView);
+        document.dispatchEvent(new CustomEvent('QRSetFile', { bubbles: true, detail: detail }));
+        if (text !== "" && text !== undefined) {
+            text = this.createPostComment(text);
+            this.setPropperLinking(text);
+        }
+        else {
+            document.getElementById("add-post").click();
+            this.semaphore_posts++;
+        }
+    };
+    //4) CREATE POST QUEUE
+    ThreadRebuilder.prototype.createPostComment = function (text) {
+        var dummy = document.createElement("DIV");
+        dummy.innerHTML = text;
+        var inside_node = dummy.firstChild;
+        var return_text = "";
+        do {
+            if (inside_node.tagName == "BR")
+                return_text += "\n";
+            else
+                return_text += inside_node.textContent;
+        } while ((inside_node = inside_node.nextSibling));
+        return return_text;
+    };
+    ;
+    ThreadRebuilder.prototype.timeListenerFunction = function () {
+        var time = parseInt(document.getElementById("qr-filename-container").nextSibling.value.replace(/[a-zA-Z]+/g, ""));
+        if (time <= 5) {
+            this.checked = false;
+        }
+        else if (time > 5) {
+            this.checked = true;
+        }
+    };
+    ThreadRebuilder.prototype.killAll = function () {
+        this.thread_data_length = 0;
+        this.posts_created = 0;
+        this.stopRoutine();
+        this.postID = undefined;
+        this.semaphore = 1;
+        this.semaphore_posts = 1;
+        this.stopFillRoutine();
+        this.fillID = undefined;
+        this.thread_data = [['Comment'], ['Image URLs'], ['Image Names'], ['Post No.']];
+        //CLEAR DUMP LIST
+        var qr_dumplist = document.getElementById("dump-list").childNodes;
+        var qr_dumplist_len = qr_dumplist.length;
+        var current_preview = 0;
+        while (qr_dumplist_len - current_preview > 1) {
+            qr_dumplist[0].firstChild.click();
+            current_preview++;
+        }
+    };
+    return ThreadRebuilder;
+}(FeatureInterface));
 var CharacterInserter = /** @class */ (function (_super) {
     __extends(CharacterInserter, _super);
     function CharacterInserter(use_kita, use_yen) {
@@ -1146,12 +1541,6 @@ var CharacterInserter = /** @class */ (function (_super) {
         if (root.nodeType !== Node.ELEMENT_NODE) {
             return;
         }
-        // var nodes = [].slice(root.getElementsByClassName('postMessage'));
-        // if(root.classList.contains('postmessage')){
-        // //insert above nodes, the root.
-        // nodes.unshift(root);
-        // }
-        console.log(root);
         if (root.textContent.indexOf(this.yen_character) <= -1 && root.textContent.indexOf(this.kita_character) <= -1) {
             return;
         }
@@ -1319,7 +1708,16 @@ var SettingsWindow = /** @class */ (function (_super) {
                     disposable_container.setAttribute("id", "disposable_container");
                     _this.contents_div.appendChild(disposable_container);
                     disposable_container.innerHTML =
-                        "\n\t\t\t\t<label>Use 4chan Archives: </label>\n\t\t\t\t<input name=\"ArchiveSettings\" id=\"OnsiteArchive\" type=\"text\">\n\t\t\t\t<br>\n\t\t\t\t<label>Use Offsite Archives: </label>\n\t\t\t\t<input name=\"ArchiveSettings\" id=\"OffsiteArchive\" type=\"text\">\n\t\t\t\t<br>\n\t\t\t\t<input id=\"setTime\" value=\"Set Archive\" type=\"button\">\n\t\t\t";
+                        "\n\t\t\t\t<label>Use 4chan Archives: </label>\n\t\t\t\t<input name=\"ArchiveSettings\" id=\"OnsiteArchive\" type=\"radio\">\n\t\t\t\t<br>\n\t\t\t\t<label>Use Offsite Archives: </label>\n\t\t\t\t<input name=\"ArchiveSettings\" id=\"OffsiteArchive\" type=\"radio\">\n\t\t\t\t<br>\n\t\t\t\t<input id=\"setArchive\" value=\"Set Archive\" type=\"button\">\n\t\t\t";
+                    (document.getElementById("setArchive")).addEventListener("click", function () {
+                        _this.storeStates();
+                        _this.clearContainer();
+                        _this.rebuildContainer();
+                    });
+                    if (_this.setting_items.thread_rebuild_settings.Archive_Type === "0")
+                        document.getElementById("OffsiteArchive").checked = true;
+                    else if (_this.setting_items.thread_rebuild_settings.Archive_Type === "1")
+                        document.getElementById("OnsiteArchive").checked = true;
                 }
             },
             { Text: "View 『¥ Text』 Settings [Customizable]", ListenerFunc: function (a_id) {
@@ -1338,7 +1736,6 @@ var SettingsWindow = /** @class */ (function (_super) {
                         _this.clearContainer();
                         _this.rebuildContainer();
                     });
-                    console.log(_this.setting_items.character_inserter_settings);
                     if (_this.setting_items.character_inserter_settings.Yen_Character !== undefined)
                         document.getElementById("quoteCharacter").value = _this.setting_items.character_inserter_settings.Yen_Character;
                     if (_this.setting_items.character_inserter_settings.Yen_Color !== undefined)
@@ -1425,7 +1822,7 @@ var SettingsWindow = /** @class */ (function (_super) {
         this.setting_items.image_hiding_settings = { Expiration_Time: localStorage.getItem("Expiration_Time"), MD5_List_FSE: localStorage.getItem("MD5_List_FSE") };
         this.retrieveWordReplaceStates();
         this.retrieveImageAdderStates();
-        this.setting_items.thread_rebuild_settings = (localStorage.getItem("tab-settings4") == 'true');
+        this.retrieveRebuildStates();
         this.retrieveCharacterInsertingStates();
         this.setting_items.password_settings = (localStorage.getItem("pw_active"));
     };
@@ -1463,6 +1860,11 @@ var SettingsWindow = /** @class */ (function (_super) {
         document.getElementById("fourchanx-css").textContent += ".qr-preview { height:" + this.setting_items.image_adder_settings.Height + "px; width: " + this.setting_items.image_adder_settings.Width + "px; left:8%;background-size: cover;}";
         document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: " + (this.setting_items.image_adder_settings.Width - 20) + "px; width: " + (this.setting_items.image_adder_settings.QR_Width) + "px;}";
     };
+    SettingsWindow.prototype.retrieveRebuildStates = function () {
+        if (localStorage.getItem("ArchiveType_FSE") !== "1" && localStorage.getItem("ArchiveType_FSE") !== "0")
+            localStorage.setItem("ArchiveType_FSE", "1");
+        this.setting_items.thread_rebuild_settings = { Archive_Type: localStorage.getItem("ArchiveType_FSE") };
+    };
     SettingsWindow.prototype.retrieveCharacterInsertingStates = function () {
         if (localStorage.getItem("Yen_Character") === undefined || localStorage.getItem("Yen_Character") === null)
             localStorage.setItem("Yen_Character", "¥");
@@ -1482,6 +1884,8 @@ var SettingsWindow = /** @class */ (function (_super) {
         this.storeTextFilterStates();
         //Image Adder settings
         this.storeImageAdderStates();
+        //Thread rebuild settings
+        this.storeRebuildStates();
         //character inserter
         this.storeCharacterInserterStates();
         //Password replace settings
@@ -1550,6 +1954,11 @@ var SettingsWindow = /** @class */ (function (_super) {
             localStorage.setItem("height_DIA", height);
             var qr_width = document.getElementById("qr_width_DIA").value;
             localStorage.setItem("qr_width_DIA", qr_width);
+        }
+    };
+    SettingsWindow.prototype.storeRebuildStates = function () {
+        if (document.getElementById("setArchive") !== null) {
+            localStorage.setItem("ArchiveType_FSE", document.getElementById("OffsiteArchive").checked === true ? "0" : "1");
         }
     };
     SettingsWindow.prototype.storeCharacterInserterStates = function () {
@@ -1878,6 +2287,9 @@ var Main = /** @class */ (function (_super) {
         }
         if (true) {
             this.features.danbooru_image_adder = new DanbooruImageAdder();
+        }
+        if (true) {
+            this.features.thread_rebuilder = new ThreadRebuilder();
         }
         if (true || true) {
             this.features.character_inserter = new CharacterInserter(true, true);

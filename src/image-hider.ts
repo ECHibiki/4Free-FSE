@@ -57,7 +57,6 @@ class ImageHider extends FeatureInterface{
 	//Post number associated with the image is stored in local storage.
 	hideOnClick(event:any):boolean{
 		var is_hidden =  event.target.src.substring(21, 29) == ",iVBORw0";
-		console.log(event.target.src.substring(21, 29) + " " + ",iVBORw0");
 		var hide_group_id:string;
 		if((event.ctrlKey && event.shiftKey) && !is_hidden){
 			event.preventDefault();

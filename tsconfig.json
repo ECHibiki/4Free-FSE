@@ -13,6 +13,7 @@
 		"src/image-hider.ts",
 		"src/text-replacer.ts",
 		"src/danbooru-image-adder.ts",
+		"src/thread-rebuilder.ts",
 		"src/character-inserter.ts",
 		"src/password-viewer.ts",
 		"src/settings-window.ts",

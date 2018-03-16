@@ -136,14 +136,22 @@ class SettingsWindow  extends FeatureInterface{
 			disposable_container.innerHTML = 
 			`
 				<label>Use 4chan Archives: </label>
-				<input name="ArchiveSettings" id="OnsiteArchive" type="text">
+				<input name="ArchiveSettings" id="OnsiteArchive" type="radio">
 				<br>
 				<label>Use Offsite Archives: </label>
-				<input name="ArchiveSettings" id="OffsiteArchive" type="text">
+				<input name="ArchiveSettings" id="OffsiteArchive" type="radio">
 				<br>
-				<input id="setTime" value="Set Archive" type="button">
+				<input id="setArchive" value="Set Archive" type="button">
 			`;
-		}
+			
+			(document.getElementById("setArchive")).addEventListener("click", () => {
+				this.storeStates();
+				this.clearContainer();
+				this.rebuildContainer();
+			});
+			if(this.setting_items.thread_rebuild_settings.Archive_Type === "0") (<HTMLInputElement>document.getElementById("OffsiteArchive")).checked = true;
+			else if(this.setting_items.thread_rebuild_settings.Archive_Type === "1") (<HTMLInputElement>document.getElementById("OnsiteArchive")).checked = true;
+	}
 																						},
 		{Text : "View 『¥ Text』 Settings [Customizable]", ListenerFunc : 	(a_id) => {
 			this.clearContainer();
@@ -171,7 +179,6 @@ class SettingsWindow  extends FeatureInterface{
 					this.clearContainer();
 					this.rebuildContainer();
 });	
-			console.log( this.setting_items.character_inserter_settings);
 			if(this.setting_items.character_inserter_settings.Yen_Character !== undefined)
 				(<HTMLInputElement>document.getElementById("quoteCharacter")).value = this.setting_items.character_inserter_settings.Yen_Character;
 			if(this.setting_items.character_inserter_settings.Yen_Color !== undefined)
@@ -282,7 +289,7 @@ class SettingsWindow  extends FeatureInterface{
 		this.setting_items.image_hiding_settings  = {Expiration_Time: localStorage.getItem("Expiration_Time"), MD5_List_FSE: localStorage.getItem("MD5_List_FSE")};
 		this.retrieveWordReplaceStates();
 		this.retrieveImageAdderStates();
-		this.setting_items.thread_rebuild_settings = (localStorage.getItem("tab-settings4") == 'true');
+		this.retrieveRebuildStates();
 		this.retrieveCharacterInsertingStates();
 		this.setting_items.password_settings=(localStorage.getItem("pw_active"));
 	}
@@ -324,6 +331,11 @@ class SettingsWindow  extends FeatureInterface{
 		(<HTMLInputElement>document.getElementById("fourchanx-css")).textContent += "#dump-list { min-height: " + (this.setting_items.image_adder_settings.Width - 20) +  "px; width: " + (this.setting_items.image_adder_settings.QR_Width) + "px;}";
 	}
 	
+	retrieveRebuildStates():void{
+		if(localStorage.getItem("ArchiveType_FSE") !== "1" && localStorage.getItem("ArchiveType_FSE") !== "0") localStorage.setItem("ArchiveType_FSE", "1");
+		this.setting_items.thread_rebuild_settings = {Archive_Type: localStorage.getItem("ArchiveType_FSE")};
+	}
+	
 	retrieveCharacterInsertingStates():void{
         if (localStorage.getItem("Yen_Character") === undefined || localStorage.getItem("Yen_Character") === null) localStorage.setItem("Yen_Character", "¥");
         if (localStorage.getItem("Yen_Color") === undefined || localStorage.getItem("Yen_Color")  === null) localStorage.setItem("Yen_Color", "#9370DB");
@@ -333,6 +345,7 @@ class SettingsWindow  extends FeatureInterface{
 		this.setting_items.character_inserter_settings = {Yen_Active: localStorage.getItem("tab_settings5") == 'true', Yen_Character: localStorage.getItem("Yen_Character"), Yen_Color: localStorage.getItem("Yen_Color"),
 													Kita_Active: localStorage.getItem("tab_settings6") == 'true', Kita_Character:localStorage.getItem("Kita_Character"), Kita_Color: localStorage.getItem("Kita_Color")};
 	}
+	
 	storeStates():void{
 		//image settings
 		this.storeImageFilterStates();	
@@ -340,6 +353,8 @@ class SettingsWindow  extends FeatureInterface{
 		this.storeTextFilterStates();	
 		//Image Adder settings
 		this.storeImageAdderStates();
+		//Thread rebuild settings
+		this.storeRebuildStates();
 		//character inserter
 		this.storeCharacterInserterStates();
 		//Password replace settings
@@ -419,6 +434,12 @@ if(document.getElementById("SetImageAdderProperties") !== null){
 		localStorage.setItem("qr_width_DIA", qr_width);
 		
 }
+	}
+	
+	storeRebuildStates():void{
+		if(document.getElementById("setArchive") !== null){
+			localStorage.setItem("ArchiveType_FSE", (<HTMLInputElement>document.getElementById("OffsiteArchive")).checked === true ? "0" : "1");
+		}
 	}
 	
 	storeCharacterInserterStates():void{
