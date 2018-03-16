@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 // @name         4Free-FSE [4chan X Enhancement]
 // @author       ECHibiki - /qa/
 // @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
-// @version      1.2.1
+// @version      1.2.2
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4Free-FSE/master/builds/4-Free.user.js
@@ -2305,9 +2305,9 @@ var Main = /** @class */ (function (_super) {
     Main.prototype.observeEvents = function () {
         var _this = this;
         document.addEventListener('PostsInserted', function (evt) {
-            if (evt.explicitOriginalTarget.plugins !== undefined) {
+            //if (evt.explicitOriginalTarget.plugins !== undefined) {
                 _this.decideAction(document.getElementById('delform'));
-            }
+           // }
         });
     };
     Main.prototype.decideAction = function (node) {
