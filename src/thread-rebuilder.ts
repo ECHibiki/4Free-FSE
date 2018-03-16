@@ -20,6 +20,8 @@ class ThreadRebuilder extends FeatureInterface{
 	}
 		
 	init():void{
+		var board_uproces = window.location.pathname;
+		this.board = board_uproces.substring(1, board_uproces.length - 1);
 		this.activate();
 	}
 	

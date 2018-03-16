@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 // @name         4Free-FSE
 // @author       ECHibiki - /qa/
 // @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
-// @version      1.0
+// @version      1.1
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4Free-FSE/master/builds/4-Free.user.js
@@ -1075,6 +1075,8 @@ var ThreadRebuilder = /** @class */ (function (_super) {
         return _this;
     }
     ThreadRebuilder.prototype.init = function () {
+        var board_uproces = window.location.pathname;
+        this.board = board_uproces.substring(1, board_uproces.length - 1);
         this.activate();
     };
     ThreadRebuilder.prototype.retrieveStates = function () {
