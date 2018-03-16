@@ -1,7 +1,7 @@
 # 4Free - Free Stuff Enhancements[4Free-FSE]
 ## Navigation
 This folder contains QAJPYOtGo's MD5 filters for 4chanX, the .ts src folder, and the built user.js file in builds.<br/>
-In the releases you can find individual scripts <a href="https://github.com/ECHibiki/4Free-FSE/releases/tag/0.0.0">as V0 : Individual Packages</a> or you can look here to see the current work on the combined Typescipt version.
+In the releases you can find individual scripts <a href="https://github.com/ECHibiki/4Free-FSE/releases/tag/V0.0.1">as V0 : Individual Packages</a> or you can look here to see the current work on the combined Typescipt version.
 ## Future Developement
 	Implement the on/off toggles for individual features. Bug fixes.
 ## About 4Free-FSE
