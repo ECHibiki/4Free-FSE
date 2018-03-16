@@ -121,7 +121,7 @@ class SettingsWindow  extends FeatureInterface{
 		
 			<hr>
 		
-			<input id="setQRProperties" value="Set Preview Size" type="button">
+			<input id="SetImageAdderProperties" value="Set Preview Size" type="button">
 			`;
 		this.setImageAdderFields();
 		this.setImageAdderEventListeners();
@@ -154,20 +154,30 @@ class SettingsWindow  extends FeatureInterface{
 			disposable_container.innerHTML = 
 			`
 				<label>¥Quote Character: </label>
-				<input name="quoteCharacter" id="quoteCharacter" type="text">
+				<input name="quoteCharacter" id="quoteCharacter" type="text" value="¥">
 				<br>
 				<label>RGB Hex Color: </label>
-				<input name="HexColorYen" id="hexColorYen" type="text">
+				<input name="HexColorYen" id="HexColorYen_text" type="text">
 				<input name="HexColorYen" id="SelectColorYen" type="color">
 				<br>
 				<input id="setQuote" value="Set Quote Settings" type="button">
 			`;			
-document.getElementById("SelectColorYen").addEventListener("input", (evt) => {
-			(<HTMLInputElement>document.getElementById("hexColorYen")).value = 
-				((<HTMLInputElement>document.getElementById("SelectColorYen")).value);
-});			
+			document.getElementById("SelectColorYen").addEventListener("input", (evt) => {
+				(<HTMLInputElement>document.getElementById("HexColorYen_text")).value = 
+					((<HTMLInputElement>document.getElementById("SelectColorYen")).value);
+			});			
+			document.getElementById("setQuote").addEventListener("click", (e) => { 
+					this.storeStates();
+					this.clearContainer();
+					this.rebuildContainer();
+});	
+			console.log( this.setting_items.character_inserter_settings);
+			if(this.setting_items.character_inserter_settings.Yen_Character !== undefined)
+				(<HTMLInputElement>document.getElementById("quoteCharacter")).value = this.setting_items.character_inserter_settings.Yen_Character;
+			if(this.setting_items.character_inserter_settings.Yen_Color !== undefined)
+				(<HTMLInputElement>document.getElementById("HexColorYen_text")).value = this.setting_items.character_inserter_settings.Yen_Color;	
 
-													
+(<HTMLInputElement>document.getElementById("SelectColorYen")).value = this.setting_items.character_inserter_settings.Yen_Color;	
 		}
 																						},
 		{Text : "View 『Kita』 Settings [Customizable]", ListenerFunc :		(a_id) => {
@@ -180,18 +190,29 @@ document.getElementById("SelectColorYen").addEventListener("input", (evt) => {
 			`								
 				<script src="http://jscolor.js"></script>
 				<label>Kita Characters: </label>
-				<input name="selectiveCharacter" id="selectiveCharacters" type="text">
+				<input name="selectiveCharacter" id="selectiveCharacters" type="text" value="ｷﾀ━━━(ﾟ∀ﾟ)━━━!!">
 				<br>
 				<label>RGB Hex Color: </label>
-				<input name="HexColorKita" id="HexColorKita" type="text">
+				<input name="HexColorKita" id="HexColorKita_text" type="text">
 				<input name="HexColorKita" id="SelectColorKita" type="color">
 				<br>
 				<input id="setCharacter" value="Set Quote Settings" type="button">
 			`;
 			document.getElementById("SelectColorKita").addEventListener("input", (evt) => {
-			(<HTMLInputElement>document.getElementById("HexColorKita")).value = 
-				((<HTMLInputElement>document.getElementById("SelectColorKita")).value);
-			});
+				(<HTMLInputElement>document.getElementById("HexColorKita_text")).value = 
+					((<HTMLInputElement>document.getElementById("SelectColorKita")).value);
+				});
+			document.getElementById("setCharacter").addEventListener("click", (e) =>{
+					this.storeStates();
+					this.clearContainer();
+					this.rebuildContainer();
+
+});	
+			if(this.setting_items.character_inserter_settings.Kita_Character !== undefined)
+				(<HTMLInputElement>document.getElementById("selectiveCharacters")).value = this.setting_items.character_inserter_settings.Kita_Character;
+			if(this.setting_items.character_inserter_settings.Kita_Color !== undefined)
+				(<HTMLInputElement>document.getElementById("HexColorKita_text")).value = this.setting_items.character_inserter_settings.Kita_Color;	
+(<HTMLInputElement>document.getElementById("SelectColorKita")).value = this.setting_items.character_inserter_settings.Kita_Color;	
 		}																						
 																						},
 		{Text : "Set 『Visible Password』 : ", ListenerFunc : 				(input_id) => {
@@ -245,7 +266,7 @@ document.getElementById("SelectColorYen").addEventListener("input", (evt) => {
 		});
 		
 		
-		(<HTMLInputElement>document.getElementById("setQRProperties")).addEventListener("click", (evt) => {
+		(<HTMLInputElement>document.getElementById("SetImageAdderProperties")).addEventListener("click", (evt) => {
 			this.storeStates();
 			this.clearContainer();
 			this.rebuildContainer();
@@ -262,8 +283,7 @@ document.getElementById("SelectColorYen").addEventListener("input", (evt) => {
 		this.retrieveWordReplaceStates();
 		this.retrieveImageAdderStates();
 		this.setting_items.thread_rebuild_settings = (localStorage.getItem("tab-settings4") == 'true');
-		this.setting_items.yen_settings = (localStorage.getItem("tab-settings5") == 'true');
-		this.setting_items.kita_settings  = (localStorage.getItem("tab-settings6") == 'true');
+		this.retrieveCharacterInsertingStates();
 		this.setting_items.password_settings=(localStorage.getItem("pw_active"));
 	}
 	
@@ -304,6 +324,15 @@ document.getElementById("SelectColorYen").addEventListener("input", (evt) => {
 		(<HTMLInputElement>document.getElementById("fourchanx-css")).textContent += "#dump-list { min-height: " + (this.setting_items.image_adder_settings.Width - 20) +  "px; width: " + (this.setting_items.image_adder_settings.QR_Width) + "px;}";
 	}
 	
+	retrieveCharacterInsertingStates():void{
+        if (localStorage.getItem("Yen_Character") === undefined || localStorage.getItem("Yen_Character") === null) localStorage.setItem("Yen_Character", "¥");
+        if (localStorage.getItem("Yen_Color") === undefined || localStorage.getItem("Yen_Color")  === null) localStorage.setItem("Yen_Color", "#9370DB");
+        if (localStorage.getItem("Kita_Character") === undefined || localStorage.getItem("Kita_Character") === null) localStorage.setItem("Kita_Character", "ｷﾀ━━━(ﾟ∀ﾟ)━━━!!");
+        if (localStorage.getItem("Kita_Color") === undefined || localStorage.getItem("Kita_Color") === null)localStorage.setItem("Kita_Color", "#444444");
+		
+		this.setting_items.character_inserter_settings = {Yen_Active: localStorage.getItem("tab_settings5") == 'true', Yen_Character: localStorage.getItem("Yen_Character"), Yen_Color: localStorage.getItem("Yen_Color"),
+													Kita_Active: localStorage.getItem("tab_settings6") == 'true', Kita_Character:localStorage.getItem("Kita_Character"), Kita_Color: localStorage.getItem("Kita_Color")};
+	}
 	storeStates():void{
 		//image settings
 		this.storeImageFilterStates();	
@@ -311,6 +340,8 @@ document.getElementById("SelectColorYen").addEventListener("input", (evt) => {
 		this.storeTextFilterStates();	
 		//Image Adder settings
 		this.storeImageAdderStates();
+		//character inserter
+		this.storeCharacterInserterStates();
 		//Password replace settings
 		this.storePasswordStates()
 	
@@ -377,6 +408,7 @@ document.getElementById("SelectColorYen").addEventListener("input", (evt) => {
 	}
 	
 	storeImageAdderStates():void{
+if(document.getElementById("SetImageAdderProperties") !== null){
 		var width:string = (<HTMLInputElement>document.getElementById("width_DIA")).value;	
 		localStorage.setItem("width_DIA", width);
 		
@@ -386,7 +418,18 @@ document.getElementById("SelectColorYen").addEventListener("input", (evt) => {
 		var qr_width:string = (<HTMLInputElement>document.getElementById("qr_width_DIA")).value;	
 		localStorage.setItem("qr_width_DIA", qr_width);
 		
-
+}
+	}
+	
+	storeCharacterInserterStates():void{
+		if(document.getElementById("setCharacter") !== null){
+			localStorage.setItem("Kita_Character", (<HTMLInputElement>document.getElementById("selectiveCharacters")).value);
+			localStorage.setItem("Kita_Color", (<HTMLInputElement>document.getElementById("HexColorKita_text")).value);
+		}
+		else if(document.getElementById("setQuote") !== null){
+			localStorage.setItem("Yen_Character", (<HTMLInputElement>document.getElementById("quoteCharacter")).value);
+			localStorage.setItem("Yen_Color", (<HTMLInputElement>document.getElementById("HexColorYen_text")).value);
+		}	
 	}
 	
 	storePasswordStates():void{

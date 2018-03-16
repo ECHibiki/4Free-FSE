@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 // @name         4Free-FSE
 // @author       ECHibiki - /qa/
 // @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
-// @version      0.4
+// @version      0.5
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4Free-FSE/master/builds/4-Free.user.js
@@ -73,6 +73,7 @@ var Constants = /** @class */ (function () {
     }
     Constants.DEFAULT_HIDE_EXPIRATION_TIME = 172800000;
     Constants.MILLISECONDS_TO_THE_HOUR = 3600000;
+    Constants.HELP_ICON_SOURCE = "data:image/jpeg;base64,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";
     return Constants;
 }());
 //unassociated functions
@@ -447,7 +448,6 @@ var DanbooruImageAdder = /** @class */ (function (_super) {
     __extends(DanbooruImageAdder, _super);
     function DanbooruImageAdder() {
         var _this = _super.call(this) || this;
-        _this.help_icon_source = "data:image/jpeg;base64,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";
         _this.timeout_functions = [];
         _this.img_URL = "";
         _this.post_number = 0;
@@ -510,7 +510,7 @@ var DanbooruImageAdder = /** @class */ (function (_super) {
         this.help_icon_container.title = "Click to View Help!";
         var help_icon = document.createElement("IMG");
         help_icon.setAttribute("class", "help_icon");
-        help_icon.src = this.help_icon_source;
+        help_icon.src = Constants.HELP_ICON_SOURCE;
         this.help_icon_container.appendChild(help_icon);
         image_tagging_row.appendChild(this.help_icon_container);
         var tooltip_div = document.createElement("DIV");
@@ -1057,6 +1057,170 @@ var DanbooruImageAdder = /** @class */ (function (_super) {
     };
     return DanbooruImageAdder;
 }(FeatureInterface));
+var CharacterInserter = /** @class */ (function (_super) {
+    __extends(CharacterInserter, _super);
+    function CharacterInserter(use_kita, use_yen) {
+        var _this = _super.call(this) || this;
+        _this.kita_character = "ｷﾀ━━━(ﾟ∀ﾟ)━━━!!";
+        _this.kita_hash_color = "#444444";
+        _this.yen_character = "¥";
+        _this.yen_hash_color = "#9370DB";
+        _this.use_yen = use_yen;
+        _this.use_kita = use_kita;
+        _this.retrieveStates();
+        _this.init();
+        _this.activate();
+        return _this;
+    }
+    CharacterInserter.prototype.init = function () {
+        this.addStyle();
+        this.hotkeyListeners();
+    };
+    CharacterInserter.prototype.activate = function () {
+        console.log("4F-FSE: CharacterInserter Active - " + (this.use_kita ? "Character Coloring+" : "") + (this.use_yen ? " Line Coloring" : ""));
+    };
+    CharacterInserter.prototype.decideAction = function (node) {
+        if (node.tagName == "BLOCKQUOTE")
+            this.colorCharacters(node);
+    };
+    CharacterInserter.prototype.retrieveStates = function () {
+        if (localStorage.getItem("Yen_Character") === undefined || localStorage.getItem("Yen_Character") === null)
+            this.yen_character = "¥";
+        else
+            this.yen_character = localStorage.getItem("Yen_Character");
+        if (localStorage.getItem("Yen_Color") === undefined || localStorage.getItem("Yen_Color") === null)
+            this.yen_hash_color = "#9370DB";
+        else
+            this.yen_hash_color = localStorage.getItem("Yen_Color");
+        if (localStorage.getItem("Kita_Character") === undefined || localStorage.getItem("Kita_Character") === null)
+            this.kita_character = "ｷﾀ━━━(ﾟ∀ﾟ)━━━!!";
+        else
+            this.kita_character = localStorage.getItem("Kita_Character");
+        if (localStorage.getItem("Kita_Color") === undefined || localStorage.getItem("Kita_Color") === null)
+            this.kita_hash_color = "#444444";
+        else
+            this.kita_hash_color = localStorage.getItem("Kita_Color");
+    };
+    CharacterInserter.prototype.storeStates = function () {
+        var items = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            items[_i] = arguments[_i];
+        }
+    };
+    //color styling
+    CharacterInserter.prototype.addStyle = function () {
+        var style = document.createElement("STYLE");
+        style.innerHTML = ".the_m_word{color:" + this.yen_hash_color + "} \n.the_k_word{color:" + this.kita_hash_color + "}";
+        document.head.appendChild(style);
+    };
+    //hotkeys for kita and yen
+    CharacterInserter.prototype.hotkeyListeners = function () {
+        var _this = this;
+        var listener_obj = {};
+        window.addEventListener("keydown", function (e) {
+            listener_obj[e.keyCode] = true;
+            var node = document.activeElement;
+            if (listener_obj[17] && listener_obj[75]) {
+                e.preventDefault();
+                _this.insertAtPos(node, _this.kita_character);
+            }
+            if (listener_obj[17] && listener_obj[220]) {
+                e.preventDefault();
+                _this.insertAtPos(node, _this.yen_character);
+            }
+        }, { passive: false, capture: false, once: false });
+        window.addEventListener("keyup", function (e) {
+            listener_obj[e.keyCode] = false;
+        }, { passive: false, capture: false, once: false });
+    };
+    CharacterInserter.prototype.insertAtPos = function (node, buzzwords) {
+        var sel_start = node.selectionStart;
+        var sel_end = node.selectionEnd;
+        var node_text = node.value;
+        node.value = node_text.substr(0, sel_start) + buzzwords + node_text.substr(sel_end);
+        node.selectionStart = sel_start + buzzwords.length;
+        node.selectionEnd = sel_end + buzzwords.length;
+    };
+    //insertion logic
+    CharacterInserter.prototype.colorCharacters = function (root) {
+        if (root.nodeType !== Node.ELEMENT_NODE) {
+            return;
+        }
+        // var nodes = [].slice(root.getElementsByClassName('postMessage'));
+        // if(root.classList.contains('postmessage')){
+        // //insert above nodes, the root.
+        // nodes.unshift(root);
+        // }
+        console.log(root);
+        if (root.textContent.indexOf(this.yen_character) <= -1 && root.textContent.indexOf(this.kita_character) <= -1) {
+            return;
+        }
+        var txtItterator = document.createNodeIterator(root, NodeFilter.SHOW_TEXT);
+        var text_node;
+        while ((text_node = txtItterator.nextNode())) {
+            //disregard text inside of A tag links and already colored text
+            if (text_node.parentNode.tagName == "A" || /the_[a-z]_word/g.test(text_node.parentNode.className))
+                continue;
+            this.setColor(text_node, txtItterator);
+        }
+    };
+    //give color to text inside of nodes.
+    // first scan for yen symbols and then check the front of the text for not nested kita.
+    CharacterInserter.prototype.setColor = function (text_node, txtItterator) {
+        var start_text_node = text_node;
+        var result;
+        var yen_node = this.use_kita ? this.searchYen(text_node) : false;
+        if (yen_node != false) {
+            //jump to internal node
+            text_node = txtItterator.nextNode();
+            //scan for nested kita
+            do {
+                result = this.use_kita ? this.searchKita(text_node) : false;
+                if (result != false) {
+                    //jump foreward to point after kita inserted
+                    text_node = txtItterator.nextNode();
+                    text_node = txtItterator.nextNode();
+                }
+            } while (result != false);
+        }
+        //scan for outside kita from start
+        do {
+            result = this.use_kita ? this.searchKita(start_text_node) : false;
+            start_text_node = result.nextSibling;
+        } while (result != false && start_text_node !== undefined);
+    };
+    //find the location of a yen, split the text from above that position, create a span element and place split into this span.
+    //Then take the initial text node and insert into it from after the text node.
+    CharacterInserter.prototype.searchYen = function (text_node) {
+        var yenIndex = text_node.textContent.indexOf(this.yen_character);
+        if (yenIndex > -1) {
+            var splitNode = text_node.splitText(yenIndex);
+            var span = document.createElement('span');
+            span.className = "the_m_word";
+            span.appendChild(splitNode);
+            text_node.parentNode.insertBefore(span, text_node.nextSibling);
+            return span;
+        }
+        return false;
+    };
+    //find the location of a kita, isolate it by splitting from the point where the kita ends and the point where it begins.
+    //Now that there are 3 text nodes, take the middle one from the start position index split, add the text which goes to the point of the rightmost split,
+    //then refer back to the parent and place it after the leftmost string.
+    CharacterInserter.prototype.searchKita = function (text_node) {
+        var kIndex = text_node.textContent.indexOf(this.kita_character);
+        if (kIndex > -1) {
+            var far_split_note = text_node.splitText(kIndex + this.kita_character.length);
+            var splitNode = text_node.splitText(kIndex);
+            var span = document.createElement('span');
+            span.className = "the_k_word";
+            span.appendChild(splitNode);
+            text_node.parentNode.insertBefore(span, text_node.nextSibling);
+            return span;
+        }
+        return false;
+    };
+    return CharacterInserter;
+}(FeatureInterface));
 var PasswordViewer = /** @class */ (function (_super) {
     __extends(PasswordViewer, _super);
     function PasswordViewer() {
@@ -1144,7 +1308,7 @@ var SettingsWindow = /** @class */ (function (_super) {
                     var disposable_container = document.createElement("DIV");
                     disposable_container.setAttribute("id", "disposable_container");
                     _this.contents_div.appendChild(disposable_container);
-                    disposable_container.innerHTML = "\n\t\t\t<table style=\"text-align:center;margin-left:5px\">\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Very Large: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"v_large_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Large: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"large_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Medium: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"medium_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Very Large: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"small_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Width: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"width_DIA\" name=\"preivew-size\" style=\"width:20%\"  type=\"text\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Height: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"height_DIA\" name=\"preivew-size\" style=\"width:20%\"  type=\"text\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t</table>\t\n\t\t\n\t\t\t<hr>\n\t\t\t\n\t\t\t<label>Quick Reply Min Width: </label>\n\t\t\t<input id=\"qr_width_DIA\" name=\"preivew-size\" style=\"width:20%\" type=\"text\">\n\t\t\n\t\t\t<hr>\n\t\t\n\t\t\t<input id=\"setQRProperties\" value=\"Set Preview Size\" type=\"button\">\n\t\t\t";
+                    disposable_container.innerHTML = "\n\t\t\t<table style=\"text-align:center;margin-left:5px\">\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Very Large: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"v_large_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Large: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"large_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Medium: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"medium_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Very Large: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"small_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Width: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"width_DIA\" name=\"preivew-size\" style=\"width:20%\"  type=\"text\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Height: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"height_DIA\" name=\"preivew-size\" style=\"width:20%\"  type=\"text\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t</table>\t\n\t\t\n\t\t\t<hr>\n\t\t\t\n\t\t\t<label>Quick Reply Min Width: </label>\n\t\t\t<input id=\"qr_width_DIA\" name=\"preivew-size\" style=\"width:20%\" type=\"text\">\n\t\t\n\t\t\t<hr>\n\t\t\n\t\t\t<input id=\"SetImageAdderProperties\" value=\"Set Preview Size\" type=\"button\">\n\t\t\t";
                     _this.setImageAdderFields();
                     _this.setImageAdderEventListeners();
                 }
@@ -1164,11 +1328,22 @@ var SettingsWindow = /** @class */ (function (_super) {
                     disposable_container.setAttribute("id", "disposable_container");
                     _this.contents_div.appendChild(disposable_container);
                     disposable_container.innerHTML =
-                        "\n\t\t\t\t<label>\u00A5Quote Character: </label>\n\t\t\t\t<input name=\"quoteCharacter\" id=\"quoteCharacter\" type=\"text\">\n\t\t\t\t<br>\n\t\t\t\t<label>RGB Hex Color: </label>\n\t\t\t\t<input name=\"HexColorYen\" id=\"hexColorYen\" type=\"text\">\n\t\t\t\t<input name=\"HexColorYen\" id=\"SelectColorYen\" type=\"color\">\n\t\t\t\t<br>\n\t\t\t\t<input id=\"setQuote\" value=\"Set Quote Settings\" type=\"button\">\n\t\t\t";
+                        "\n\t\t\t\t<label>\u00A5Quote Character: </label>\n\t\t\t\t<input name=\"quoteCharacter\" id=\"quoteCharacter\" type=\"text\" value=\"\u00A5\">\n\t\t\t\t<br>\n\t\t\t\t<label>RGB Hex Color: </label>\n\t\t\t\t<input name=\"HexColorYen\" id=\"HexColorYen_text\" type=\"text\">\n\t\t\t\t<input name=\"HexColorYen\" id=\"SelectColorYen\" type=\"color\">\n\t\t\t\t<br>\n\t\t\t\t<input id=\"setQuote\" value=\"Set Quote Settings\" type=\"button\">\n\t\t\t";
                     document.getElementById("SelectColorYen").addEventListener("input", function (evt) {
-                        document.getElementById("hexColorYen").value =
+                        document.getElementById("HexColorYen_text").value =
                             (document.getElementById("SelectColorYen").value);
                     });
+                    document.getElementById("setQuote").addEventListener("click", function (e) {
+                        _this.storeStates();
+                        _this.clearContainer();
+                        _this.rebuildContainer();
+                    });
+                    console.log(_this.setting_items.character_inserter_settings);
+                    if (_this.setting_items.character_inserter_settings.Yen_Character !== undefined)
+                        document.getElementById("quoteCharacter").value = _this.setting_items.character_inserter_settings.Yen_Character;
+                    if (_this.setting_items.character_inserter_settings.Yen_Color !== undefined)
+                        document.getElementById("HexColorYen_text").value = _this.setting_items.character_inserter_settings.Yen_Color;
+                    document.getElementById("SelectColorYen").value = _this.setting_items.character_inserter_settings.Yen_Color;
                 }
             },
             { Text: "View 『Kita』 Settings [Customizable]", ListenerFunc: function (a_id) {
@@ -1177,11 +1352,21 @@ var SettingsWindow = /** @class */ (function (_super) {
                     disposable_container.setAttribute("id", "disposable_container");
                     _this.contents_div.appendChild(disposable_container);
                     disposable_container.innerHTML =
-                        "\t\t\t\t\t\t\t\t\n\t\t\t\t<script src=\"http://jscolor.js\"></script>\n\t\t\t\t<label>Kita Characters: </label>\n\t\t\t\t<input name=\"selectiveCharacter\" id=\"selectiveCharacters\" type=\"text\">\n\t\t\t\t<br>\n\t\t\t\t<label>RGB Hex Color: </label>\n\t\t\t\t<input name=\"HexColorKita\" id=\"HexColorKita\" type=\"text\">\n\t\t\t\t<input name=\"HexColorKita\" id=\"SelectColorKita\" type=\"color\">\n\t\t\t\t<br>\n\t\t\t\t<input id=\"setCharacter\" value=\"Set Quote Settings\" type=\"button\">\n\t\t\t";
+                        "\t\t\t\t\t\t\t\t\n\t\t\t\t<script src=\"http://jscolor.js\"></script>\n\t\t\t\t<label>Kita Characters: </label>\n\t\t\t\t<input name=\"selectiveCharacter\" id=\"selectiveCharacters\" type=\"text\" value=\"\uFF77\uFF80\u2501\u2501\u2501(\uFF9F\u2200\uFF9F)\u2501\u2501\u2501!!\">\n\t\t\t\t<br>\n\t\t\t\t<label>RGB Hex Color: </label>\n\t\t\t\t<input name=\"HexColorKita\" id=\"HexColorKita_text\" type=\"text\">\n\t\t\t\t<input name=\"HexColorKita\" id=\"SelectColorKita\" type=\"color\">\n\t\t\t\t<br>\n\t\t\t\t<input id=\"setCharacter\" value=\"Set Quote Settings\" type=\"button\">\n\t\t\t";
                     document.getElementById("SelectColorKita").addEventListener("input", function (evt) {
-                        document.getElementById("HexColorKita").value =
+                        document.getElementById("HexColorKita_text").value =
                             (document.getElementById("SelectColorKita").value);
                     });
+                    document.getElementById("setCharacter").addEventListener("click", function (e) {
+                        _this.storeStates();
+                        _this.clearContainer();
+                        _this.rebuildContainer();
+                    });
+                    if (_this.setting_items.character_inserter_settings.Kita_Character !== undefined)
+                        document.getElementById("selectiveCharacters").value = _this.setting_items.character_inserter_settings.Kita_Character;
+                    if (_this.setting_items.character_inserter_settings.Kita_Color !== undefined)
+                        document.getElementById("HexColorKita_text").value = _this.setting_items.character_inserter_settings.Kita_Color;
+                    document.getElementById("SelectColorKita").value = _this.setting_items.character_inserter_settings.Kita_Color;
                 }
             },
             { Text: "Set 『Visible Password』 : ", ListenerFunc: function (input_id) {
@@ -1228,7 +1413,7 @@ var SettingsWindow = /** @class */ (function (_super) {
             document.getElementById("width_DIA").value = "200";
             document.getElementById("height_DIA").value = "200";
         });
-        document.getElementById("setQRProperties").addEventListener("click", function (evt) {
+        document.getElementById("SetImageAdderProperties").addEventListener("click", function (evt) {
             _this.storeStates();
             _this.clearContainer();
             _this.rebuildContainer();
@@ -1241,8 +1426,7 @@ var SettingsWindow = /** @class */ (function (_super) {
         this.retrieveWordReplaceStates();
         this.retrieveImageAdderStates();
         this.setting_items.thread_rebuild_settings = (localStorage.getItem("tab-settings4") == 'true');
-        this.setting_items.yen_settings = (localStorage.getItem("tab-settings5") == 'true');
-        this.setting_items.kita_settings = (localStorage.getItem("tab-settings6") == 'true');
+        this.retrieveCharacterInsertingStates();
         this.setting_items.password_settings = (localStorage.getItem("pw_active"));
     };
     SettingsWindow.prototype.retrieveWordReplaceStates = function () {
@@ -1279,6 +1463,18 @@ var SettingsWindow = /** @class */ (function (_super) {
         document.getElementById("fourchanx-css").textContent += ".qr-preview { height:" + this.setting_items.image_adder_settings.Height + "px; width: " + this.setting_items.image_adder_settings.Width + "px; left:8%;background-size: cover;}";
         document.getElementById("fourchanx-css").textContent += "#dump-list { min-height: " + (this.setting_items.image_adder_settings.Width - 20) + "px; width: " + (this.setting_items.image_adder_settings.QR_Width) + "px;}";
     };
+    SettingsWindow.prototype.retrieveCharacterInsertingStates = function () {
+        if (localStorage.getItem("Yen_Character") === undefined || localStorage.getItem("Yen_Character") === null)
+            localStorage.setItem("Yen_Character", "¥");
+        if (localStorage.getItem("Yen_Color") === undefined || localStorage.getItem("Yen_Color") === null)
+            localStorage.setItem("Yen_Color", "#9370DB");
+        if (localStorage.getItem("Kita_Character") === undefined || localStorage.getItem("Kita_Character") === null)
+            localStorage.setItem("Kita_Character", "ｷﾀ━━━(ﾟ∀ﾟ)━━━!!");
+        if (localStorage.getItem("Kita_Color") === undefined || localStorage.getItem("Kita_Color") === null)
+            localStorage.setItem("Kita_Color", "#444444");
+        this.setting_items.character_inserter_settings = { Yen_Active: localStorage.getItem("tab_settings5") == 'true', Yen_Character: localStorage.getItem("Yen_Character"), Yen_Color: localStorage.getItem("Yen_Color"),
+            Kita_Active: localStorage.getItem("tab_settings6") == 'true', Kita_Character: localStorage.getItem("Kita_Character"), Kita_Color: localStorage.getItem("Kita_Color") };
+    };
     SettingsWindow.prototype.storeStates = function () {
         //image settings
         this.storeImageFilterStates();
@@ -1286,6 +1482,8 @@ var SettingsWindow = /** @class */ (function (_super) {
         this.storeTextFilterStates();
         //Image Adder settings
         this.storeImageAdderStates();
+        //character inserter
+        this.storeCharacterInserterStates();
         //Password replace settings
         this.storePasswordStates();
         this.retrieveStates();
@@ -1345,12 +1543,24 @@ var SettingsWindow = /** @class */ (function (_super) {
         }
     };
     SettingsWindow.prototype.storeImageAdderStates = function () {
-        var width = document.getElementById("width_DIA").value;
-        localStorage.setItem("width_DIA", width);
-        var height = document.getElementById("height_DIA").value;
-        localStorage.setItem("height_DIA", height);
-        var qr_width = document.getElementById("qr_width_DIA").value;
-        localStorage.setItem("qr_width_DIA", qr_width);
+        if (document.getElementById("SetImageAdderProperties") !== null) {
+            var width = document.getElementById("width_DIA").value;
+            localStorage.setItem("width_DIA", width);
+            var height = document.getElementById("height_DIA").value;
+            localStorage.setItem("height_DIA", height);
+            var qr_width = document.getElementById("qr_width_DIA").value;
+            localStorage.setItem("qr_width_DIA", qr_width);
+        }
+    };
+    SettingsWindow.prototype.storeCharacterInserterStates = function () {
+        if (document.getElementById("setCharacter") !== null) {
+            localStorage.setItem("Kita_Character", document.getElementById("selectiveCharacters").value);
+            localStorage.setItem("Kita_Color", document.getElementById("HexColorKita_text").value);
+        }
+        else if (document.getElementById("setQuote") !== null) {
+            localStorage.setItem("Yen_Character", document.getElementById("quoteCharacter").value);
+            localStorage.setItem("Yen_Color", document.getElementById("HexColorYen_text").value);
+        }
     };
     SettingsWindow.prototype.storePasswordStates = function () {
         //password view settings
@@ -1668,6 +1878,9 @@ var Main = /** @class */ (function (_super) {
         }
         if (true) {
             this.features.danbooru_image_adder = new DanbooruImageAdder();
+        }
+        if (true || true) {
+            this.features.character_inserter = new CharacterInserter(true, true);
         }
         if (this.settings.password_settings == 'true') {
             this.features.text_replacer = new PasswordViewer();

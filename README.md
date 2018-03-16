@@ -3,7 +3,7 @@
 This folder contains QAJPYOtGo's MD5 filters for 4chanX, the .ts src folder, and the built user.js file in builds.<br/>
 In the releases you can find individual scripts <a href="https://github.com/ECHibiki/4Free-FSE/releases/tag/0.0.0">as V0 : Individual Packages</a> or you can look here to see the current work on the combined Typescipt version.
 ## Future Developement
-	Combine all into one master script relying entirely on 4chanX and it's API.
+	Implement the on/off toggles for individual features. Bug fixes.
 ## About 4Free-FSE
 4chanX-Free Stuff Enhancements is a userscript that operates with 4chanX to give it additional features. These enhancements were written by me from early 2017 up to 2018 as a way to teach myself how to work with JavaScript while giving something back to the community I took part in.
 Some of these features are simple, like the password viewer, others are more complex using multiple concurent AJAX calls such as the thread rebuilder or the image adder. <br/>
