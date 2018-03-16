@@ -1,3 +1,5 @@
+
+
 class Main extends FeatureInterface{
 	features:any = {};/*;any bypasses dot notation issues on objects*/
 	settings:any = {};
@@ -8,7 +10,7 @@ class Main extends FeatureInterface{
 		else this.activate();	
 		this.retrieveStates();
 		this.init();
-		this.decideAction();
+		this.decideAction(document.getElementById('delform'));
 		this.observeEvents();
 	}
 	
@@ -44,10 +46,14 @@ class Main extends FeatureInterface{
 	storeStates(){}
 	
 	observeEvents():void{
-		document.addEventListener('PostsInserted', evt => this.decideAction());
+		document.addEventListener('PostsInserted', (evt:any) => {
+			if(evt.explicitOriginalTarget.plugins !== undefined){ 
+				this.decideAction(document.getElementById('delform'));
+			}
+		});
 	}
-	decideAction():void{
-		var start:any = document.getElementById('delform');
+	decideAction(node:any):void{
+		var start:any = node;
 		var itterator:any = document.createNodeIterator(start, NodeFilter.SHOW_ELEMENT);
 		var node:any;
 
