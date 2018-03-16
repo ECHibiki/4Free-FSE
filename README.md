@@ -1,5 +1,6 @@
 # 4Free - Free Stuff Enhancements[4Free-FSE]
 ## Navigation
+### Download @ <a href="https://greasyfork.org/en/scripts/39561-4free-fse">GreasyFork</a> or Here
 This folder contains QAJPYOtGo's MD5 filters for 4chanX, the .ts src folder, and the built user.js file in builds.<br/>
 In the releases you can find individual scripts <a href="https://github.com/ECHibiki/4Free-FSE/releases/tag/V0.0.1">as V0 : Individual Packages</a> or you can look here to see the current work on the combined Typescipt version.
 ## Future Developement
