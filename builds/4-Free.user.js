@@ -9,10 +9,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 // ==UserScript==
-// @name         4Free-FSE
+// @name         4Free-FSE [4chan X Enhancement]
 // @author       ECHibiki - /qa/
 // @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
-// @version      1.1
+// @version      1.2
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4Free-FSE/master/builds/4-Free.user.js
@@ -195,7 +195,7 @@ var ImageHider = /** @class */ (function (_super) {
     __extends(ImageHider, _super);
     function ImageHider() {
         var _this = _super.call(this) || this;
-        _this.blank_png = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAALiMAAC4jAHM9rsvAAAA\n\t\t\t\t\t\t\t\t\t\t\t\tG3RFWHRTb2Z0d2FyZQBDZWxzeXMgU3R1ZGlvIFRvb2zBp+F8AAAAo0lEQVR42u3RAQ0AAAjDMO5\n\t\t\t\t\t\t\t\t\t\t\t\tf9LFBSCdhTdvRnQIEiIAAERAgAgJEQIC4AERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAE\n\t\t\t\t\t\t\t\t\t\t\t\tBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAg\n\t\t\t\t\t\t\t\t\t\t\t\tIEAEBIiBABERAgAgIEAEBIiBABAQIECACAkRAgAjI9xbzUCtI4axs4wAAAABJRU5ErkJggg==";
+        _this.blank_png = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAALiMAAC4jAHM9rsvAAAAG3RFWHRTb2Z0d2FyZQBDZWxzeXMgU3R1ZGlvIFRvb2zBp+F8AAAAo0lEQVR42u3RAQ0AAAjDMO5f9LFBSCdhTdvRnQIEiIAAERAgAgJEQIC4AERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABAQIECACAkRAgAjI9xbzUCtI4axs4wAAAABJRU5ErkJggg==";
         _this.retrieveStates();
         _this.init();
         _this.activate();
@@ -2271,7 +2271,7 @@ var Main = /** @class */ (function (_super) {
             _this.activate();
         _this.retrieveStates();
         _this.init();
-        _this.decideAction();
+        _this.decideAction(document.getElementById('delform'));
         _this.observeEvents();
         return _this;
     }
@@ -2304,10 +2304,15 @@ var Main = /** @class */ (function (_super) {
     Main.prototype.storeStates = function () { };
     Main.prototype.observeEvents = function () {
         var _this = this;
-        document.addEventListener('PostsInserted', function (evt) { return _this.decideAction(); });
+        document.addEventListener('PostsInserted', function (evt) {
+            if (evt.explicitOriginalTarget.plugins !== undefined) {
+                _this.decideAction(document.getElementById('delform'));
+            }
+        });
     };
-    Main.prototype.decideAction = function () {
-        var start = document.getElementById('delform');
+    Main.prototype.decideAction = function (node) {
+        console.log("tdeci");
+        var start = node;
         var itterator = document.createNodeIterator(start, NodeFilter.SHOW_ELEMENT);
         var node;
         for (var feature_key in this.features)
