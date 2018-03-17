@@ -31,7 +31,7 @@ class TextReplacer extends FeatureInterface{
 				});
 			}
 			else return;
-			if(!already_filtered){
+			if(!already_filtered && this.text_filters.length !== 0){
 				var itterator:any = document.createNodeIterator(node, NodeFilter.SHOW_TEXT);
 				var localNode:any;
 				while((localNode = itterator.nextNode())){
@@ -58,9 +58,9 @@ class TextReplacer extends FeatureInterface{
 		var JSON_storage:any = {};
 		var storage_key:string;
 		while(storage_index < window.localStorage.length) {
-			storage_index++;
 			storage_key = window.localStorage.key(storage_index);
 			JSON_storage[storage_key] = window.localStorage.getItem(storage_key);
+			storage_index++;
 		}
 		this.number_of_filters = JSON_storage["filter_quantity"];
 		var filters:string[] = Generics.getJSONPropertiesByKeyName(JSON_storage,"[0-9]+FLT");

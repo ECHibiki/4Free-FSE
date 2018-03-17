@@ -273,6 +273,10 @@ var ImageHider = /** @class */ (function (_super) {
     ImageHider.prototype.decideAction = function (node) {
         //tagname is always upper in HTML, in xml it's displayed as written.
         if (node.tagName === 'IMG') {
+            if (node.id === "ihover") {
+                this.hideHoverImageNode(node);
+                return;
+            }
             if (!/\d+IMG/.test(node.getAttribute('hide-grouping')) && (node.getAttribute('data-md5') !== null)) {
                 this.hideImageNode(node);
             }
@@ -280,11 +284,10 @@ var ImageHider = /** @class */ (function (_super) {
     };
     //Activate
     ImageHider.prototype.activate = function () {
-        var _this = this;
-        new MutationObserver(function (mutations) {
-            _this.retrieveStates();
-            _this.hideHoverImageNode(mutations);
-        }).observe(document.getElementById('hoverUI'), { childList: true });
+        // new MutationObserver((mutations) => {
+        // this.retrieveStates();
+        // 
+        // }).observe(document.getElementById('hoverUI'), {childList: true});
         console.log("4F-FSE: ImageHider Active");
     };
     ImageHider.prototype.hideImageNode = function (image_node) {
@@ -313,6 +316,7 @@ var ImageHider = /** @class */ (function (_super) {
             var md5_filters_arr_len = this.md5_filters_arr.length;
             for (var md5 = 0; md5 < md5_filters_arr_len; md5++) {
                 if (node_md5 == this.md5_filters_arr[md5]) {
+                    this.threads_to_hide.push();
                     image_node.setAttribute('hidden-src', image_node.src);
                     image_node.src = this.blank_png;
                     sister_node.setAttribute('hidden-src', sister_node.src);
@@ -322,48 +326,38 @@ var ImageHider = /** @class */ (function (_super) {
             }
         }
     };
-    ImageHider.prototype.hideHoverImageNode = function (mutation_record) {
-        var _this = this;
-        mutation_record.forEach(function (mutation) {
-            mutation.addedNodes.forEach(function (image_node) {
-                var is_embeded_post;
-                if (image_node.tagName == 'DIV') {
-                    is_embeded_post = true;
-                    image_node = image_node.getElementsByClassName('postContainer')[0];
-                    if (image_node === undefined)
-                        return;
-                }
-                var unprocessed_id = image_node.getAttribute('data-full-i-d');
-                if (unprocessed_id === null)
+    ImageHider.prototype.hideHoverImageNode = function (image_node) {
+        var is_embeded_post;
+        // if(image_node.tagName == 'DIV') {
+        // is_embeded_post = true;
+        // image_node = image_node.getElementsByClassName('postContainer')[0];
+        // if(image_node === undefined) return;
+        // }
+        var unprocessed_id = image_node.getAttribute('data-full-i-d');
+        // if (unprocessed_id === null) return;					
+        var proccessed_id = unprocessed_id.substring(unprocessed_id.indexOf('.') + 1);
+        var image_node_id = proccessed_id + 'IMG';
+        // if(is_embeded_post) image_node =  image_node.getElementsByTagName('IMG')[0];
+        if (image_node === undefined)
+            return;
+        for (var thread = 0, threadstore_len = this.threads_to_hide.length; thread < threadstore_len; thread++) {
+            if (image_node_id == this.threads_to_hide[thread]) {
+                image_node.removeAttribute('src');
+                return;
+            }
+        }
+        //thread node holds the MD5
+        var node_md5;
+        // if(is_embeded_post) node_md5 = image_node.getAttribute('data-md5');
+        /*else */ node_md5 = document.getElementById('f' + proccessed_id).getElementsByTagName('IMG')[0].getAttribute('data-md5');
+        if (this.md5_filters_arr !== undefined) {
+            for (var md5 = 0, md5_filters_arr_len = this.md5_filters_arr.length; md5 < md5_filters_arr_len; md5++) {
+                if (node_md5 == this.md5_filters_arr[md5]) {
+                    image_node.removeAttribute('src');
                     return;
-                var proccessed_id = unprocessed_id.substring(unprocessed_id.indexOf('.') + 1);
-                var image_node_id = proccessed_id + 'IMG';
-                if (is_embeded_post)
-                    image_node = image_node.getElementsByTagName('IMG')[0];
-                if (image_node === undefined)
-                    return;
-                for (var thread = 0, threadstore_len = _this.threads_to_hide.length; thread < threadstore_len; thread++) {
-                    if (image_node_id == _this.threads_to_hide[thread]) {
-                        image_node.removeAttribute('src');
-                        return;
-                    }
                 }
-                //thread node holds the MD5
-                var node_md5;
-                if (is_embeded_post)
-                    node_md5 = image_node.getAttribute('data-md5');
-                else
-                    node_md5 = document.getElementById('f' + proccessed_id).getElementsByTagName('IMG')[0].getAttribute('data-md5');
-                if (_this.md5_filters_arr !== undefined) {
-                    for (var md5 = 0, md5_filters_arr_len = _this.md5_filters_arr.length; md5 < md5_filters_arr_len; md5++) {
-                        if (node_md5 == _this.md5_filters_arr[md5]) {
-                            image_node.removeAttribute('src');
-                            return;
-                        }
-                    }
-                }
-            });
-        });
+            }
+        }
     };
     return ImageHider;
 }(FeatureInterface));
@@ -397,7 +391,7 @@ var TextReplacer = /** @class */ (function (_super) {
             }
             else
                 return;
-            if (!already_filtered) {
+            if (!already_filtered && this.text_filters.length !== 0) {
                 var itterator = document.createNodeIterator(node, NodeFilter.SHOW_TEXT);
                 var localNode;
                 while ((localNode = itterator.nextNode())) {
@@ -424,9 +418,9 @@ var TextReplacer = /** @class */ (function (_super) {
         var JSON_storage = {};
         var storage_key;
         while (storage_index < window.localStorage.length) {
-            storage_index++;
             storage_key = window.localStorage.key(storage_index);
             JSON_storage[storage_key] = window.localStorage.getItem(storage_key);
+            storage_index++;
         }
         this.number_of_filters = JSON_storage["filter_quantity"];
         var filters = Generics.getJSONPropertiesByKeyName(JSON_storage, "[0-9]+FLT");
@@ -1834,19 +1828,17 @@ var SettingsWindow = /** @class */ (function (_super) {
         var JSON_storage = {};
         var storage_key;
         var text_filters = [];
-        while (storage_index < window.localStorage.length) {
-            storage_index++;
+        var local_store_len = window.localStorage.length;
+        while (storage_index < local_store_len) {
             storage_key = window.localStorage.key(storage_index);
             JSON_storage[storage_key] = window.localStorage.getItem(storage_key);
+            storage_index++;
         }
         var filters = Generics.getJSONPropertiesByKeyName(JSON_storage, "[0-9]+FLT");
         filters.sort();
         filters.forEach(function (filter) {
             text_filters.push(TextReplacer.formatFilterSettings(JSON_storage[filter]));
         });
-        var width = localStorage.getItem("width_DIA");
-        var height = localStorage.getItem("height_DIA");
-        var qr_width = localStorage.getItem("qr_width_DIA");
         this.setting_items.word_replace_settings = { Number_of_filters: localStorage.getItem("filter_quantity"), Text_Filter_List: text_filters };
     };
     SettingsWindow.prototype.retrieveImageAdderStates = function () {
@@ -2285,7 +2277,7 @@ var Main = /** @class */ (function (_super) {
             this.features.image_hider = new ImageHider();
         }
         if (true) {
-            this.features.image_replacer = new TextReplacer();
+            this.features.text_replacer = new TextReplacer();
         }
         if (true) {
             this.features.danbooru_image_adder = new DanbooruImageAdder();
@@ -2297,18 +2289,23 @@ var Main = /** @class */ (function (_super) {
             this.features.character_inserter = new CharacterInserter(true, true);
         }
         if (this.settings.password_settings == 'true') {
-            this.features.text_replacer = new PasswordViewer();
+            this.features.password_viewer = new PasswordViewer();
         }
     };
     Main.prototype.activate = function () { console.log("4F-FSE Starting"); };
     Main.prototype.storeStates = function () { };
     Main.prototype.observeEvents = function () {
         var _this = this;
-        document.addEventListener('PostsInserted', function (evt) {
-            //if (evt.explicitOriginalTarget.plugins !== undefined) {
-                _this.decideAction(document.getElementById('delform'));
-           // }
-        });
+        var document_changes = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                [].forEach.call(mutation.addedNodes, function (node) { return _this.decideAction(node); });
+            });
+        }).observe(document.body, { childList: true, subtree: true });
+        // document.addEventListener('PostsInserted', (evt:any) => {
+        // if(evt.explicitOriginalTarget.plugins !== undefined){ 
+        // this.decideAction(document.getElementById('delform'));
+        // }
+        // });
     };
     Main.prototype.decideAction = function (node) {
         var start = node;
@@ -2317,8 +2314,11 @@ var Main = /** @class */ (function (_super) {
         for (var feature_key in this.features)
             this.features[feature_key].retrieveStates();
         while ((node = itterator.nextNode())) {
-            for (var feature_key in this.features)
+            if (node.tagName !== "BLOCKQUOTE" && node.tagName !== "IMG")
+                continue;
+            for (var feature_key in this.features) {
                 this.features[feature_key].decideAction(node);
+            }
         }
     };
     return Main;

@@ -300,10 +300,11 @@ class SettingsWindow  extends FeatureInterface{
 		var JSON_storage:any = {};
 		var storage_key:string;
 		var text_filters:any[] = [];
-		while(storage_index < window.localStorage.length) {
-			storage_index++;
+		var local_store_len = window.localStorage.length;
+		while(storage_index < local_store_len) {
 			storage_key = window.localStorage.key(storage_index);
 			JSON_storage[storage_key] = window.localStorage.getItem(storage_key);
+			storage_index++;
 		}
 		var filters:string[] = Generics.getJSONPropertiesByKeyName(JSON_storage,"[0-9]+FLT");
 		filters.sort();
@@ -311,10 +312,6 @@ class SettingsWindow  extends FeatureInterface{
 			text_filters.push(TextReplacer.formatFilterSettings(JSON_storage[filter]));
 		});
 		
-		var width = localStorage.getItem("width_DIA");
-		var height = localStorage.getItem("height_DIA");
-		var qr_width = localStorage.getItem("qr_width_DIA");
-
 		this.setting_items.word_replace_settings = {Number_of_filters: localStorage.getItem("filter_quantity"), Text_Filter_List: text_filters};
 	}
 	

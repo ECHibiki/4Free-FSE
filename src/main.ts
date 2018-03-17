@@ -26,7 +26,7 @@ class Main extends FeatureInterface{
 			this.features.image_hider = new ImageHider();
 		}
 		if(true){
-			this.features.image_replacer = new TextReplacer();
+			this.features.text_replacer = new TextReplacer();
 		}
 		if(true){
 			this.features.danbooru_image_adder = new DanbooruImageAdder();
@@ -38,7 +38,7 @@ class Main extends FeatureInterface{
 			this.features.character_inserter = new CharacterInserter(true, true);
 		}
 		if(this.settings.password_settings == 'true'){
-			this.features.text_replacer = new PasswordViewer();
+			this.features.password_viewer = new PasswordViewer();
 		}
 	}
 	
@@ -46,13 +46,21 @@ class Main extends FeatureInterface{
 	storeStates(){}
 	
 	observeEvents():void{
-		document.addEventListener('PostsInserted', (evt:any) => {
-			if(evt.explicitOriginalTarget.plugins !== undefined){ 
-				this.decideAction(document.getElementById('delform'));
-			}
-		});
+		var document_changes = new MutationObserver((mutations)=>{
+			mutations.forEach((mutation) => {
+				[].forEach.call(mutation.addedNodes, (node)=> this.decideAction(node));
+			});
+		}).observe(document.body, {childList: true, subtree:true});
+		
+		// document.addEventListener('PostsInserted', (evt:any) => {
+			
+			// if(evt.explicitOriginalTarget.plugins !== undefined){ 
+				// this.decideAction(document.getElementById('delform'));
+			// }
+		// });
 	}
 	decideAction(node:any):void{
+		
 		var start:any = node;
 		var itterator:any = document.createNodeIterator(start, NodeFilter.SHOW_ELEMENT);
 		var node:any;
@@ -61,8 +69,10 @@ class Main extends FeatureInterface{
 			this.features[feature_key].retrieveStates();
 		
 		while((node = itterator.nextNode())){
-			for(let feature_key in this.features)
+			if(node.tagName !== "BLOCKQUOTE" && node.tagName !== "IMG") continue;
+			for(let feature_key in this.features){
 				this.features[feature_key].decideAction(node);
+			}
 		}
 	}
 }
