@@ -295,7 +295,7 @@ class SettingsWindow  extends FeatureInterface{
 	}
 	
 	retrieveActiveToggles():void{
-		if(localStorage.getItem("ImageHidingActive")  == null || localStorage.getItem("ImageHidingActive") === undefined){
+		if(localStorage.getItem("4F-FSE") === null){
 			(<HTMLInputElement>document.getElementById("check-settings0")).checked = true;
 			(<HTMLInputElement>document.getElementById("check-settings1")).checked = false;
 			(<HTMLInputElement>document.getElementById("check-settings2")).checked = false;
@@ -303,6 +303,7 @@ class SettingsWindow  extends FeatureInterface{
 			(<HTMLInputElement>document.getElementById("check-settings4")).checked = true;
 			(<HTMLInputElement>document.getElementById("check-settings5")).checked = true;
 			(<HTMLInputElement>document.getElementById("check-settings6")).checked = true;
+			localStorage.setItem("4F-FSE", "Success");
 			this.displayWindow();
 			return;
 		} 
@@ -365,7 +366,6 @@ class SettingsWindow  extends FeatureInterface{
 		this.setting_items.character_inserter_settings = {Yen_Active: localStorage.getItem("YenActive") == 'true', Yen_Character: localStorage.getItem("Yen_Character"), Yen_Color: localStorage.getItem("Yen_Color"),
 													Kita_Active: localStorage.getItem("KitaActive") == 'true', Kita_Character:localStorage.getItem("Kita_Character"), Kita_Color: localStorage.getItem("Kita_Color")};
 													
-									console.log(this.setting_items.character_inserter_settings );
 	}
 	
 	storeStates():void{

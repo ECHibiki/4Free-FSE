@@ -55,12 +55,6 @@ class Main extends FeatureInterface{
 			});
 		}).observe(document.body, {childList: true, subtree:true});
 		
-		// document.addEventListener('PostsInserted', (evt:any) => {
-			
-			// if(evt.explicitOriginalTarget.plugins !== undefined){ 
-				// this.decideAction(document.getElementById('delform'));
-			// }
-		// });
 	}
 	decideAction(node:any):void{
 		if(node === undefined || node.tagName === undefined) return;

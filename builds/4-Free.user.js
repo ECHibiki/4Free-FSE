@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 // @name         4Free-FSE [4chan X Enhancement]
 // @author       ECHibiki - /qa/
 // @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
-// @version      1.3.0
+// @version      1.3.1
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4Free-FSE/master/builds/4-Free.user.js
@@ -1822,7 +1822,7 @@ var SettingsWindow = /** @class */ (function (_super) {
         this.setting_items.password_settings = (localStorage.getItem("PasswordActive"));
     };
     SettingsWindow.prototype.retrieveActiveToggles = function () {
-        if (localStorage.getItem("ImageHidingActive") == null || localStorage.getItem("ImageHidingActive") === undefined) {
+        if (localStorage.getItem("4F-FSE") === null) {
             document.getElementById("check-settings0").checked = true;
             document.getElementById("check-settings1").checked = false;
             document.getElementById("check-settings2").checked = false;
@@ -1830,6 +1830,7 @@ var SettingsWindow = /** @class */ (function (_super) {
             document.getElementById("check-settings4").checked = true;
             document.getElementById("check-settings5").checked = true;
             document.getElementById("check-settings6").checked = true;
+            localStorage.setItem("4F-FSE", "Success");
             this.displayWindow();
             return;
         }
@@ -1890,7 +1891,6 @@ var SettingsWindow = /** @class */ (function (_super) {
             localStorage.setItem("Kita_Color", "#444444");
         this.setting_items.character_inserter_settings = { Yen_Active: localStorage.getItem("YenActive") == 'true', Yen_Character: localStorage.getItem("Yen_Character"), Yen_Color: localStorage.getItem("Yen_Color"),
             Kita_Active: localStorage.getItem("KitaActive") == 'true', Kita_Character: localStorage.getItem("Kita_Character"), Kita_Color: localStorage.getItem("Kita_Color") };
-        console.log(this.setting_items.character_inserter_settings);
     };
     SettingsWindow.prototype.storeStates = function () {
         //image settings
@@ -2341,11 +2341,6 @@ var Main = /** @class */ (function (_super) {
                 [].forEach.call(mutation.addedNodes, function (node) { return _this.decideAction(node); });
             });
         }).observe(document.body, { childList: true, subtree: true });
-        // document.addEventListener('PostsInserted', (evt:any) => {
-        // if(evt.explicitOriginalTarget.plugins !== undefined){ 
-        // this.decideAction(document.getElementById('delform'));
-        // }
-        // });
     };
     Main.prototype.decideAction = function (node) {
         if (node === undefined || node.tagName === undefined)
