@@ -16,7 +16,7 @@ class SettingsWindow  extends FeatureInterface{
 		//to change order change, this AND...*
 	list_items:any[] = 
 	[
-		{Text : "View 『Image Hiding』 Settings", ListenerFunc : 				(a_id) => {
+		{Text : " | View 『Image Hiding』 Settings", ListenerFunc : 				(a_id) => {
 			this.clearContainer();
 			(<Element>this.contents_div).innerHTML = 
 				`
@@ -46,7 +46,7 @@ class SettingsWindow  extends FeatureInterface{
 			}
 
 																						},
-		{Text : "View 『Word Replacement』 Settings", ListenerFunc : 			(a_id) => {
+		{Text : " | View 『Word Replacement』 Settings", ListenerFunc : 			(a_id) => {
 			this.clearContainer();
 			
 			var disposable_container:any = document.createElement("DIV");
@@ -56,7 +56,7 @@ class SettingsWindow  extends FeatureInterface{
 			this.filterSetTable();				
 		}
 																						},
-		{Text : "View 『Danbooru Image Adder』 Settings", ListenerFunc :		(a_id) => {		
+		{Text : " | View 『Danbooru Image Adder』 Settings", ListenerFunc :		(a_id) => {		
 			this.clearContainer();
 			
 			var disposable_container:Element = document.createElement("DIV");
@@ -127,7 +127,7 @@ class SettingsWindow  extends FeatureInterface{
 		this.setImageAdderEventListeners();
 		}
 																						},
-		{Text : "View 『Thread Rebuilder』 Settings", ListenerFunc : 			(a_id) => {
+		{Text : " | View 『Thread Rebuilder』 Settings", ListenerFunc : 			(a_id) => {
 			this.clearContainer();
 			
 			var disposable_container = document.createElement("DIV");
@@ -153,7 +153,7 @@ class SettingsWindow  extends FeatureInterface{
 			else if(this.setting_items.thread_rebuild_settings.Archive_Type === "1") (<HTMLInputElement>document.getElementById("OnsiteArchive")).checked = true;
 	}
 																						},
-		{Text : "View 『¥ Text』 Settings [Customizable]", ListenerFunc : 	(a_id) => {
+		{Text : " | View 『¥ Text』 Settings [Customizable]", ListenerFunc : 	(a_id) => {
 			this.clearContainer();
 			
 			var disposable_container = document.createElement("DIV");
@@ -187,7 +187,7 @@ class SettingsWindow  extends FeatureInterface{
 (<HTMLInputElement>document.getElementById("SelectColorYen")).value = this.setting_items.character_inserter_settings.Yen_Color;	
 		}
 																						},
-		{Text : "View 『Kita』 Settings [Customizable]", ListenerFunc :		(a_id) => {
+		{Text : " | View 『Kita』 Settings [Customizable]", ListenerFunc :		(a_id) => {
 			this.clearContainer();
 			
 			var disposable_container = document.createElement("DIV");
@@ -203,7 +203,7 @@ class SettingsWindow  extends FeatureInterface{
 				<input name="HexColorKita" id="HexColorKita_text" type="text">
 				<input name="HexColorKita" id="SelectColorKita" type="color">
 				<br>
-				<input id="setCharacter" value="Set Quote Settings" type="button">
+				<input id="setCharacter" value="Set Character Settings" type="button">
 			`;
 			document.getElementById("SelectColorKita").addEventListener("input", (evt) => {
 				(<HTMLInputElement>document.getElementById("HexColorKita_text")).value = 
@@ -219,10 +219,10 @@ class SettingsWindow  extends FeatureInterface{
 				(<HTMLInputElement>document.getElementById("selectiveCharacters")).value = this.setting_items.character_inserter_settings.Kita_Character;
 			if(this.setting_items.character_inserter_settings.Kita_Color !== undefined)
 				(<HTMLInputElement>document.getElementById("HexColorKita_text")).value = this.setting_items.character_inserter_settings.Kita_Color;	
-(<HTMLInputElement>document.getElementById("SelectColorKita")).value = this.setting_items.character_inserter_settings.Kita_Color;	
+			(<HTMLInputElement>document.getElementById("SelectColorKita")).value = this.setting_items.character_inserter_settings.Kita_Color;	
 		}																						
 																						},
-		{Text : "Set 『Visible Password』 : ", ListenerFunc : 				(input_id) => {
+		{Text : " | Set 『Visible Password』", ListenerFunc : 				(input_id) => {
 			var input = document.getElementById(input_id);
 			var is_check:boolean = !(<HTMLInputElement>input).checked;
 			(<HTMLInputElement>document.getElementById(input_id)).checked = is_check;
@@ -286,12 +286,33 @@ class SettingsWindow  extends FeatureInterface{
 		//*...THIS
 	retrieveStates():void{
 		//values used to fill out data fields
-		this.setting_items.image_hiding_settings  = {Expiration_Time: localStorage.getItem("Expiration_Time"), MD5_List_FSE: localStorage.getItem("MD5_List_FSE")};
+		this.setting_items.image_hiding_settings  = {Expiration_Time: localStorage.getItem("Expiration_Time"), MD5_List_FSE: localStorage.getItem("MD5_List_FSE"), Active: localStorage.getItem("ImageHidingActive")};
 		this.retrieveWordReplaceStates();
 		this.retrieveImageAdderStates();
 		this.retrieveRebuildStates();
 		this.retrieveCharacterInsertingStates();
-		this.setting_items.password_settings=(localStorage.getItem("pw_active"));
+		this.setting_items.password_settings=(localStorage.getItem("PasswordActive"));
+	}
+	
+	retrieveActiveToggles():void{
+		if(localStorage.getItem("ImageHidingActive")  == null || localStorage.getItem("ImageHidingActive") === undefined){
+			(<HTMLInputElement>document.getElementById("check-settings0")).checked = true;
+			(<HTMLInputElement>document.getElementById("check-settings1")).checked = false;
+			(<HTMLInputElement>document.getElementById("check-settings2")).checked = false;
+			(<HTMLInputElement>document.getElementById("check-settings3")).checked = false;
+			(<HTMLInputElement>document.getElementById("check-settings4")).checked = true;
+			(<HTMLInputElement>document.getElementById("check-settings5")).checked = true;
+			(<HTMLInputElement>document.getElementById("check-settings6")).checked = true;
+			this.displayWindow();
+			return;
+		} 
+		(<HTMLInputElement>document.getElementById("check-settings0")).checked = localStorage.getItem("ImageHidingActive") === 'true';
+		(<HTMLInputElement>document.getElementById("check-settings1")).checked = localStorage.getItem("TextReplaceActive") === 'true';
+		(<HTMLInputElement>document.getElementById("check-settings2")).checked = localStorage.getItem("ImageAdderActive") === 'true';
+		(<HTMLInputElement>document.getElementById("check-settings3")).checked = localStorage.getItem("ThreadRebuilderActive") === 'true';
+		(<HTMLInputElement>document.getElementById("check-settings4")).checked = localStorage.getItem("YenActive") === 'true';
+		(<HTMLInputElement>document.getElementById("check-settings5")).checked = localStorage.getItem("KitaActive") === 'true';
+		(<HTMLInputElement>document.getElementById("check-settings6")).checked = localStorage.getItem("PasswordActive") === 'true';
 	}
 	
 	retrieveWordReplaceStates():void{
@@ -312,13 +333,14 @@ class SettingsWindow  extends FeatureInterface{
 			text_filters.push(TextReplacer.formatFilterSettings(JSON_storage[filter]));
 		});
 		
-		this.setting_items.word_replace_settings = {Number_of_filters: localStorage.getItem("filter_quantity"), Text_Filter_List: text_filters};
+		this.setting_items.word_replace_settings = {Number_of_filters: localStorage.getItem("filter_quantity"), Text_Filter_List: text_filters, Active:localStorage.getItem("TextReplaceActive")};
 	}
 	
 	retrieveImageAdderStates():void{
 		this.setting_items.image_adder_settings =  {Width: localStorage.getItem("width_DIA"),
 													Height: localStorage.getItem("height_DIA"), 
-													QR_Width: localStorage.getItem("qr_width_DIA")};
+													QR_Width: localStorage.getItem("qr_width_DIA"),
+													Active:localStorage.getItem("ImageAdderActive")};
 		
 		if(this.setting_items.image_adder_settings.Height === null) this.setting_items.image_adder_settings.Height = 400;
 		if(this.setting_items.image_adder_settings.Width === null) this.setting_items.image_adder_settings.Width = 400;
@@ -326,11 +348,12 @@ class SettingsWindow  extends FeatureInterface{
 		
 		(<HTMLInputElement>document.getElementById("fourchanx-css")).textContent += ".qr-preview { height:" +  this.setting_items.image_adder_settings.Height + "px; width: " + this.setting_items.image_adder_settings.Width +  "px; left:8%;background-size: cover;}";
 		(<HTMLInputElement>document.getElementById("fourchanx-css")).textContent += "#dump-list { min-height: " + (this.setting_items.image_adder_settings.Width - 20) +  "px; width: " + (this.setting_items.image_adder_settings.QR_Width) + "px;}";
+		
 	}
 	
 	retrieveRebuildStates():void{
 		if(localStorage.getItem("ArchiveType_FSE") !== "1" && localStorage.getItem("ArchiveType_FSE") !== "0") localStorage.setItem("ArchiveType_FSE", "1");
-		this.setting_items.thread_rebuild_settings = {Archive_Type: localStorage.getItem("ArchiveType_FSE")};
+		this.setting_items.thread_rebuild_settings = {Archive_Type: localStorage.getItem("ArchiveType_FSE"), Active:localStorage.getItem("ThreadRebuilderActive")};
 	}
 	
 	retrieveCharacterInsertingStates():void{
@@ -339,8 +362,10 @@ class SettingsWindow  extends FeatureInterface{
         if (localStorage.getItem("Kita_Character") === undefined || localStorage.getItem("Kita_Character") === null) localStorage.setItem("Kita_Character", "ｷﾀ━━━(ﾟ∀ﾟ)━━━!!");
         if (localStorage.getItem("Kita_Color") === undefined || localStorage.getItem("Kita_Color") === null)localStorage.setItem("Kita_Color", "#444444");
 		
-		this.setting_items.character_inserter_settings = {Yen_Active: localStorage.getItem("tab_settings5") == 'true', Yen_Character: localStorage.getItem("Yen_Character"), Yen_Color: localStorage.getItem("Yen_Color"),
-													Kita_Active: localStorage.getItem("tab_settings6") == 'true', Kita_Character:localStorage.getItem("Kita_Character"), Kita_Color: localStorage.getItem("Kita_Color")};
+		this.setting_items.character_inserter_settings = {Yen_Active: localStorage.getItem("YenActive") == 'true', Yen_Character: localStorage.getItem("Yen_Character"), Yen_Color: localStorage.getItem("Yen_Color"),
+													Kita_Active: localStorage.getItem("KitaActive") == 'true', Kita_Character:localStorage.getItem("Kita_Character"), Kita_Color: localStorage.getItem("Kita_Color")};
+													
+									console.log(this.setting_items.character_inserter_settings );
 	}
 	
 	storeStates():void{
@@ -358,6 +383,17 @@ class SettingsWindow  extends FeatureInterface{
 		this.storePasswordStates()
 	
 		this.retrieveStates();
+	}
+	
+	storeActiveToggles():void{
+		console.log("tog");
+		localStorage.setItem("ImageHidingActive", ((<HTMLInputElement>document.getElementById("check-settings0")).checked.toString()));
+		localStorage.setItem("TextReplaceActive", ((<HTMLInputElement>document.getElementById("check-settings1")).checked.toString()));
+		localStorage.setItem("ImageAdderActive", ((<HTMLInputElement>document.getElementById("check-settings2")).checked.toString()));
+		localStorage.setItem("ThreadRebuilderActive", ((<HTMLInputElement>document.getElementById("check-settings3")).checked.toString()));
+		localStorage.setItem("YenActive", ((<HTMLInputElement>document.getElementById("check-settings4")).checked.toString()));
+		localStorage.setItem("KitaActive", ((<HTMLInputElement>document.getElementById("check-settings5")).checked.toString()));
+		localStorage.setItem("PasswordActive", ((<HTMLInputElement>document.getElementById("check-settings6")).checked.toString()));
 	}
 	
 	storeImageFilterStates():void{
@@ -453,7 +489,7 @@ if(document.getElementById("SetImageAdderProperties") !== null){
 	storePasswordStates():void{
 			//password view settings
 		if(document.getElementById("check-settings6") !== null)
-		localStorage.setItem("pw_active", `${(<HTMLInputElement>document.getElementById("check-settings6")).checked}`);		
+		localStorage.setItem("PasswordActive", `${(<HTMLInputElement>document.getElementById("check-settings6")).checked}`);		
 	}
 	
 	clearContainer():void{
@@ -520,6 +556,7 @@ if(document.getElementById("SetImageAdderProperties") !== null){
 
 		this.end_para.setAttribute('class', 'footerStyle');
 				
+		this.ul_selection_start.setAttribute("ID", "selection_list");
 		this.generateList(this.contents_div);
 	}
 	
@@ -528,32 +565,42 @@ if(document.getElementById("SetImageAdderProperties") !== null){
 			var li = document.createElement('LI');
 			li.setAttribute('class', 'settingsItem');
 			if(list_item.Text.indexOf('View') > -1){
+				var input:any = document.createElement('INPUT');
+				var input_id:string = 'check-settings' + index;
+				input.setAttribute('TYPE','checkbox');
+				input.setAttribute('ID', 'check-settings' + index);
+				li.appendChild(input);		
+				input.addEventListener('click', (evt) => this.storeActiveToggles());
+					
 				var a:any =  document.createElement('A');
                 a.setAttribute('href','javascript:void(0)');
 				a.textContent = list_item.Text;
 				var a_id = 'tab-settings' + index;
 				a.setAttribute('ID', 'tab-settings' + index);
 				var setup_func =(_a_id) => {
-					a.addEventListener('click', (evt) => list_item.ListenerFunc(_a_id));
+					a.addEventListener('click', (evt) => list_item.ListenerFunc(_a_id ));
 					li.appendChild(a);
 					this.ul_selection_start.appendChild(li);
 				}
 				setup_func(a_id);
 			}
 			else{
-				var label:any =  document.createElement('LABEL');
-				label.textContent = list_item.Text;
-				li.appendChild(label);
-				
 				var input:any = document.createElement('INPUT');
 				var input_id:string = 'check-settings' + index;
 				input.setAttribute('TYPE','checkbox');
 				input.setAttribute('ID', 'check-settings' + index);
-				li.appendChild(input);
+				input.addEventListener('click', (evt) => this.storeActiveToggles());
+				li.appendChild(input);			
+
+				var label:any =  document.createElement('LABEL');
+				label.textContent = list_item.Text;
+			
+				li.appendChild(label);
 				this.ul_selection_start.appendChild(li);
+				
 				(<HTMLInputElement>input).checked = this.setting_items.password_settings == 'true';
-				var setup_func = (_input_id) => {
-					label.addEventListener('click',(evt) => list_item.ListenerFunc(_input_id));
+				var setup_func = (input_id) => {
+					label.addEventListener('click',(evt) => list_item.ListenerFunc(input_id));
 				};
 				setup_func(input_id);
 			}
@@ -569,9 +616,11 @@ if(document.getElementById("SetImageAdderProperties") !== null){
 		this.title_para.appendChild(this.title_text);
 		this.settings_div.appendChild(this.title_para);
 		this.settings_div.appendChild(this.contents_div);		
+		this.contents_div.appendChild(this.ul_selection_start);
 		this.end_para.appendChild(this.end_text);
 		this.settings_div.appendChild(this.end_para);
 		document.body.appendChild(this.settings_div);
+		this.retrieveActiveToggles();
 	}
 	decideAction(node:any):void{}
 	
@@ -597,8 +646,6 @@ if(document.getElementById("SetImageAdderProperties") !== null){
 		filter_table.setAttribute("id", "filter_table");
 		disposable_container.appendChild(filter_table);
 
-		var table_row:any = document.createElement("tr");
-		filter_table.appendChild(table_row);
 		var table_head_active:any =  document.createElement("th");
 		var head_text_active:any = document.createTextNode("Active");
 		table_head_active.appendChild(head_text_active);
@@ -699,29 +746,28 @@ if(document.getElementById("SetImageAdderProperties") !== null){
 			
 		var filter_table:any = document.getElementById("filter_table");
 		filter_table.deleteRow(number_of_filters + 1);
-		number_of_filters++;
 
 		var table_row_contents:any = document.createElement("tr");
-		table_row_contents.setAttribute("id", "FilterRow" +  (number_of_filters - 1));
+		table_row_contents.setAttribute("id", "FilterRow" +  (number_of_filters));
 
 		var table_data_active:any =  document.createElement("td");
 		var table_checkbox_active:any = document.createElement("input");
 		table_checkbox_active.setAttribute("type", "checkbox");
-		table_checkbox_active.setAttribute("id", "Active" + (number_of_filters - 1));
+		table_checkbox_active.setAttribute("id", "Active" + (number_of_filters));
 		table_data_active.appendChild(table_checkbox_active);
 		table_row_contents.appendChild(table_data_active);
 
 		var table_data_pattern:any =  document.createElement("td");
 		var table_input_pattern:any = document.createElement("input");
 		table_input_pattern.setAttribute("class", "inputs");
-		table_input_pattern.setAttribute("id", "Pattern" + (number_of_filters - 1));
+		table_input_pattern.setAttribute("id", "Pattern" + (number_of_filters));
 		table_data_pattern.appendChild(table_input_pattern);
 		table_row_contents.appendChild(table_data_pattern);
 
 		var table_data_replacement:any =  document.createElement("td");
 		var table_input_replacement:any =  document.createElement("input");
 		table_input_replacement.setAttribute("class", "inputs");
-		table_input_replacement.setAttribute("id", "Replacement" + (number_of_filters - 1));
+		table_input_replacement.setAttribute("id", "Replacement" + (number_of_filters));
 		table_data_replacement.appendChild(table_input_replacement);
 		table_row_contents.appendChild(table_data_replacement);
 
@@ -764,7 +810,7 @@ if(document.getElementById("SetImageAdderProperties") !== null){
 		var table_close_collumn:any = document.createElement("td");
 		var table_close_button:any = document.createElement("input");
 		table_close_button.setAttribute("type", "button");
-		table_close_button.setAttribute("value", "Close Menu");
+		table_close_button.setAttribute("value", "Close Without Saving");
 		table_close_button.setAttribute("style", "padding: 7px 0; margin:5px 0;");
 		table_close_button.addEventListener("click", (evt) => {
 			this.clearContainer();

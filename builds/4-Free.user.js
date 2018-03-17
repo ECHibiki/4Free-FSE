@@ -255,7 +255,6 @@ var ImageHider = /** @class */ (function (_super) {
                 image_node.setAttribute('hidden-src', image_node.src);
                 image_node.src = _this.blank_png;
             });
-            return false;
         }
         else if (event.ctrlKey && event.shiftKey) {
             event.preventDefault();
@@ -266,8 +265,8 @@ var ImageHider = /** @class */ (function (_super) {
             [].slice.call(document.querySelectorAll('img[hide-grouping="' + hide_group_id + '"]')).forEach(function (image_node) {
                 image_node.src = image_node.getAttribute('hidden-src');
             });
-            return false;
         }
+        this.retrieveStates();
         return true;
     };
     ImageHider.prototype.decideAction = function (node) {
@@ -1662,7 +1661,7 @@ var SettingsWindow = /** @class */ (function (_super) {
         _this.settings_style = document.createElement('STYLE');
         //to change order change, this AND...*
         _this.list_items = [
-            { Text: "View 『Image Hiding』 Settings", ListenerFunc: function (a_id) {
+            { Text: " | View 『Image Hiding』 Settings", ListenerFunc: function (a_id) {
                     _this.clearContainer();
                     _this.contents_div.innerHTML =
                         "\n\t\t\t\t<div id=\"disposable_container\">\n\t\t\t\t\t\t\t\t <label>Non-MD5 Expiration Time(hours): </label>\n\t\t\t\t\t\t\t\t <input id=\"Expiration_Time\">\n\t\t\t\t\t\t\t\t <hr>\n\t\t\t\t\t\t\t\t <label>MD5 Filters:</label>\n\t\t\t\t\t\t\t\t <br>\n\t\t\t\t\t\t\t\t <textarea style=\"width:98%;height:217px\" placeholder=\"Enter MD5 like on 4chanX... \n\t\t\t\t\t\t\t\t/abc123/\n\t\t\t\t\t\t\t\t/def890/\" id=\"MD5_List_FSE\"></textarea>\n\t\t\t\t\t\t\t\t<hr>\n\t\t\t\t</div>\n\t\t\t\t";
@@ -1679,7 +1678,7 @@ var SettingsWindow = /** @class */ (function (_super) {
                     set_button.setAttribute('TYPE', 'button');
                 }
             },
-            { Text: "View 『Word Replacement』 Settings", ListenerFunc: function (a_id) {
+            { Text: " | View 『Word Replacement』 Settings", ListenerFunc: function (a_id) {
                     _this.clearContainer();
                     var disposable_container = document.createElement("DIV");
                     disposable_container.setAttribute("ID", "disposable_container");
@@ -1688,7 +1687,7 @@ var SettingsWindow = /** @class */ (function (_super) {
                     _this.filterSetTable();
                 }
             },
-            { Text: "View 『Danbooru Image Adder』 Settings", ListenerFunc: function (a_id) {
+            { Text: " | View 『Danbooru Image Adder』 Settings", ListenerFunc: function (a_id) {
                     _this.clearContainer();
                     var disposable_container = document.createElement("DIV");
                     disposable_container.setAttribute("id", "disposable_container");
@@ -1698,7 +1697,7 @@ var SettingsWindow = /** @class */ (function (_super) {
                     _this.setImageAdderEventListeners();
                 }
             },
-            { Text: "View 『Thread Rebuilder』 Settings", ListenerFunc: function (a_id) {
+            { Text: " | View 『Thread Rebuilder』 Settings", ListenerFunc: function (a_id) {
                     _this.clearContainer();
                     var disposable_container = document.createElement("DIV");
                     disposable_container.setAttribute("id", "disposable_container");
@@ -1716,7 +1715,7 @@ var SettingsWindow = /** @class */ (function (_super) {
                         document.getElementById("OnsiteArchive").checked = true;
                 }
             },
-            { Text: "View 『¥ Text』 Settings [Customizable]", ListenerFunc: function (a_id) {
+            { Text: " | View 『¥ Text』 Settings [Customizable]", ListenerFunc: function (a_id) {
                     _this.clearContainer();
                     var disposable_container = document.createElement("DIV");
                     disposable_container.setAttribute("id", "disposable_container");
@@ -1739,13 +1738,13 @@ var SettingsWindow = /** @class */ (function (_super) {
                     document.getElementById("SelectColorYen").value = _this.setting_items.character_inserter_settings.Yen_Color;
                 }
             },
-            { Text: "View 『Kita』 Settings [Customizable]", ListenerFunc: function (a_id) {
+            { Text: " | View 『Kita』 Settings [Customizable]", ListenerFunc: function (a_id) {
                     _this.clearContainer();
                     var disposable_container = document.createElement("DIV");
                     disposable_container.setAttribute("id", "disposable_container");
                     _this.contents_div.appendChild(disposable_container);
                     disposable_container.innerHTML =
-                        "\t\t\t\t\t\t\t\t\n\t\t\t\t<script src=\"http://jscolor.js\"></script>\n\t\t\t\t<label>Kita Characters: </label>\n\t\t\t\t<input name=\"selectiveCharacter\" id=\"selectiveCharacters\" type=\"text\" value=\"\uFF77\uFF80\u2501\u2501\u2501(\uFF9F\u2200\uFF9F)\u2501\u2501\u2501!!\">\n\t\t\t\t<br>\n\t\t\t\t<label>RGB Hex Color: </label>\n\t\t\t\t<input name=\"HexColorKita\" id=\"HexColorKita_text\" type=\"text\">\n\t\t\t\t<input name=\"HexColorKita\" id=\"SelectColorKita\" type=\"color\">\n\t\t\t\t<br>\n\t\t\t\t<input id=\"setCharacter\" value=\"Set Quote Settings\" type=\"button\">\n\t\t\t";
+                        "\t\t\t\t\t\t\t\t\n\t\t\t\t<script src=\"http://jscolor.js\"></script>\n\t\t\t\t<label>Kita Characters: </label>\n\t\t\t\t<input name=\"selectiveCharacter\" id=\"selectiveCharacters\" type=\"text\" value=\"\uFF77\uFF80\u2501\u2501\u2501(\uFF9F\u2200\uFF9F)\u2501\u2501\u2501!!\">\n\t\t\t\t<br>\n\t\t\t\t<label>RGB Hex Color: </label>\n\t\t\t\t<input name=\"HexColorKita\" id=\"HexColorKita_text\" type=\"text\">\n\t\t\t\t<input name=\"HexColorKita\" id=\"SelectColorKita\" type=\"color\">\n\t\t\t\t<br>\n\t\t\t\t<input id=\"setCharacter\" value=\"Set Character Settings\" type=\"button\">\n\t\t\t";
                     document.getElementById("SelectColorKita").addEventListener("input", function (evt) {
                         document.getElementById("HexColorKita_text").value =
                             (document.getElementById("SelectColorKita").value);
@@ -1762,7 +1761,7 @@ var SettingsWindow = /** @class */ (function (_super) {
                     document.getElementById("SelectColorKita").value = _this.setting_items.character_inserter_settings.Kita_Color;
                 }
             },
-            { Text: "Set 『Visible Password』 : ", ListenerFunc: function (input_id) {
+            { Text: " | Set 『Visible Password』", ListenerFunc: function (input_id) {
                     var input = document.getElementById(input_id);
                     var is_check = !input.checked;
                     document.getElementById(input_id).checked = is_check;
@@ -1815,12 +1814,32 @@ var SettingsWindow = /** @class */ (function (_super) {
     //*...THIS
     SettingsWindow.prototype.retrieveStates = function () {
         //values used to fill out data fields
-        this.setting_items.image_hiding_settings = { Expiration_Time: localStorage.getItem("Expiration_Time"), MD5_List_FSE: localStorage.getItem("MD5_List_FSE") };
+        this.setting_items.image_hiding_settings = { Expiration_Time: localStorage.getItem("Expiration_Time"), MD5_List_FSE: localStorage.getItem("MD5_List_FSE"), Active: localStorage.getItem("ImageHidingActive") };
         this.retrieveWordReplaceStates();
         this.retrieveImageAdderStates();
         this.retrieveRebuildStates();
         this.retrieveCharacterInsertingStates();
-        this.setting_items.password_settings = (localStorage.getItem("pw_active"));
+        this.setting_items.password_settings = (localStorage.getItem("PasswordActive"));
+    };
+    SettingsWindow.prototype.retrieveActiveToggles = function () {
+        if (localStorage.getItem("ImageHidingActive") == null || localStorage.getItem("ImageHidingActive") === undefined) {
+            document.getElementById("check-settings0").checked = true;
+            document.getElementById("check-settings1").checked = false;
+            document.getElementById("check-settings2").checked = false;
+            document.getElementById("check-settings3").checked = false;
+            document.getElementById("check-settings4").checked = true;
+            document.getElementById("check-settings5").checked = true;
+            document.getElementById("check-settings6").checked = true;
+            this.displayWindow();
+            return;
+        }
+        document.getElementById("check-settings0").checked = localStorage.getItem("ImageHidingActive") === 'true';
+        document.getElementById("check-settings1").checked = localStorage.getItem("TextReplaceActive") === 'true';
+        document.getElementById("check-settings2").checked = localStorage.getItem("ImageAdderActive") === 'true';
+        document.getElementById("check-settings3").checked = localStorage.getItem("ThreadRebuilderActive") === 'true';
+        document.getElementById("check-settings4").checked = localStorage.getItem("YenActive") === 'true';
+        document.getElementById("check-settings5").checked = localStorage.getItem("KitaActive") === 'true';
+        document.getElementById("check-settings6").checked = localStorage.getItem("PasswordActive") === 'true';
     };
     SettingsWindow.prototype.retrieveWordReplaceStates = function () {
         //acquire text filter representation
@@ -1839,12 +1858,13 @@ var SettingsWindow = /** @class */ (function (_super) {
         filters.forEach(function (filter) {
             text_filters.push(TextReplacer.formatFilterSettings(JSON_storage[filter]));
         });
-        this.setting_items.word_replace_settings = { Number_of_filters: localStorage.getItem("filter_quantity"), Text_Filter_List: text_filters };
+        this.setting_items.word_replace_settings = { Number_of_filters: localStorage.getItem("filter_quantity"), Text_Filter_List: text_filters, Active: localStorage.getItem("TextReplaceActive") };
     };
     SettingsWindow.prototype.retrieveImageAdderStates = function () {
         this.setting_items.image_adder_settings = { Width: localStorage.getItem("width_DIA"),
             Height: localStorage.getItem("height_DIA"),
-            QR_Width: localStorage.getItem("qr_width_DIA") };
+            QR_Width: localStorage.getItem("qr_width_DIA"),
+            Active: localStorage.getItem("ImageAdderActive") };
         if (this.setting_items.image_adder_settings.Height === null)
             this.setting_items.image_adder_settings.Height = 400;
         if (this.setting_items.image_adder_settings.Width === null)
@@ -1857,7 +1877,7 @@ var SettingsWindow = /** @class */ (function (_super) {
     SettingsWindow.prototype.retrieveRebuildStates = function () {
         if (localStorage.getItem("ArchiveType_FSE") !== "1" && localStorage.getItem("ArchiveType_FSE") !== "0")
             localStorage.setItem("ArchiveType_FSE", "1");
-        this.setting_items.thread_rebuild_settings = { Archive_Type: localStorage.getItem("ArchiveType_FSE") };
+        this.setting_items.thread_rebuild_settings = { Archive_Type: localStorage.getItem("ArchiveType_FSE"), Active: localStorage.getItem("ThreadRebuilderActive") };
     };
     SettingsWindow.prototype.retrieveCharacterInsertingStates = function () {
         if (localStorage.getItem("Yen_Character") === undefined || localStorage.getItem("Yen_Character") === null)
@@ -1868,8 +1888,9 @@ var SettingsWindow = /** @class */ (function (_super) {
             localStorage.setItem("Kita_Character", "ｷﾀ━━━(ﾟ∀ﾟ)━━━!!");
         if (localStorage.getItem("Kita_Color") === undefined || localStorage.getItem("Kita_Color") === null)
             localStorage.setItem("Kita_Color", "#444444");
-        this.setting_items.character_inserter_settings = { Yen_Active: localStorage.getItem("tab_settings5") == 'true', Yen_Character: localStorage.getItem("Yen_Character"), Yen_Color: localStorage.getItem("Yen_Color"),
-            Kita_Active: localStorage.getItem("tab_settings6") == 'true', Kita_Character: localStorage.getItem("Kita_Character"), Kita_Color: localStorage.getItem("Kita_Color") };
+        this.setting_items.character_inserter_settings = { Yen_Active: localStorage.getItem("YenActive") == 'true', Yen_Character: localStorage.getItem("Yen_Character"), Yen_Color: localStorage.getItem("Yen_Color"),
+            Kita_Active: localStorage.getItem("KitaActive") == 'true', Kita_Character: localStorage.getItem("Kita_Character"), Kita_Color: localStorage.getItem("Kita_Color") };
+        console.log(this.setting_items.character_inserter_settings);
     };
     SettingsWindow.prototype.storeStates = function () {
         //image settings
@@ -1885,6 +1906,16 @@ var SettingsWindow = /** @class */ (function (_super) {
         //Password replace settings
         this.storePasswordStates();
         this.retrieveStates();
+    };
+    SettingsWindow.prototype.storeActiveToggles = function () {
+        console.log("tog");
+        localStorage.setItem("ImageHidingActive", (document.getElementById("check-settings0").checked.toString()));
+        localStorage.setItem("TextReplaceActive", (document.getElementById("check-settings1").checked.toString()));
+        localStorage.setItem("ImageAdderActive", (document.getElementById("check-settings2").checked.toString()));
+        localStorage.setItem("ThreadRebuilderActive", (document.getElementById("check-settings3").checked.toString()));
+        localStorage.setItem("YenActive", (document.getElementById("check-settings4").checked.toString()));
+        localStorage.setItem("KitaActive", (document.getElementById("check-settings5").checked.toString()));
+        localStorage.setItem("PasswordActive", (document.getElementById("check-settings6").checked.toString()));
     };
     SettingsWindow.prototype.storeImageFilterStates = function () {
         if (document.getElementById("Expiration_Time") !== null) {
@@ -1968,7 +1999,7 @@ var SettingsWindow = /** @class */ (function (_super) {
     SettingsWindow.prototype.storePasswordStates = function () {
         //password view settings
         if (document.getElementById("check-settings6") !== null)
-            localStorage.setItem("pw_active", "" + document.getElementById("check-settings6").checked);
+            localStorage.setItem("PasswordActive", "" + document.getElementById("check-settings6").checked);
     };
     SettingsWindow.prototype.clearContainer = function () {
         var disposable = document.getElementById("disposable_container");
@@ -1995,6 +2026,7 @@ var SettingsWindow = /** @class */ (function (_super) {
         this.title_para.setAttribute('class', 'titleStyle');
         this.contents_div.setAttribute('class', 'contentStyle');
         this.end_para.setAttribute('class', 'footerStyle');
+        this.ul_selection_start.setAttribute("ID", "selection_list");
         this.generateList(this.contents_div);
     };
     SettingsWindow.prototype.generateList = function (head_node) {
@@ -2003,6 +2035,12 @@ var SettingsWindow = /** @class */ (function (_super) {
             var li = document.createElement('LI');
             li.setAttribute('class', 'settingsItem');
             if (list_item.Text.indexOf('View') > -1) {
+                var input = document.createElement('INPUT');
+                var input_id = 'check-settings' + index;
+                input.setAttribute('TYPE', 'checkbox');
+                input.setAttribute('ID', 'check-settings' + index);
+                li.appendChild(input);
+                input.addEventListener('click', function (evt) { return _this.storeActiveToggles(); });
                 var a = document.createElement('A');
                 a.setAttribute('href', 'javascript:void(0)');
                 a.textContent = list_item.Text;
@@ -2016,18 +2054,19 @@ var SettingsWindow = /** @class */ (function (_super) {
                 setup_func(a_id);
             }
             else {
-                var label = document.createElement('LABEL');
-                label.textContent = list_item.Text;
-                li.appendChild(label);
                 var input = document.createElement('INPUT');
                 var input_id = 'check-settings' + index;
                 input.setAttribute('TYPE', 'checkbox');
                 input.setAttribute('ID', 'check-settings' + index);
+                input.addEventListener('click', function (evt) { return _this.storeActiveToggles(); });
                 li.appendChild(input);
+                var label = document.createElement('LABEL');
+                label.textContent = list_item.Text;
+                li.appendChild(label);
                 _this.ul_selection_start.appendChild(li);
                 input.checked = _this.setting_items.password_settings == 'true';
-                var setup_func = function (_input_id) {
-                    label.addEventListener('click', function (evt) { return list_item.ListenerFunc(_input_id); });
+                var setup_func = function (input_id) {
+                    label.addEventListener('click', function (evt) { return list_item.ListenerFunc(input_id); });
                 };
                 setup_func(input_id);
             }
@@ -2043,9 +2082,11 @@ var SettingsWindow = /** @class */ (function (_super) {
         this.title_para.appendChild(this.title_text);
         this.settings_div.appendChild(this.title_para);
         this.settings_div.appendChild(this.contents_div);
+        this.contents_div.appendChild(this.ul_selection_start);
         this.end_para.appendChild(this.end_text);
         this.settings_div.appendChild(this.end_para);
         document.body.appendChild(this.settings_div);
+        this.retrieveActiveToggles();
     };
     SettingsWindow.prototype.decideAction = function (node) { };
     SettingsWindow.prototype.getSettingsArr = function () {
@@ -2067,8 +2108,6 @@ var SettingsWindow = /** @class */ (function (_super) {
         filter_table.setAttribute("style", "text-align:center;");
         filter_table.setAttribute("id", "filter_table");
         disposable_container.appendChild(filter_table);
-        var table_row = document.createElement("tr");
-        filter_table.appendChild(table_row);
         var table_head_active = document.createElement("th");
         var head_text_active = document.createTextNode("Active");
         table_head_active.appendChild(head_text_active);
@@ -2156,25 +2195,24 @@ var SettingsWindow = /** @class */ (function (_super) {
         var number_of_filters = parseInt(this.setting_items.word_replace_settings.number_of_filters);
         var filter_table = document.getElementById("filter_table");
         filter_table.deleteRow(number_of_filters + 1);
-        number_of_filters++;
         var table_row_contents = document.createElement("tr");
-        table_row_contents.setAttribute("id", "FilterRow" + (number_of_filters - 1));
+        table_row_contents.setAttribute("id", "FilterRow" + (number_of_filters));
         var table_data_active = document.createElement("td");
         var table_checkbox_active = document.createElement("input");
         table_checkbox_active.setAttribute("type", "checkbox");
-        table_checkbox_active.setAttribute("id", "Active" + (number_of_filters - 1));
+        table_checkbox_active.setAttribute("id", "Active" + (number_of_filters));
         table_data_active.appendChild(table_checkbox_active);
         table_row_contents.appendChild(table_data_active);
         var table_data_pattern = document.createElement("td");
         var table_input_pattern = document.createElement("input");
         table_input_pattern.setAttribute("class", "inputs");
-        table_input_pattern.setAttribute("id", "Pattern" + (number_of_filters - 1));
+        table_input_pattern.setAttribute("id", "Pattern" + (number_of_filters));
         table_data_pattern.appendChild(table_input_pattern);
         table_row_contents.appendChild(table_data_pattern);
         var table_data_replacement = document.createElement("td");
         var table_input_replacement = document.createElement("input");
         table_input_replacement.setAttribute("class", "inputs");
-        table_input_replacement.setAttribute("id", "Replacement" + (number_of_filters - 1));
+        table_input_replacement.setAttribute("id", "Replacement" + (number_of_filters));
         table_data_replacement.appendChild(table_input_replacement);
         table_row_contents.appendChild(table_data_replacement);
         filter_table.appendChild(table_row_contents);
@@ -2210,7 +2248,7 @@ var SettingsWindow = /** @class */ (function (_super) {
         var table_close_collumn = document.createElement("td");
         var table_close_button = document.createElement("input");
         table_close_button.setAttribute("type", "button");
-        table_close_button.setAttribute("value", "Close Menu");
+        table_close_button.setAttribute("value", "Close Without Saving");
         table_close_button.setAttribute("style", "padding: 7px 0; margin:5px 0;");
         table_close_button.addEventListener("click", function (evt) {
             _this.clearContainer();
@@ -2273,24 +2311,26 @@ var Main = /** @class */ (function (_super) {
         this.settings = top_bar.getSettingsArr();
     };
     Main.prototype.init = function () {
-        if (true) {
+        if (this.settings.image_hiding_settings.Active) {
             this.features.image_hider = new ImageHider();
         }
-        if (true) {
+        if (this.settings.word_replace_settings.Active) {
             this.features.text_replacer = new TextReplacer();
         }
-        if (true) {
+        if (this.settings.image_adder_settings.Active) {
             this.features.danbooru_image_adder = new DanbooruImageAdder();
         }
-        if (true) {
+        if (this.settings.thread_rebuild_settings.Active) {
             this.features.thread_rebuilder = new ThreadRebuilder();
         }
-        if (true || true) {
-            this.features.character_inserter = new CharacterInserter(true, true);
+        if (this.settings.character_inserter_settings.Yen_Active || this.settings.character_inserter_settings.Kita_Active) {
+            this.features.character_inserter = new CharacterInserter(this.settings.character_inserter_settings.Yen_Active, this.settings.character_inserter_settings.Kita_Active);
         }
         if (this.settings.password_settings == 'true') {
             this.features.password_viewer = new PasswordViewer();
         }
+        for (var feature_key in this.features)
+            this.features[feature_key].retrieveStates();
     };
     Main.prototype.activate = function () { console.log("4F-FSE Starting"); };
     Main.prototype.storeStates = function () { };
@@ -2308,11 +2348,11 @@ var Main = /** @class */ (function (_super) {
         // });
     };
     Main.prototype.decideAction = function (node) {
+        if (node === undefined || node.tagName === undefined)
+            return;
         var start = node;
         var itterator = document.createNodeIterator(start, NodeFilter.SHOW_ELEMENT);
         var node;
-        for (var feature_key in this.features)
-            this.features[feature_key].retrieveStates();
         while ((node = itterator.nextNode())) {
             if (node.tagName !== "BLOCKQUOTE" && node.tagName !== "IMG")
                 continue;

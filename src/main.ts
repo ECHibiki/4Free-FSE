@@ -22,24 +22,27 @@ class Main extends FeatureInterface{
 	}
 	
 	init():void{	
-		if(true){
+		if(this.settings.image_hiding_settings.Active){
 			this.features.image_hider = new ImageHider();
 		}
-		if(true){
+		if(this.settings.word_replace_settings.Active){
 			this.features.text_replacer = new TextReplacer();
 		}
-		if(true){
+		if(this.settings.image_adder_settings.Active){
 			this.features.danbooru_image_adder = new DanbooruImageAdder();
 		}
-		if(true){
+		if(this.settings.thread_rebuild_settings.Active){
 			this.features.thread_rebuilder = new ThreadRebuilder();
 		}
-		if(true || true){
-			this.features.character_inserter = new CharacterInserter(true, true);
+		if(this.settings.character_inserter_settings.Yen_Active || this.settings.character_inserter_settings.Kita_Active){
+			this.features.character_inserter = new CharacterInserter(this.settings.character_inserter_settings.Yen_Active, this.settings.character_inserter_settings.Kita_Active);
 		}
 		if(this.settings.password_settings == 'true'){
 			this.features.password_viewer = new PasswordViewer();
 		}
+		
+		for(let feature_key in this.features)
+			this.features[feature_key].retrieveStates();
 	}
 	
 	activate(){ console.log("4F-FSE Starting");	}
@@ -60,14 +63,11 @@ class Main extends FeatureInterface{
 		// });
 	}
 	decideAction(node:any):void{
-		
+		if(node === undefined || node.tagName === undefined) return;
 		var start:any = node;
 		var itterator:any = document.createNodeIterator(start, NodeFilter.SHOW_ELEMENT);
 		var node:any;
-
-		for(let feature_key in this.features)
-			this.features[feature_key].retrieveStates();
-		
+				
 		while((node = itterator.nextNode())){
 			if(node.tagName !== "BLOCKQUOTE" && node.tagName !== "IMG") continue;
 			for(let feature_key in this.features){

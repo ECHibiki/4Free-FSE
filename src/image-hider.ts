@@ -63,7 +63,6 @@ class ImageHider extends FeatureInterface{
 				image_node.setAttribute('hidden-src', image_node.src);
 				image_node.src = this.blank_png;
 			});
-			return false;
 		}
 		else if(event.ctrlKey && event.shiftKey){
 			event.preventDefault();
@@ -74,8 +73,8 @@ class ImageHider extends FeatureInterface{
 			[].slice.call(document.querySelectorAll('img[hide-grouping="' + hide_group_id + '"]')).forEach((image_node) => {
 				image_node.src = image_node.getAttribute('hidden-src');
 			});
-			return false;
 		}
+		this.retrieveStates();
 		return true;
 	}
 	
