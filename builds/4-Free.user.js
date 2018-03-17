@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 // @name         4Free-FSE [4chan X Enhancement]
 // @author       ECHibiki - /qa/
 // @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
-// @version      1.3.1
+// @version      1.3.2
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4Free-FSE/master/builds/4-Free.user.js
@@ -276,36 +276,51 @@ var ImageHider = /** @class */ (function (_super) {
                 this.hideHoverImageNode(node);
                 return;
             }
-            if (!/\d+IMG/.test(node.getAttribute('hide-grouping')) && (node.getAttribute('data-md5') !== null)) {
+            if (node.getAttribute('data-md5') !== null) {
                 this.hideImageNode(node);
             }
         }
     };
     //Activate
     ImageHider.prototype.activate = function () {
-        // new MutationObserver((mutations) => {
-        // this.retrieveStates();
-        // 
-        // }).observe(document.getElementById('hoverUI'), {childList: true});
         console.log("4F-FSE: ImageHider Active");
     };
     ImageHider.prototype.hideImageNode = function (image_node) {
         var _this = this;
         var sister_node = image_node.parentNode.parentNode.parentNode.getElementsByClassName('catalog-thumb')[0]; // the catalog sister to index
-        if (sister_node === undefined)
-            sister_node = document.createElement('IMG');
-        image_node.setAttribute('hide-grouping', image_node.parentNode.parentNode.id.substring(1) + 'IMG');
-        sister_node.setAttribute('hide-grouping', image_node.parentNode.parentNode.id.substring(1) + 'IMG');
-        image_node.addEventListener('click', function (evt) { return _this.hideOnClick(evt); });
-        sister_node.addEventListener('click', function (evt) { return _this.hideOnClick(evt); });
+        var sister_node_non_exist = false;
+        if (sister_node === undefined) {
+            sister_node_non_exist = true;
+        }
+        var image_node_already_run = false;
+        if (/\d+IMG/.test(image_node.getAttribute('hide-grouping'))) {
+            image_node_already_run = true;
+            if (!sister_node_non_exist) {
+                if (/\d+IMG/.test(sister_node.getAttribute('hide-grouping'))) {
+                    return;
+                }
+            }
+        }
+        if (!image_node_already_run)
+            image_node.setAttribute('hide-grouping', image_node.parentNode.parentNode.id.substring(1) + 'IMG');
+        if (!sister_node_non_exist)
+            sister_node.setAttribute('hide-grouping', image_node.parentNode.parentNode.id.substring(1) + 'IMG');
+        if (!image_node_already_run)
+            image_node.addEventListener('click', function (evt) { return _this.hideOnClick(evt); });
+        if (!sister_node_non_exist)
+            sister_node.addEventListener('click', function (evt) { return _this.hideOnClick(evt); });
         var threadstore_len = this.threads_to_hide.length;
         var node_group_id = image_node.getAttribute('hide-grouping');
         for (var thread = 0; thread < threadstore_len; thread++) {
             if (node_group_id == this.threads_to_hide[thread]) {
-                image_node.setAttribute('hidden-src', image_node.src);
-                image_node.src = this.blank_png;
-                sister_node.setAttribute('hidden-src', sister_node.src);
-                sister_node.src = this.blank_png;
+                if (!image_node_already_run) {
+                    image_node.setAttribute('hidden-src', image_node.src);
+                    image_node.src = this.blank_png;
+                }
+                if (!sister_node_non_exist) {
+                    sister_node.setAttribute('hidden-src', sister_node.src);
+                    sister_node.src = this.blank_png;
+                }
                 return;
             }
         }
@@ -316,10 +331,14 @@ var ImageHider = /** @class */ (function (_super) {
             for (var md5 = 0; md5 < md5_filters_arr_len; md5++) {
                 if (node_md5 == this.md5_filters_arr[md5]) {
                     this.threads_to_hide.push();
-                    image_node.setAttribute('hidden-src', image_node.src);
-                    image_node.src = this.blank_png;
-                    sister_node.setAttribute('hidden-src', sister_node.src);
-                    sister_node.src = this.blank_png;
+                    if (!image_node_already_run) {
+                        image_node.setAttribute('hidden-src', image_node.src);
+                        image_node.src = this.blank_png;
+                    }
+                    if (!sister_node_non_exist) {
+                        sister_node.setAttribute('hidden-src', sister_node.src);
+                        sister_node.src = this.blank_png;
+                    }
                     return;
                 }
             }
@@ -327,13 +346,7 @@ var ImageHider = /** @class */ (function (_super) {
     };
     ImageHider.prototype.hideHoverImageNode = function (image_node) {
         var is_embeded_post;
-        // if(image_node.tagName == 'DIV') {
-        // is_embeded_post = true;
-        // image_node = image_node.getElementsByClassName('postContainer')[0];
-        // if(image_node === undefined) return;
-        // }
         var unprocessed_id = image_node.getAttribute('data-full-i-d');
-        // if (unprocessed_id === null) return;					
         var proccessed_id = unprocessed_id.substring(unprocessed_id.indexOf('.') + 1);
         var image_node_id = proccessed_id + 'IMG';
         // if(is_embeded_post) image_node =  image_node.getElementsByTagName('IMG')[0];

@@ -85,41 +85,51 @@ class ImageHider extends FeatureInterface{
 				this.hideHoverImageNode(node);
 				return;
 			}
-			if(!/\d+IMG/.test(node.getAttribute('hide-grouping')) && (node.getAttribute('data-md5') !== null)){
+			if(node.getAttribute('data-md5') !== null){
 				this.hideImageNode(node);
 			}
 		}
 	}
 		//Activate
 	activate():void{
-		// new MutationObserver((mutations) => {
-			// this.retrieveStates();
-			// 
-		// }).observe(document.getElementById('hoverUI'), {childList: true});
 		console.log("4F-FSE: ImageHider Active");	
 	}
 	
 	hideImageNode(image_node:any){
 		var sister_node:any = image_node.parentNode.parentNode.parentNode.getElementsByClassName('catalog-thumb')[0]; // the catalog sister to index
-		if(sister_node === undefined) sister_node = document.createElement('IMG');
+		var sister_node_non_exist = false;
+		if(sister_node === undefined){
+			sister_node_non_exist = true;
+		} 
+		var image_node_already_run = false;
+		if(/\d+IMG/.test(image_node.getAttribute('hide-grouping'))){
+			image_node_already_run = true;
+			if(!sister_node_non_exist){
+				if(/\d+IMG/.test(sister_node.getAttribute('hide-grouping'))){
+					return;
+				}
+			}
+		}
+			
+		if(!image_node_already_run) image_node.setAttribute('hide-grouping', image_node.parentNode.parentNode.id.substring(1) + 'IMG');
+		if(!sister_node_non_exist)sister_node.setAttribute('hide-grouping', image_node.parentNode.parentNode.id.substring(1) + 'IMG');
 
-		image_node.setAttribute('hide-grouping', image_node.parentNode.parentNode.id.substring(1) + 'IMG');
-		sister_node.setAttribute('hide-grouping', image_node.parentNode.parentNode.id.substring(1) + 'IMG');
-
-		image_node.addEventListener('click', (evt) => this.hideOnClick(evt));
-		sister_node.addEventListener('click',(evt) => this.hideOnClick(evt));
+		if(!image_node_already_run) image_node.addEventListener('click', (evt) => this.hideOnClick(evt));
+		if(!sister_node_non_exist) sister_node.addEventListener('click',(evt) => this.hideOnClick(evt));
 
 		var threadstore_len = this.threads_to_hide.length;
 		var node_group_id = image_node.getAttribute('hide-grouping');
 
 		for(let thread = 0 ; thread < threadstore_len; thread++){
 			if(node_group_id == this.threads_to_hide[thread]){
-				image_node.setAttribute('hidden-src', image_node.src);
-				image_node.src = this.blank_png;
-
-				sister_node.setAttribute('hidden-src', sister_node.src);
-				sister_node.src = this.blank_png;
-
+				if(!image_node_already_run){
+					image_node.setAttribute('hidden-src', image_node.src);
+					image_node.src = this.blank_png;
+				}
+				if(!sister_node_non_exist){
+					sister_node.setAttribute('hidden-src', sister_node.src);
+					sister_node.src = this.blank_png;
+				}
 				return;
 			}
 		}
@@ -130,12 +140,14 @@ class ImageHider extends FeatureInterface{
 			for(var md5:number = 0 ; md5 < md5_filters_arr_len; md5++){
 				if(node_md5 == this.md5_filters_arr[md5]){
 					this.threads_to_hide.push();
-					image_node.setAttribute('hidden-src', image_node.src);
-					image_node.src = this.blank_png;
-
-					sister_node.setAttribute('hidden-src', sister_node.src);
-					sister_node.src = this.blank_png;
-
+					if(!image_node_already_run){
+						image_node.setAttribute('hidden-src', image_node.src);
+						image_node.src = this.blank_png;
+					}
+					if(!sister_node_non_exist){
+						sister_node.setAttribute('hidden-src', sister_node.src);
+						sister_node.src = this.blank_png;
+					}
 					return;
 				}
 			}
@@ -144,14 +156,7 @@ class ImageHider extends FeatureInterface{
 	
 	hideHoverImageNode(image_node:any):void{	
 				var is_embeded_post:boolean;
-				// if(image_node.tagName == 'DIV') {
-					// is_embeded_post = true;
-					// image_node = image_node.getElementsByClassName('postContainer')[0];
-					// if(image_node === undefined) return;
-				// }
-				
-				var unprocessed_id:string = image_node.getAttribute('data-full-i-d');
-				// if (unprocessed_id === null) return;					
+				var unprocessed_id:string = image_node.getAttribute('data-full-i-d');			
 				var proccessed_id:string = unprocessed_id.substring(unprocessed_id.indexOf('.') + 1);
 				var image_node_id:string = proccessed_id + 'IMG';		
 				// if(is_embeded_post) image_node =  image_node.getElementsByTagName('IMG')[0];
