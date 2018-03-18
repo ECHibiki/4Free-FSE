@@ -80,7 +80,7 @@ class ImageHider extends FeatureInterface{
 	
 	decideAction(node:any):void{
 		//tagname is always upper in HTML, in xml it's displayed as written.
-		if(node.tagName  === 'IMG'){
+		if(node.tagName  === 'IMG' || node.tagName  === 'VIDEO'){
 			if(node.id === "ihover"){
 				this.hideHoverImageNode(node);
 				return;
@@ -155,30 +155,28 @@ class ImageHider extends FeatureInterface{
 	}
 	
 	hideHoverImageNode(image_node:any):void{	
-				var is_embeded_post:boolean;
-				var unprocessed_id:string = image_node.getAttribute('data-full-i-d');			
-				var proccessed_id:string = unprocessed_id.substring(unprocessed_id.indexOf('.') + 1);
-				var image_node_id:string = proccessed_id + 'IMG';		
-				// if(is_embeded_post) image_node =  image_node.getElementsByTagName('IMG')[0];
-				if(image_node === undefined) return;
-				
-				for(var thread = 0, threadstore_len:number = this.threads_to_hide.length ; thread < threadstore_len; thread++){
-					if(image_node_id == this.threads_to_hide[thread]){						
-						image_node.removeAttribute('src');
-						return;
-					}
+		var unprocessed_id:string = image_node.getAttribute('data-full-i-d');			
+		var proccessed_id:string = unprocessed_id.substring(unprocessed_id.indexOf('.') + 1);
+		var image_node_id:string = proccessed_id + 'IMG';		
+		if(image_node === undefined) return;
+		
+		for(var thread = 0, threadstore_len:number = this.threads_to_hide.length ; thread < threadstore_len; thread++){
+			if(image_node_id == this.threads_to_hide[thread]){		
+				image_node.removeAttribute('src');
+				return;
+			}
+		}
+		//thread node holds the MD5
+		var node_md5:string;
+		// if(is_embeded_post) node_md5 = image_node.getAttribute('data-md5');
+		/*else */node_md5 = document.getElementById('f' + proccessed_id).getElementsByTagName('IMG')[0].getAttribute('data-md5');
+		if(this.md5_filters_arr !== undefined){
+			for(var md5:number = 0 , md5_filters_arr_len:number = this.md5_filters_arr.length; md5 < md5_filters_arr_len; md5++){
+				if(node_md5 == this.md5_filters_arr[md5]){
+					image_node.removeAttribute('src');
+					return;
 				}
-				//thread node holds the MD5
-				var node_md5:string;
-				// if(is_embeded_post) node_md5 = image_node.getAttribute('data-md5');
-				/*else */node_md5 = document.getElementById('f' + proccessed_id).getElementsByTagName('IMG')[0].getAttribute('data-md5');
-				if(this.md5_filters_arr !== undefined){
-					for(var md5:number = 0 , md5_filters_arr_len:number = this.md5_filters_arr.length; md5 < md5_filters_arr_len; md5++){
-						if(node_md5 == this.md5_filters_arr[md5]){
-							image_node.removeAttribute('src');
-							return;
-						}
-					}
-				}
+			}
+		}
 	}
 }

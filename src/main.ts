@@ -63,7 +63,7 @@ class Main extends FeatureInterface{
 		var node:any;
 				
 		while((node = itterator.nextNode())){
-			if(node.tagName !== "BLOCKQUOTE" && node.tagName !== "IMG") continue;
+			if(node.tagName !== "BLOCKQUOTE" && node.tagName !== "IMG" && node.tagName !== "VIDEO") continue;
 			for(let feature_key in this.features){
 				this.features[feature_key].decideAction(node);
 			}

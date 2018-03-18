@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 // @name         4Free-FSE [4chan X Enhancement]
 // @author       ECHibiki - /qa/
 // @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
-// @version      1.3.2
+// @version      1.3.3
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4Free-FSE/master/builds/4-Free.user.js
@@ -271,7 +271,7 @@ var ImageHider = /** @class */ (function (_super) {
     };
     ImageHider.prototype.decideAction = function (node) {
         //tagname is always upper in HTML, in xml it's displayed as written.
-        if (node.tagName === 'IMG') {
+        if (node.tagName === 'IMG' || node.tagName === 'VIDEO') {
             if (node.id === "ihover") {
                 this.hideHoverImageNode(node);
                 return;
@@ -345,11 +345,9 @@ var ImageHider = /** @class */ (function (_super) {
         }
     };
     ImageHider.prototype.hideHoverImageNode = function (image_node) {
-        var is_embeded_post;
         var unprocessed_id = image_node.getAttribute('data-full-i-d');
         var proccessed_id = unprocessed_id.substring(unprocessed_id.indexOf('.') + 1);
         var image_node_id = proccessed_id + 'IMG';
-        // if(is_embeded_post) image_node =  image_node.getElementsByTagName('IMG')[0];
         if (image_node === undefined)
             return;
         for (var thread = 0, threadstore_len = this.threads_to_hide.length; thread < threadstore_len; thread++) {
@@ -2362,7 +2360,7 @@ var Main = /** @class */ (function (_super) {
         var itterator = document.createNodeIterator(start, NodeFilter.SHOW_ELEMENT);
         var node;
         while ((node = itterator.nextNode())) {
-            if (node.tagName !== "BLOCKQUOTE" && node.tagName !== "IMG")
+            if (node.tagName !== "BLOCKQUOTE" && node.tagName !== "IMG" && node.tagName !== "VIDEO")
                 continue;
             for (var feature_key in this.features) {
                 this.features[feature_key].decideAction(node);
