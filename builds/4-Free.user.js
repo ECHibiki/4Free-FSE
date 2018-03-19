@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 // @name         4Free-FSE [4chan X Enhancement]
 // @author       ECHibiki - /qa/
 // @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
-// @version      1.3.4
+// @version      1.3.5
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4Free-FSE/master/builds/4-Free.user.js
@@ -1900,8 +1900,8 @@ var SettingsWindow = /** @class */ (function (_super) {
             localStorage.setItem("Kita_Character", "ｷﾀ━━━(ﾟ∀ﾟ)━━━!!");
         if (localStorage.getItem("Kita_Color") === undefined || localStorage.getItem("Kita_Color") === null)
             localStorage.setItem("Kita_Color", "#444444");
-        this.setting_items.character_inserter_settings = { Yen_Active: localStorage.getItem("YenActive") == 'true', Yen_Character: localStorage.getItem("Yen_Character"), Yen_Color: localStorage.getItem("Yen_Color"),
-            Kita_Active: localStorage.getItem("KitaActive") == 'true', Kita_Character: localStorage.getItem("Kita_Character"), Kita_Color: localStorage.getItem("Kita_Color") };
+        this.setting_items.character_inserter_settings = { Yen_Active: localStorage.getItem("YenActive"), Yen_Character: localStorage.getItem("Yen_Character"), Yen_Color: localStorage.getItem("Yen_Color"),
+            Kita_Active: localStorage.getItem("KitaActive"), Kita_Character: localStorage.getItem("Kita_Character"), Kita_Color: localStorage.getItem("Kita_Color") };
     };
     SettingsWindow.prototype.storeStates = function () {
         //image settings
