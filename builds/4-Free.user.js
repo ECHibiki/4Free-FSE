@@ -1870,7 +1870,7 @@ var SettingsWindow = /** @class */ (function (_super) {
         filters.forEach(function (filter) {
             text_filters.push(TextReplacer.formatFilterSettings(JSON_storage[filter]));
         });
-        this.setting_items.word_replace_settings = { Number_of_filters: localStorage.getItem("filter_quantity"), Text_Filter_List: text_filters, Active: localStorage.getItem("TextReplaceActive") };
+        this.setting_items.word_replace_settings = { Number_of_Filters: localStorage.getItem("filter_quantity"), Text_Filter_List: text_filters, Active: localStorage.getItem("TextReplaceActive") };
     };
     SettingsWindow.prototype.retrieveImageAdderStates = function () {
         this.setting_items.image_adder_settings = { Width: localStorage.getItem("width_DIA"),
@@ -1919,7 +1919,6 @@ var SettingsWindow = /** @class */ (function (_super) {
         this.retrieveStates();
     };
     SettingsWindow.prototype.storeActiveToggles = function () {
-        console.log("tog");
         localStorage.setItem("ImageHidingActive", (document.getElementById("check-settings0").checked.toString()));
         localStorage.setItem("TextReplaceActive", (document.getElementById("check-settings1").checked.toString()));
         localStorage.setItem("ImageAdderActive", (document.getElementById("check-settings2").checked.toString()));
@@ -1943,16 +1942,16 @@ var SettingsWindow = /** @class */ (function (_super) {
     SettingsWindow.prototype.storeTextFilterStates = function () {
         if (document.getElementById("FilterRow0") !== null) {
             var f_row_moving = document.getElementById("FilterRow0");
-            var number_of_filters = 0;
-            var number_of_filters_actual = 0;
+            var Number_of_Filters = 0;
+            var Number_of_Filters_actual = 0;
             while (f_row_moving.nextSibling !== null) {
-                if (document.getElementById("Pattern" + number_of_filters).value !== "")
-                    number_of_filters_actual++;
-                number_of_filters++;
+                if (document.getElementById("Pattern" + Number_of_Filters).value !== "")
+                    Number_of_Filters_actual++;
+                Number_of_Filters++;
                 f_row_moving = f_row_moving.nextSibling;
             }
-            window.localStorage.setItem("filter_quantity", number_of_filters_actual.toString());
-            for (var pattern_input = 0; pattern_input < number_of_filters; pattern_input++) {
+            window.localStorage.setItem("filter_quantity", Number_of_Filters_actual.toString());
+            for (var pattern_input = 0; pattern_input < Number_of_Filters; pattern_input++) {
                 var pattern_to_store = document.getElementById("Pattern" + pattern_input).value;
                 var replacement_to_store = document.getElementById("Replacement" + pattern_input).value;
                 var setting = 'g';
@@ -2119,24 +2118,27 @@ var SettingsWindow = /** @class */ (function (_super) {
         filter_table.setAttribute("style", "text-align:center;");
         filter_table.setAttribute("id", "filter_table");
         disposable_container.appendChild(filter_table);
+        var top_row = document.createElement("TR");
+        filter_table.appendChild(top_row);
         var table_head_active = document.createElement("th");
+        top_row.appendChild(table_head_active);
         var head_text_active = document.createTextNode("Active");
         table_head_active.appendChild(head_text_active);
-        filter_table.appendChild(table_head_active);
         var table_head_pattern = document.createElement("th");
+        top_row.appendChild(table_head_pattern);
         var headTextPattern = document.createTextNode("Pattern");
         table_head_pattern.appendChild(headTextPattern);
-        filter_table.appendChild(table_head_pattern);
         var table_head_replacement = document.createElement("th");
+        top_row.appendChild(table_head_replacement);
         var head_text_replacement = document.createTextNode("Replacement");
         table_head_replacement.appendChild(head_text_replacement);
-        filter_table.appendChild(table_head_replacement);
         //Create the pattern table
         //loop to create rows
-        var number_of_filters = parseInt(this.setting_items.word_replace_settings.number_of_filters);
-        if (number_of_filters === 0 || isNaN(number_of_filters))
-            number_of_filters = 6;
-        for (var i = 0; i < number_of_filters; i++) {
+        var Number_of_Filters = parseInt(this.setting_items.word_replace_settings.Number_of_Filters);
+        console.log(Number_of_Filters);
+        if (Number_of_Filters === 0 || isNaN(Number_of_Filters))
+            Number_of_Filters = 6;
+        for (var i = 0; i < Number_of_Filters; i++) {
             var table_row_contents = document.createElement("tr");
             table_row_contents.setAttribute("id", "FilterRow" + i);
             var table_data_active = document.createElement("td");
@@ -2203,27 +2205,32 @@ var SettingsWindow = /** @class */ (function (_super) {
     };
     SettingsWindow.prototype.filterAddRow = function () {
         var _this = this;
-        var number_of_filters = parseInt(this.setting_items.word_replace_settings.number_of_filters);
         var filter_table = document.getElementById("filter_table");
-        filter_table.deleteRow(number_of_filters + 1);
+        var Number_of_Filters = 0;
+        var filter_children = document.getElementById("filter_table").firstChild;
+        while (filter_children.nextSibling) {
+            filter_children = filter_children.nextSibling;
+            Number_of_Filters++;
+        }
         var table_row_contents = document.createElement("tr");
-        table_row_contents.setAttribute("id", "FilterRow" + (number_of_filters));
+        table_row_contents.setAttribute("id", "FilterRow" + (Number_of_Filters - 1));
+        filter_table.removeChild(filter_children);
         var table_data_active = document.createElement("td");
         var table_checkbox_active = document.createElement("input");
         table_checkbox_active.setAttribute("type", "checkbox");
-        table_checkbox_active.setAttribute("id", "Active" + (number_of_filters));
+        table_checkbox_active.setAttribute("id", "Active" + (Number_of_Filters - 1));
         table_data_active.appendChild(table_checkbox_active);
         table_row_contents.appendChild(table_data_active);
         var table_data_pattern = document.createElement("td");
         var table_input_pattern = document.createElement("input");
         table_input_pattern.setAttribute("class", "inputs");
-        table_input_pattern.setAttribute("id", "Pattern" + (number_of_filters));
+        table_input_pattern.setAttribute("id", "Pattern" + (Number_of_Filters - 1));
         table_data_pattern.appendChild(table_input_pattern);
         table_row_contents.appendChild(table_data_pattern);
         var table_data_replacement = document.createElement("td");
         var table_input_replacement = document.createElement("input");
         table_input_replacement.setAttribute("class", "inputs");
-        table_input_replacement.setAttribute("id", "Replacement" + (number_of_filters));
+        table_input_replacement.setAttribute("id", "Replacement" + (Number_of_Filters - 1));
         table_data_replacement.appendChild(table_input_replacement);
         table_row_contents.appendChild(table_data_replacement);
         filter_table.appendChild(table_row_contents);
@@ -2270,15 +2277,19 @@ var SettingsWindow = /** @class */ (function (_super) {
         filter_table.appendChild(table_last_contents);
     };
     SettingsWindow.prototype.filterRemoveRow = function () {
-        var number_of_filters = parseInt(this.setting_items.word_replace_settings.number_of_filters);
         var filter_table = document.getElementById("filter_table");
-        if (number_of_filters != 0) {
-            filter_table.deleteRow(number_of_filters);
-            number_of_filters--;
+        var Number_of_Filters = 0;
+        var filter_children = document.getElementById("filter_table").firstChild;
+        while (filter_children.nextSibling) {
+            filter_children = filter_children.nextSibling;
+            Number_of_Filters++;
+        }
+        if (Number_of_Filters != 2) {
+            filter_table.deleteRow(--Number_of_Filters);
         }
     };
     SettingsWindow.prototype.filterSetTable = function () {
-        var filter_length = this.setting_items.word_replace_settings.Text_Filter_List.length;
+        var filter_length = this.setting_items.word_replace_settings.Number_of_Filters;
         for (var filter_count = 0; filter_count < filter_length; filter_count++) {
             if (this.setting_items.word_replace_settings.Text_Filter_List[filter_count].Active === null ||
                 this.setting_items.word_replace_settings.Text_Filter_List[filter_count].Regex === null ||
@@ -2322,20 +2333,20 @@ var Main = /** @class */ (function (_super) {
         this.settings = top_bar.getSettingsArr();
     };
     Main.prototype.init = function () {
-        if (this.settings.image_hiding_settings.Active) {
+        if (this.settings.image_hiding_settings.Active === "true") {
             this.features.image_hider = new ImageHider();
         }
-        if (this.settings.word_replace_settings.Active) {
+        if (this.settings.word_replace_settings.Active === "true") {
             this.features.text_replacer = new TextReplacer();
         }
-        if (this.settings.image_adder_settings.Active) {
+        if (this.settings.image_adder_settings.Active === "true") {
             this.features.danbooru_image_adder = new DanbooruImageAdder();
         }
-        if (this.settings.thread_rebuild_settings.Active) {
+        if (this.settings.thread_rebuild_settings.Active === "true") {
             this.features.thread_rebuilder = new ThreadRebuilder();
         }
-        if (this.settings.character_inserter_settings.Yen_Active || this.settings.character_inserter_settings.Kita_Active) {
-            this.features.character_inserter = new CharacterInserter(this.settings.character_inserter_settings.Yen_Active, this.settings.character_inserter_settings.Kita_Active);
+        if (this.settings.character_inserter_settings.Yen_Active === "true" || this.settings.character_inserter_settings.Kita_Active === "true") {
+            this.features.character_inserter = new CharacterInserter(this.settings.character_inserter_settings.Yen_Active === "true", this.settings.character_inserter_settings.Kita_Active === "true");
         }
         if (this.settings.password_settings == 'true') {
             this.features.password_viewer = new PasswordViewer();

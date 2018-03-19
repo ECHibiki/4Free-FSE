@@ -334,7 +334,7 @@ class SettingsWindow  extends FeatureInterface{
 			text_filters.push(TextReplacer.formatFilterSettings(JSON_storage[filter]));
 		});
 		
-		this.setting_items.word_replace_settings = {Number_of_filters: localStorage.getItem("filter_quantity"), Text_Filter_List: text_filters, Active:localStorage.getItem("TextReplaceActive")};
+		this.setting_items.word_replace_settings = {Number_of_Filters: localStorage.getItem("filter_quantity"), Text_Filter_List: text_filters, Active:localStorage.getItem("TextReplaceActive")};
 	}
 	
 	retrieveImageAdderStates():void{
@@ -386,7 +386,6 @@ class SettingsWindow  extends FeatureInterface{
 	}
 	
 	storeActiveToggles():void{
-		console.log("tog");
 		localStorage.setItem("ImageHidingActive", ((<HTMLInputElement>document.getElementById("check-settings0")).checked.toString()));
 		localStorage.setItem("TextReplaceActive", ((<HTMLInputElement>document.getElementById("check-settings1")).checked.toString()));
 		localStorage.setItem("ImageAdderActive", ((<HTMLInputElement>document.getElementById("check-settings2")).checked.toString()));
@@ -412,16 +411,16 @@ class SettingsWindow  extends FeatureInterface{
 	storeTextFilterStates():void{
 		if(document.getElementById("FilterRow0") !== null){		
 			var f_row_moving:any = document.getElementById("FilterRow0");
-			var number_of_filters:number = 0;
-			var number_of_filters_actual:number = 0;
+			var Number_of_Filters:number = 0;
+			var Number_of_Filters_actual:number = 0;
 			while(f_row_moving.nextSibling !== null){
-				if((<HTMLInputElement>document.getElementById("Pattern" + number_of_filters)).value !== "") number_of_filters_actual++;
-				number_of_filters++;
+				if((<HTMLInputElement>document.getElementById("Pattern" + Number_of_Filters)).value !== "") Number_of_Filters_actual++;
+				Number_of_Filters++;
 				f_row_moving = f_row_moving.nextSibling;
-			}		
-			window.localStorage.setItem("filter_quantity", number_of_filters_actual.toString());
+			}			
+			window.localStorage.setItem("filter_quantity", Number_of_Filters_actual.toString());
 			
-			for (var pattern_input:number = 0 ; pattern_input < number_of_filters; pattern_input++){
+			for (var pattern_input:number = 0 ; pattern_input < Number_of_Filters; pattern_input++){
 				var pattern_to_store:string = (<HTMLInputElement>document.getElementById("Pattern"+pattern_input)).value;
 				var replacement_to_store:string = (<HTMLInputElement>document.getElementById("Replacement"+pattern_input)).value;
 				var setting:string = 'g';
@@ -646,24 +645,28 @@ if(document.getElementById("SetImageAdderProperties") !== null){
 		filter_table.setAttribute("id", "filter_table");
 		disposable_container.appendChild(filter_table);
 
+		var top_row = document.createElement("TR");
+		filter_table.appendChild(top_row);
+		
 		var table_head_active:any =  document.createElement("th");
+		top_row.appendChild(table_head_active);
 		var head_text_active:any = document.createTextNode("Active");
 		table_head_active.appendChild(head_text_active);
-		filter_table.appendChild(table_head_active);
 		var table_head_pattern:any =  document.createElement("th");
+		top_row.appendChild(table_head_pattern);
 		var headTextPattern:any = document.createTextNode("Pattern");
 		table_head_pattern.appendChild(headTextPattern);
-		filter_table.appendChild(table_head_pattern);
 		var table_head_replacement:any =  document.createElement("th");
+		top_row.appendChild(table_head_replacement);
 		var head_text_replacement:any = document.createTextNode("Replacement");
 		table_head_replacement.appendChild(head_text_replacement);
-		filter_table.appendChild(table_head_replacement);
 
 		//Create the pattern table
 		//loop to create rows
-		var number_of_filters:number = parseInt(this.setting_items.word_replace_settings.number_of_filters);
-		if (number_of_filters === 0 || isNaN(number_of_filters)) number_of_filters = 6;
-		for (var i = 0; i <  number_of_filters ; i++){
+		var Number_of_Filters:number = parseInt(this.setting_items.word_replace_settings.Number_of_Filters);
+		console.log(Number_of_Filters);
+		if (Number_of_Filters === 0 || isNaN(Number_of_Filters)) Number_of_Filters = 6;
+		for (var i = 0; i <  Number_of_Filters ; i++){
 			var table_row_contents:any = document.createElement("tr");
 			table_row_contents.setAttribute("id", "FilterRow" + i);
 
@@ -742,32 +745,37 @@ if(document.getElementById("SetImageAdderProperties") !== null){
 	}
 	
 	filterAddRow():void{
-		var number_of_filters:number = parseInt(this.setting_items.word_replace_settings.number_of_filters);
-			
 		var filter_table:any = document.getElementById("filter_table");
-		filter_table.deleteRow(number_of_filters + 1);
-
+		var Number_of_Filters = 0;
+		var filter_children = document.getElementById("filter_table").firstChild;
+		while(filter_children.nextSibling){
+			filter_children = filter_children.nextSibling;
+			Number_of_Filters++
+		} 
+		
+		
 		var table_row_contents:any = document.createElement("tr");
-		table_row_contents.setAttribute("id", "FilterRow" +  (number_of_filters));
-
+		table_row_contents.setAttribute("id", "FilterRow" +  (Number_of_Filters - 1));
+		filter_table.removeChild(filter_children);
+		
 		var table_data_active:any =  document.createElement("td");
 		var table_checkbox_active:any = document.createElement("input");
 		table_checkbox_active.setAttribute("type", "checkbox");
-		table_checkbox_active.setAttribute("id", "Active" + (number_of_filters));
+		table_checkbox_active.setAttribute("id", "Active" + (Number_of_Filters- 1));
 		table_data_active.appendChild(table_checkbox_active);
 		table_row_contents.appendChild(table_data_active);
 
 		var table_data_pattern:any =  document.createElement("td");
 		var table_input_pattern:any = document.createElement("input");
 		table_input_pattern.setAttribute("class", "inputs");
-		table_input_pattern.setAttribute("id", "Pattern" + (number_of_filters));
+		table_input_pattern.setAttribute("id", "Pattern" + (Number_of_Filters- 1));
 		table_data_pattern.appendChild(table_input_pattern);
 		table_row_contents.appendChild(table_data_pattern);
 
 		var table_data_replacement:any =  document.createElement("td");
 		var table_input_replacement:any =  document.createElement("input");
 		table_input_replacement.setAttribute("class", "inputs");
-		table_input_replacement.setAttribute("id", "Replacement" + (number_of_filters));
+		table_input_replacement.setAttribute("id", "Replacement" + (Number_of_Filters- 1));
 		table_data_replacement.appendChild(table_input_replacement);
 		table_row_contents.appendChild(table_data_replacement);
 
@@ -823,17 +831,20 @@ if(document.getElementById("SetImageAdderProperties") !== null){
 	}
 
 	filterRemoveRow():void{
-		var number_of_filters:number = parseInt(this.setting_items.word_replace_settings.number_of_filters);
-			
 		var filter_table:any = document.getElementById("filter_table");
-		if(number_of_filters != 0){
-			filter_table.deleteRow(number_of_filters);
-			number_of_filters--;
+		var Number_of_Filters = 0;
+		var filter_children = document.getElementById("filter_table").firstChild;
+		while(filter_children.nextSibling){
+			filter_children = filter_children.nextSibling;
+			Number_of_Filters++
+		} 
+		if(Number_of_Filters != 2){
+			filter_table.deleteRow(--Number_of_Filters);
 		}
 	}
 
 	filterSetTable():void{
-		var filter_length = this.setting_items.word_replace_settings.Text_Filter_List.length; 
+		var filter_length = this.setting_items.word_replace_settings.Number_of_Filters; 
 		for (var filter_count:number = 0 ; filter_count < filter_length ; filter_count++){
 			if(
 				this.setting_items.word_replace_settings.Text_Filter_List[filter_count].Active === null || 

@@ -22,20 +22,21 @@ class Main extends FeatureInterface{
 	}
 	
 	init():void{	
-		if(this.settings.image_hiding_settings.Active){
+		if(this.settings.image_hiding_settings.Active === "true"){
 			this.features.image_hider = new ImageHider();
 		}
-		if(this.settings.word_replace_settings.Active){
+		if(this.settings.word_replace_settings.Active === "true"){
 			this.features.text_replacer = new TextReplacer();
 		}
-		if(this.settings.image_adder_settings.Active){
+		if(this.settings.image_adder_settings.Active === "true"){
 			this.features.danbooru_image_adder = new DanbooruImageAdder();
 		}
-		if(this.settings.thread_rebuild_settings.Active){
+		if(this.settings.thread_rebuild_settings.Active === "true"){
 			this.features.thread_rebuilder = new ThreadRebuilder();
 		}
-		if(this.settings.character_inserter_settings.Yen_Active || this.settings.character_inserter_settings.Kita_Active){
-			this.features.character_inserter = new CharacterInserter(this.settings.character_inserter_settings.Yen_Active, this.settings.character_inserter_settings.Kita_Active);
+		if(this.settings.character_inserter_settings.Yen_Active === "true" || this.settings.character_inserter_settings.Kita_Active === "true"){
+			this.features.character_inserter = new CharacterInserter(this.settings.character_inserter_settings.Yen_Active  === "true",
+																		this.settings.character_inserter_settings.Kita_Active === "true");
 		}
 		if(this.settings.password_settings == 'true'){
 			this.features.password_viewer = new PasswordViewer();
