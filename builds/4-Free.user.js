@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 // @name         4Free-FSE [4chan X Enhancement]
 // @author       ECHibiki - /qa/
 // @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
-// @version      1.3.3
+// @version      1.3.4
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4Free-FSE/master/builds/4-Free.user.js
