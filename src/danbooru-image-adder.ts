@@ -74,6 +74,7 @@ class DanbooruImageAdder extends FeatureInterface{
 		var checkbox_safe:Element = document.createElement("INPUT");
 		checkbox_safe.setAttribute("id", "safe");
 		checkbox_safe.setAttribute("type", "checkbox");
+		(<HTMLInputElement>checkbox_safe).checked = true;
 		var checkbox_safe_text:Text  = document.createTextNode("Safe");
 		var checkbox_questionable:Element = document.createElement("INPUT");
 		checkbox_questionable.setAttribute("id", "questionable");
