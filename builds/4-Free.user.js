@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 // @name         4Free-FSE [4chan X Enhancement]
 // @author       ECHibiki - /qa/
 // @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
-// @version      1.3.5
+// @version      1.3.6
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4Free-FSE/master/builds/4-Free.user.js
@@ -67,7 +67,7 @@ Uses:
 
     __Note:__ some 4chan boards don't allow custom post passwords. May require cookie manipulation, but this has not yet been tested...
 
-*/ 
+*/
 var Constants = /** @class */ (function () {
     function Constants() {
     }
@@ -492,6 +492,7 @@ var DanbooruImageAdder = /** @class */ (function (_super) {
         var checkbox_safe = document.createElement("INPUT");
         checkbox_safe.setAttribute("id", "safe");
         checkbox_safe.setAttribute("type", "checkbox");
+        checkbox_safe.checked = true;
         var checkbox_safe_text = document.createTextNode("Safe");
         var checkbox_questionable = document.createElement("INPUT");
         checkbox_questionable.setAttribute("id", "questionable");
