@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 // @name         4Free-FSE [4chan X Enhancement]
 // @author       ECHibiki - /qa/
 // @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
-// @version      1.3.6
+// @version      1.3.7
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4Free-FSE/master/builds/4-Free.user.js
@@ -455,10 +455,11 @@ var DanbooruImageAdder = /** @class */ (function (_super) {
         _this.img_URL = "";
         _this.post_number = 0;
         _this.page_number = 0;
-        _this.json_post_numbers_used = [];
+        _this.json_page_numbers_used = [];
         _this.previous_images = [];
         _this.json_numbers_used = [];
-        _this.subdomain_regex = new RegExp("https://");
+        _this.previous_page = 9001;
+        _this.subdomain_regex = new RegExp("http(|s)://");
         _this.maximum_attempts = 20;
         _this.time_max = 10;
         _this.time = 10;
@@ -592,7 +593,8 @@ var DanbooruImageAdder = /** @class */ (function (_super) {
     DanbooruImageAdder.prototype.activate = function () {
         var _this = this;
         //on setimage click clear flags, timers and start another search
-        this.json_post_numbers_used = Array();
+        this.json_page_numbers_used = Array();
+        this.previous_page = 9001;
         //reset a failed_to_find_required_tags boolean
         this.primed_for_fail = false;
         for (var i = 0; i < this.timeout_functions.length; i++) {
@@ -693,7 +695,7 @@ var DanbooruImageAdder = /** @class */ (function (_super) {
         //Set image tags.
         var tags = document.getElementById("tag_input").value.trim();
         if (tags.indexOf(":") > -1) {
-            Generics.alert4ChanX("Character ':' not used for file characteristic searches", "warning");
+            Generics.alert4ChanX("Character ':' not used for functional purpose", "warning");
         }
         var tags_arr = tags.split(" ");
         var xhr_image_load = new GM_xmlhttpRequest(({
@@ -717,11 +719,7 @@ var DanbooruImageAdder = /** @class */ (function (_super) {
     //make 4chanX alerts on issues, and account for error cases.
     DanbooruImageAdder.prototype.verifyTags = function (data, tags) {
         data = data.response;
-        //if data is blank, use a no-tag approach
-        if (tags.length == 1 && tags[0] == "")
-            this.json_tag = " ";
-        else
-            this.json_tag = data;
+        this.json_tag = data;
         this.failed_to_find_required_tags_state = false;
         //if data has a null or undefined case, return an error
         if (data.length == 0) {
@@ -787,30 +785,19 @@ var DanbooruImageAdder = /** @class */ (function (_super) {
     };
     //set where to search
     DanbooruImageAdder.prototype.setPostAndPage = function (end_URL) {
-        var _this = this;
-        //posts
         this.post_number = 0;
         //page
         if (this.top_page != this.top_page_max)
             this.smallest_tag_size = this.top_page * 20;
         if (this.smallest_tag_size == 0)
             this.smallest_tag_size = 100;
-        do {
-            var escape_cond = true;
-            this.page_number = ((Math.floor(Math.random() * 10000)) % Math.ceil(this.smallest_tag_size / 20)) % 1000; //1000 is max page search limit
-            this.json_post_numbers_used.forEach(function (page) {
-                if (page == 0) {
-                    _this.primed_for_fail = true; // no more pages to search and looped once
-                    escape_cond = true;
-                    return;
-                }
-                else if (page == _this.page_number) {
-                    escape_cond = false;
-                    return;
-                }
-            });
-        } while (!escape_cond);
+        var escape_cond = true;
+        this.page_number = ((Math.floor(Math.random() * 10000)) % Math.ceil(this.smallest_tag_size / 20)) % 1000; //1000 is max page search limit
+        if (this.page_number == 0 && this.previous_page == 0) {
+            this.primed_for_fail = true;
+        }
         this.json_numbers_used.push(this.page_number);
+        this.previous_page = this.page_number;
         var URL = "https://danbooru.donmai.us/posts.json?page=" + this.page_number + end_URL;
         return URL;
     };
@@ -828,12 +815,12 @@ var DanbooruImageAdder = /** @class */ (function (_super) {
                 var duplicate = false;
                 //check for repeating images found
                 this_arr.previous_images.forEach(function (item) {
-                    if (item[0] == this_arr.post_number && item[1] == this_arr.post_number) {
+                    if (item[0] == this_arr.page_number && item[1] == this_arr.post_number) {
                         duplicate = true;
+                        this_arr.post_number++;
                     }
-                    this_arr.post_number++;
                 });
-            } while (duplicate == false && this_arr.previous_images.length > this_arr.post_number);
+            } while (duplicate);
             if (this_arr.primed_for_fail) {
                 Generics.alert4ChanX("No Results: All found for tags \"" + document.getElementById("tag_input").value + "\"", "error");
                 this_arr.reset_search_timer_fields();
@@ -844,6 +831,8 @@ var DanbooruImageAdder = /** @class */ (function (_super) {
                     this_arr.top_page = this_arr.page_number + this_arr.post_number / 20;
                 }
                 this_arr.number_of_attempts--;
+                //posts
+                this_arr.post_number = 0;
                 document.getElementById("timer").textContent = this_arr.number_of_attempts + "|" + this_arr.time;
                 this_arr.setImage(this_arr);
             }
@@ -893,7 +882,7 @@ var DanbooruImageAdder = /** @class */ (function (_super) {
                     //Case2: reaches an undefined page.
                     //Result: Switches to a new page
                     this_arr.top_page = this_arr.page_number;
-                    this_arr.number_of_attempts--;
+                    //this_arr.number_of_attempts--;
                     this_arr.setImage(this_arr);
                     return;
                 }
@@ -1032,8 +1021,8 @@ var DanbooruImageAdder = /** @class */ (function (_super) {
                 }
             }
             if (!image_found) {
-                this_arr.top_page = this_arr.page_number;
-                this_arr.number_of_attempts--;
+                // this_arr.top_page = this_arr.page_number;
+                // //this_arr.number_of_attempts--;
                 this_arr.setImage(this_arr);
             }
         }
@@ -1704,7 +1693,7 @@ var SettingsWindow = /** @class */ (function (_super) {
                     var disposable_container = document.createElement("DIV");
                     disposable_container.setAttribute("id", "disposable_container");
                     _this.contents_div.appendChild(disposable_container);
-                    disposable_container.innerHTML = "\n\t\t\t<table style=\"text-align:center;margin-left:5px\">\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Very Large: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"v_large_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Large: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"large_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Medium: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"medium_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Very Large: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"small_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Width: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"width_DIA\" name=\"preivew-size\" style=\"width:20%\"  type=\"text\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Height: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"height_DIA\" name=\"preivew-size\" style=\"width:20%\"  type=\"text\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t</table>\t\n\t\t\n\t\t\t<hr>\n\t\t\t\n\t\t\t<label>Quick Reply Min Width: </label>\n\t\t\t<input id=\"qr_width_DIA\" name=\"preivew-size\" style=\"width:20%\" type=\"text\">\n\t\t\n\t\t\t<hr>\n\t\t\n\t\t\t<input id=\"SetImageAdderProperties\" value=\"Set Preview Size\" type=\"button\">\n\t\t\t";
+                    disposable_container.innerHTML = "\n\t\t\t<table style=\"text-align:center;margin-left:5px\">\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Very Large: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"v_large_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Large: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"large_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Medium: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"medium_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Small: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"small_DIA\" name=\"preivew-size\" style=\"display:inline\" type=\"radio\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Width: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"width_DIA\" name=\"preivew-size\" style=\"width:20%\"  type=\"text\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<label>Height: </label>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<input id=\"height_DIA\" name=\"preivew-size\" style=\"width:20%\"  type=\"text\">\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t</table>\t\n\t\t\n\t\t\t<hr>\n\t\t\t\n\t\t\t<label>Quick Reply Min Width: </label>\n\t\t\t<input id=\"qr_width_DIA\" name=\"preivew-size\" style=\"width:20%\" type=\"text\">\n\t\t\n\t\t\t<hr>\n\t\t\n\t\t\t<input id=\"SetImageAdderProperties\" value=\"Set Preview Size\" type=\"button\">\n\t\t\t";
                     _this.setImageAdderFields();
                     _this.setImageAdderEventListeners();
                 }

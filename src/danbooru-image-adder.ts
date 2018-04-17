@@ -15,20 +15,21 @@ class DanbooruImageAdder extends FeatureInterface{
 	
 	post_number:number = 0;
 	page_number:number = 0;
-	json_post_numbers_used:number[] = [];
+	json_page_numbers_used:number[] = [];
 	primed_for_fail:boolean;
 	tag_incorrect_state:boolean;
 	
 	json_tag:string;
 	previous_images:number[][] = [];
 	json_numbers_used:number[] = [];
+	previous_page:number = 9001;
 	
 	json_page:any;
 	top_page:number;
 	top_page_max:number;
 	smallest_tag_size:number;
 	
-	subdomain_regex:RegExp = new RegExp("(raikou|hijiribe)\d*\.");
+	subdomain_regex:RegExp = new RegExp("http(|s)://");
 	
 	number_of_attempts:number;
 	maximum_attempts:number = 20;
@@ -41,7 +42,7 @@ class DanbooruImageAdder extends FeatureInterface{
 	
 	constructor(){
 		super();
-		this.init();		
+		this.init();
 	}
 	init():void{
 		this.time = this.time_max;
@@ -190,7 +191,8 @@ class DanbooruImageAdder extends FeatureInterface{
 		
 	activate():void{
 		//on setimage click clear flags, timers and start another search
-		this.json_post_numbers_used = Array();
+		this.json_page_numbers_used = Array();
+		this.previous_page = 9001;
 		//reset a failed_to_find_required_tags boolean
 		this.primed_for_fail = false;
 		for(var i = 0 ; i < this.timeout_functions.length; i++){
@@ -299,7 +301,7 @@ class DanbooruImageAdder extends FeatureInterface{
 		var tags:string = (<HTMLInputElement>document.getElementById("tag_input")).value.trim();
 
 		if(tags.indexOf(":") > -1) {
-			Generics.alert4ChanX("Character ':' not used for file characteristic searches", "warning");
+			Generics.alert4ChanX("Character ':' not used for functional purpose", "warning");
 		}
 		var tags_arr:string[] = tags.split(" ");
 
@@ -327,9 +329,7 @@ class DanbooruImageAdder extends FeatureInterface{
 		//make 4chanX alerts on issues, and account for error cases.
 	verifyTags(data:any, tags:string[]):string{
 		data = data.response;
-		//if data is blank, use a no-tag approach
-		if(tags.length == 1 && tags[0] == "") this.json_tag = " ";
-		else this.json_tag = data;
+		this.json_tag = data;
 		this.failed_to_find_required_tags_state = false;
 		//if data has a null or undefined case, return an error
 		if(data.length == 0){
@@ -390,30 +390,18 @@ class DanbooruImageAdder extends FeatureInterface{
 	}
 
 //set where to search
-	setPostAndPage(end_URL):string{
-		//posts
+	setPostAndPage(end_URL):string{		
 		this.post_number = 0;
-		
 	   //page
 		if(this.top_page != this.top_page_max) this.smallest_tag_size = this.top_page * 20;
 		if(this.smallest_tag_size == 0) this.smallest_tag_size = 100;
-		do{
-			var escape_cond:boolean = true;
-			this.page_number = ((Math.floor(Math.random() * 10000)) % Math.ceil(this.smallest_tag_size / 20)) % 1000;    //1000 is max page search limit
-			this.json_post_numbers_used.forEach((page)=>{
-				if(page == 0){
-					this.primed_for_fail = true; // no more pages to search and looped once
-					escape_cond = true;
-					return;
-				}
-				else if(page == this.page_number){
-					escape_cond = false;
-					return;
-				}
-			});
-		} while(!escape_cond);
+		var escape_cond:boolean = true;
+		this.page_number = ((Math.floor(Math.random() * 10000)) % Math.ceil(this.smallest_tag_size / 20)) % 1000;    //1000 is max page search limit
+		if(this.page_number == 0 && this.previous_page == 0){
+			this.primed_for_fail = true;
+		}
 		this.json_numbers_used.push(this.page_number);
-
+		this.previous_page = this.page_number;
 		var URL = "https://danbooru.donmai.us/posts.json?page=" + this.page_number + end_URL;
 		return URL;
 	}
@@ -432,27 +420,28 @@ class DanbooruImageAdder extends FeatureInterface{
 				var duplicate:boolean = false;
 				//check for repeating images found
 				this_arr.previous_images.forEach((item) => {
-					if(item[0] == this_arr.post_number && item[1] == this_arr.post_number){
+					if(item[0] == this_arr.page_number && item[1] == this_arr.post_number){
 						duplicate = true;
+						this_arr.post_number++;
 					}
-					this_arr.post_number++;
 				});
-			}while(duplicate == false && this_arr.previous_images.length > this_arr.post_number);
+			}while(duplicate);
 			if(this_arr.primed_for_fail){
 				Generics.alert4ChanX("No Results: All found for tags \"" + (<HTMLInputElement>document.getElementById("tag_input")).value + "\"", "error");
 				this_arr.reset_search_timer_fields();
 				return;
 			}
-			//redo
+			//Out of items on current json page so go to next page
 			else if((data.length < this_arr.post_number+1) && this_arr.number_of_attempts > 0) {
 				if(this_arr.top_page > this_arr.page_number){
 					this_arr.top_page = this_arr.page_number + this_arr.post_number / 20;
 				}
 				this_arr.number_of_attempts--;
+						//posts
+				this_arr.post_number = 0;
 				document.getElementById("timer").textContent = this_arr.number_of_attempts + "|" + this_arr.time;
 				this_arr.setImage(this_arr);
 			}
-			//process page
 			else if (this_arr.number_of_attempts > 0){
 				//ALL PARAMETERS WILL BE RESET INSIDE JSON
 				document.getElementById("timer").textContent =  this_arr.number_of_attempts + "|" + this_arr.time;
@@ -502,7 +491,7 @@ class DanbooruImageAdder extends FeatureInterface{
 					//Case2: reaches an undefined page.
 					//Result: Switches to a new page
 					this_arr.top_page = this_arr.page_number;
-					this_arr.number_of_attempts--;
+					//this_arr.number_of_attempts--;
 					this_arr.setImage(this_arr);
 					return;
 				}
@@ -652,8 +641,8 @@ class DanbooruImageAdder extends FeatureInterface{
 				}
 			}
 			if(!image_found){
-				this_arr.top_page = this_arr.page_number;
-				this_arr.number_of_attempts--;
+				// this_arr.top_page = this_arr.page_number;
+				// //this_arr.number_of_attempts--;
 				this_arr.setImage(this_arr);
 			}
 		}

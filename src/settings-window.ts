@@ -90,7 +90,7 @@ class SettingsWindow  extends FeatureInterface{
 				</tr>
 				<tr>
 					<td>
-						<label>Very Large: </label>
+						<label>Small: </label>
 					</td>
 					<td>
 						<input id="small_DIA" name="preivew-size" style="display:inline" type="radio">
