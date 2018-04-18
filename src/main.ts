@@ -21,7 +21,7 @@ class Main extends FeatureInterface{
 		this.settings = top_bar.getSettingsArr();
 	}
 	
-	init():void{	
+	init():void{
 		if(this.settings.image_hiding_settings.Active === "true"){
 			this.features.image_hider = new ImageHider();
 		}

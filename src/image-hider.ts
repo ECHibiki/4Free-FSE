@@ -5,6 +5,7 @@ class ImageHider extends FeatureInterface{
 	hide_expiration_time:number;
 	threads_to_hide:string[];
 	md5_filters_arr:string[];
+	listener_obj = {};
 	
 	constructor(){
 		super();
@@ -46,7 +47,9 @@ class ImageHider extends FeatureInterface{
 		window.localStorage.setItem(item_pairs[0], item_pairs[1]);	
 	}
 	
-	init():void{	}
+	init():void{	
+		this.hotkeyListeners();
+	}
 	
 	//hide image onclick listener.
 	//Method 404's a given image. This 404'ing allows image dissabling to be toggled on and off.
@@ -54,7 +57,7 @@ class ImageHider extends FeatureInterface{
 	hideOnClick(event:any):boolean{
 		var is_hidden =  event.target.src.substring(21, 29) == ",iVBORw0";
 		var hide_group_id:string;
-		if((event.ctrlKey && event.shiftKey) && !is_hidden){
+		if((this.listener_obj[17] && this.listener_obj[16]) && !is_hidden){
 			event.preventDefault();
 			event.stopPropagation();
 			hide_group_id = event.target.getAttribute('hide-grouping');
@@ -64,7 +67,7 @@ class ImageHider extends FeatureInterface{
 				image_node.src = this.blank_png;
 			});
 		}
-		else if(event.ctrlKey && event.shiftKey){
+		else if(this.listener_obj[17] && this.listener_obj[16]){
 			event.preventDefault();
 			event.stopPropagation();
 			hide_group_id = event.target.getAttribute('hide-grouping');
@@ -76,6 +79,16 @@ class ImageHider extends FeatureInterface{
 		}
 		this.retrieveStates();
 		return true;
+	}
+	
+		//hotkeys for ctrl[17] and shift[16]
+	 hotkeyListeners():void{		
+		window.addEventListener("keydown", (e)=>{
+			this.listener_obj[e.keyCode] = true;
+		}, {passive:false, capture:false, once:false});
+		window.addEventListener("keyup", (e) => {
+			this.listener_obj[e.keyCode] = false;
+		}, {passive:false, capture:false, once:false});
 	}
 	
 	decideAction(node:any):void{

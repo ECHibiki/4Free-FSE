@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 // @name         4Free-FSE [4chan X Enhancement]
 // @author       ECHibiki - /qa/
 // @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
-// @version      1.3.7
+// @version      1.3.8
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4Free-FSE/master/builds/4-Free.user.js
@@ -196,6 +196,7 @@ var ImageHider = /** @class */ (function (_super) {
     function ImageHider() {
         var _this = _super.call(this) || this;
         _this.blank_png = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAALiMAAC4jAHM9rsvAAAAG3RFWHRTb2Z0d2FyZQBDZWxzeXMgU3R1ZGlvIFRvb2zBp+F8AAAAo0lEQVR42u3RAQ0AAAjDMO5f9LFBSCdhTdvRnQIEiIAAERAgAgJEQIC4AERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABERAgAgIEAEBIiBABAQIECACAkRAgAjI9xbzUCtI4axs4wAAAABJRU5ErkJggg==";
+        _this.listener_obj = {};
         _this.retrieveStates();
         _this.init();
         _this.activate();
@@ -238,7 +239,9 @@ var ImageHider = /** @class */ (function (_super) {
         }
         window.localStorage.setItem(item_pairs[0], item_pairs[1]);
     };
-    ImageHider.prototype.init = function () { };
+    ImageHider.prototype.init = function () {
+        this.hotkeyListeners();
+    };
     //hide image onclick listener.
     //Method 404's a given image. This 404'ing allows image dissabling to be toggled on and off.
     //Post number associated with the image is stored in local storage.
@@ -246,7 +249,7 @@ var ImageHider = /** @class */ (function (_super) {
         var _this = this;
         var is_hidden = event.target.src.substring(21, 29) == ",iVBORw0";
         var hide_group_id;
-        if ((event.ctrlKey && event.shiftKey) && !is_hidden) {
+        if ((this.listener_obj[17] && this.listener_obj[16]) && !is_hidden) {
             event.preventDefault();
             event.stopPropagation();
             hide_group_id = event.target.getAttribute('hide-grouping');
@@ -256,7 +259,7 @@ var ImageHider = /** @class */ (function (_super) {
                 image_node.src = _this.blank_png;
             });
         }
-        else if (event.ctrlKey && event.shiftKey) {
+        else if (this.listener_obj[17] && this.listener_obj[16]) {
             event.preventDefault();
             event.stopPropagation();
             hide_group_id = event.target.getAttribute('hide-grouping');
@@ -268,6 +271,16 @@ var ImageHider = /** @class */ (function (_super) {
         }
         this.retrieveStates();
         return true;
+    };
+    //hotkeys for ctrl[17] and shift[16]
+    ImageHider.prototype.hotkeyListeners = function () {
+        var _this = this;
+        window.addEventListener("keydown", function (e) {
+            _this.listener_obj[e.keyCode] = true;
+        }, { passive: false, capture: false, once: false });
+        window.addEventListener("keyup", function (e) {
+            _this.listener_obj[e.keyCode] = false;
+        }, { passive: false, capture: false, once: false });
     };
     ImageHider.prototype.decideAction = function (node) {
         //tagname is always upper in HTML, in xml it's displayed as written.
