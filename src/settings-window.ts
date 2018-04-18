@@ -223,9 +223,6 @@ class SettingsWindow  extends FeatureInterface{
 		}																						
 																						},
 		{Text : " | Set 『Visible Password』", ListenerFunc : 				(input_id) => {
-			var input = document.getElementById(input_id);
-			var is_check:boolean = !(<HTMLInputElement>input).checked;
-			(<HTMLInputElement>document.getElementById(input_id)).checked = is_check;
 			this.storeStates();
 		}																					},
 	]
@@ -589,11 +586,11 @@ if(document.getElementById("SetImageAdderProperties") !== null){
 				input.setAttribute('TYPE','checkbox');
 				input.setAttribute('ID', 'check-settings' + index);
 				input.addEventListener('click', (evt) => this.storeActiveToggles());
-				li.appendChild(input);			
 
 				var label:any =  document.createElement('LABEL');
-				label.textContent = list_item.Text;
-			
+				label.appendChild(input);	
+				var label_text = document.createTextNode(list_item.Text);	
+				label.appendChild(label_text);
 				li.appendChild(label);
 				this.ul_selection_start.appendChild(li);
 				

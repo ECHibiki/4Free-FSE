@@ -57,7 +57,7 @@ class ImageHider extends FeatureInterface{
 	hideOnClick(event:any):boolean{
 		var is_hidden =  event.target.src.substring(21, 29) == ",iVBORw0";
 		var hide_group_id:string;
-		if((this.listener_obj[17] && this.listener_obj[16]) && !is_hidden){
+		if(((this.listener_obj[17] || this.listener_obj[91])  && this.listener_obj[16]) && !is_hidden){
 			event.preventDefault();
 			event.stopPropagation();
 			hide_group_id = event.target.getAttribute('hide-grouping');
@@ -67,7 +67,7 @@ class ImageHider extends FeatureInterface{
 				image_node.src = this.blank_png;
 			});
 		}
-		else if(this.listener_obj[17] && this.listener_obj[16]){
+		else if((this.listener_obj[17] || this.listener_obj[91]) && this.listener_obj[16]){
 			event.preventDefault();
 			event.stopPropagation();
 			hide_group_id = event.target.getAttribute('hide-grouping');

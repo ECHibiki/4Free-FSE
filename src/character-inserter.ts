@@ -57,11 +57,11 @@ else this.kita_hash_color = localStorage.getItem("Kita_Color");
 			listener_obj[e.keyCode] = true;
 
 			var node = document.activeElement;
-			if (listener_obj[17] && listener_obj[75]){
+			if ((listener_obj[17] || listener_obj[91]) && listener_obj[75]){
 				e.preventDefault();
 				this.insertAtPos(node, this.kita_character);
 			}
-			if (listener_obj[17] && listener_obj[220]){
+			if ((listener_obj[17] || listener_obj[91]) && listener_obj[220]){
 				e.preventDefault();
 				this.insertAtPos(node, this.yen_character);
 			}

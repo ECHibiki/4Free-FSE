@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 // @name         4Free-FSE [4chan X Enhancement]
 // @author       ECHibiki - /qa/
 // @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
-// @version      1.3.8
+// @version      1.3.9
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4Free-FSE/master/builds/4-Free.user.js
@@ -249,7 +249,7 @@ var ImageHider = /** @class */ (function (_super) {
         var _this = this;
         var is_hidden = event.target.src.substring(21, 29) == ",iVBORw0";
         var hide_group_id;
-        if ((this.listener_obj[17] && this.listener_obj[16]) && !is_hidden) {
+        if (((this.listener_obj[17] || this.listener_obj[91]) && this.listener_obj[16]) && !is_hidden) {
             event.preventDefault();
             event.stopPropagation();
             hide_group_id = event.target.getAttribute('hide-grouping');
@@ -259,7 +259,7 @@ var ImageHider = /** @class */ (function (_super) {
                 image_node.src = _this.blank_png;
             });
         }
-        else if (this.listener_obj[17] && this.listener_obj[16]) {
+        else if ((this.listener_obj[17] || this.listener_obj[91]) && this.listener_obj[16]) {
             event.preventDefault();
             event.stopPropagation();
             hide_group_id = event.target.getAttribute('hide-grouping');
@@ -1524,11 +1524,11 @@ var CharacterInserter = /** @class */ (function (_super) {
         window.addEventListener("keydown", function (e) {
             listener_obj[e.keyCode] = true;
             var node = document.activeElement;
-            if (listener_obj[17] && listener_obj[75]) {
+            if ((listener_obj[17] || listener_obj[91]) && listener_obj[75]) {
                 e.preventDefault();
                 _this.insertAtPos(node, _this.kita_character);
             }
-            if (listener_obj[17] && listener_obj[220]) {
+            if ((listener_obj[17] || listener_obj[91]) && listener_obj[220]) {
                 e.preventDefault();
                 _this.insertAtPos(node, _this.yen_character);
             }
@@ -1776,9 +1776,6 @@ var SettingsWindow = /** @class */ (function (_super) {
                 }
             },
             { Text: " | Set 『Visible Password』", ListenerFunc: function (input_id) {
-                    var input = document.getElementById(input_id);
-                    var is_check = !input.checked;
-                    document.getElementById(input_id).checked = is_check;
                     _this.storeStates();
                 } },
         ];
@@ -2072,9 +2069,10 @@ var SettingsWindow = /** @class */ (function (_super) {
                 input.setAttribute('TYPE', 'checkbox');
                 input.setAttribute('ID', 'check-settings' + index);
                 input.addEventListener('click', function (evt) { return _this.storeActiveToggles(); });
-                li.appendChild(input);
                 var label = document.createElement('LABEL');
-                label.textContent = list_item.Text;
+                label.appendChild(input);
+                var label_text = document.createTextNode(list_item.Text);
+                label.appendChild(label_text);
                 li.appendChild(label);
                 _this.ul_selection_start.appendChild(li);
                 input.checked = _this.setting_items.password_settings == 'true';
