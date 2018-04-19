@@ -426,6 +426,9 @@ class DanbooruImageAdder extends FeatureInterface{
 					}
 				});
 			}while(duplicate);
+			
+			this_arr.number_of_attempts--;
+							
 			if(this_arr.primed_for_fail){
 				Generics.alert4ChanX("No Results: All found for tags \"" + (<HTMLInputElement>document.getElementById("tag_input")).value + "\"", "error");
 				this_arr.reset_search_timer_fields();
@@ -436,7 +439,6 @@ class DanbooruImageAdder extends FeatureInterface{
 				if(this_arr.top_page > this_arr.page_number){
 					this_arr.top_page = this_arr.page_number + this_arr.post_number / 20;
 				}
-				this_arr.number_of_attempts--;
 						//posts
 				this_arr.post_number = 0;
 				document.getElementById("timer").textContent = this_arr.number_of_attempts + "|" + this_arr.time;
@@ -491,7 +493,6 @@ class DanbooruImageAdder extends FeatureInterface{
 					//Case2: reaches an undefined page.
 					//Result: Switches to a new page
 					this_arr.top_page = this_arr.page_number;
-					//this_arr.number_of_attempts--;
 					this_arr.setImage(this_arr);
 					return;
 				}
@@ -642,7 +643,6 @@ class DanbooruImageAdder extends FeatureInterface{
 			}
 			if(!image_found){
 				// this_arr.top_page = this_arr.page_number;
-				// //this_arr.number_of_attempts--;
 				this_arr.setImage(this_arr);
 			}
 		}
