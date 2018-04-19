@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 // @name         4Free-FSE [4chan X Enhancement]
 // @author       ECHibiki - /qa/
 // @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
-// @version      1.3.10
+// @version      1.3.11
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4Free-FSE/master/builds/4-Free.user.js
@@ -1550,6 +1550,22 @@ var CharacterInserter = /** @class */ (function (_super) {
         if (root.textContent.indexOf(this.yen_character) <= -1 && root.textContent.indexOf(this.kita_character) <= -1) {
             return;
         }
+        var wbr = root.getElementsByTagName('WBR');
+        var wbr_len = wbr.length;
+        var wbr_indices = Array();
+        function previousIndex(len) {
+            if (len > 0)
+                return wbr_indices[len - 1];
+            else
+                return 0;
+        }
+        for (var wbr_item = 0; wbr_item < wbr_len; wbr_item++) {
+            wbr_indices.push(wbr[wbr_item].previousSibling.length + previousIndex(wbr_item));
+        }
+        while (wbr.length) {
+            root.removeChild(wbr[wbr.length - 1]);
+        }
+        root.normalize();
         var txtItterator = document.createNodeIterator(root, NodeFilter.SHOW_TEXT);
         var text_node;
         while ((text_node = txtItterator.nextNode())) {
@@ -1558,6 +1574,26 @@ var CharacterInserter = /** @class */ (function (_super) {
                 continue;
             this.setColor(text_node, txtItterator);
         }
+        //restart and add back the wbr
+        var txtItterator = document.createNodeIterator(root, NodeFilter.SHOW_TEXT);
+        var text_node;
+        while ((text_node = txtItterator.nextNode())) {
+            //disregard text inside of A tag links and already colored text
+            if (text_node.parentNode.tagName == "A")
+                continue;
+            wbr_indices = this.addWBR(text_node, txtItterator, wbr_indices);
+        }
+    };
+    //reinsert <wbr>
+    CharacterInserter.prototype.addWBR = function (text_node, txtItterator, wbr_indices) {
+        wbr_indices[0] = wbr_indices[0] - text_node.length;
+        if (wbr_indices[0] <= 0) {
+            var split_node = text_node.splitText(text_node.length + wbr_indices[0]);
+            var wbr = document.createElement("WBR");
+            split_node.parentNode.insertBefore(wbr, text_node.nextSibling);
+            wbr_indices.shift();
+        }
+        return wbr_indices;
     };
     //give color to text inside of nodes.
     // first scan for yen symbols and then check the front of the text for not nested kita.

@@ -29,15 +29,14 @@ yen_hash_color:string = "#9370DB";
 			this.colorCharacters(node);
 	}
 	retrieveStates():void{
-if (localStorage.getItem("Yen_Character") === undefined || localStorage.getItem("Yen_Character") === null) this.yen_character = "¥";
-else this.yen_character = localStorage.getItem("Yen_Character");
-        if (localStorage.getItem("Yen_Color") === undefined || localStorage.getItem("Yen_Color")  === null) this.yen_hash_color = "#9370DB";
-else this.yen_hash_color = localStorage.getItem("Yen_Color");
-        if (localStorage.getItem("Kita_Character") === undefined || localStorage.getItem("Kita_Character") === null) this.kita_character = "ｷﾀ━━━(ﾟ∀ﾟ)━━━!!";
-else this.kita_character = localStorage.getItem("Kita_Character");
-        if (localStorage.getItem("Kita_Color") === undefined || localStorage.getItem("Kita_Color") === null)this.kita_hash_color = "#444444";
-else this.kita_hash_color = localStorage.getItem("Kita_Color");
-
+		if (localStorage.getItem("Yen_Character") === undefined || localStorage.getItem("Yen_Character") === null) this.yen_character = "¥";
+		else this.yen_character = localStorage.getItem("Yen_Character");
+				if (localStorage.getItem("Yen_Color") === undefined || localStorage.getItem("Yen_Color")  === null) this.yen_hash_color = "#9370DB";
+		else this.yen_hash_color = localStorage.getItem("Yen_Color");
+				if (localStorage.getItem("Kita_Character") === undefined || localStorage.getItem("Kita_Character") === null) this.kita_character = "ｷﾀ━━━(ﾟ∀ﾟ)━━━!!";
+		else this.kita_character = localStorage.getItem("Kita_Character");
+				if (localStorage.getItem("Kita_Color") === undefined || localStorage.getItem("Kita_Color") === null)this.kita_hash_color = "#444444";
+		else this.kita_hash_color = localStorage.getItem("Kita_Color");
 	}
 	storeStates(...items:any[]):void{}
 
@@ -87,19 +86,57 @@ else this.kita_hash_color = localStorage.getItem("Kita_Color");
 	colorCharacters(root){
 		if(root.nodeType !== Node.ELEMENT_NODE){
 			return;
-		}
-			
+		}	
 			if(root.textContent.indexOf(this.yen_character) <= -1 && root.textContent.indexOf(this.kita_character) <= -1){
 				return;
 			}
-			var txtItterator = document.createNodeIterator(root, NodeFilter.SHOW_TEXT);
-			var text_node;
-			while((text_node = txtItterator.nextNode())){
-				//disregard text inside of A tag links and already colored text
-				if(text_node.parentNode.tagName == "A" || /the_[a-z]_word/g.test(text_node.parentNode.className)) continue;
-				this.setColor(text_node, txtItterator);
-			}
+			
+		var wbr = root.getElementsByTagName('WBR');
+        var wbr_len = wbr.length;
+        var wbr_indices = Array();
+        function previousIndex(len){
+            if(len > 0) return wbr_indices[len-1];
+            else return 0;
+        }
+        for(var wbr_item = 0;wbr_item < wbr_len; wbr_item++){
+            wbr_indices.push(wbr[wbr_item].previousSibling.length + previousIndex(wbr_item));
+        }
+        while(wbr.length){
+            root.removeChild(wbr[wbr.length-1]);
+        }
+        root.normalize();
+		
+		var txtItterator = document.createNodeIterator(root, NodeFilter.SHOW_TEXT);
+		var text_node;
+		while((text_node = txtItterator.nextNode())){
+			//disregard text inside of A tag links and already colored text
+			if(text_node.parentNode.tagName == "A" || /the_[a-z]_word/g.test(text_node.parentNode.className)) continue;
+			this.setColor(text_node, txtItterator);
+		}
+		
+        //restart and add back the wbr
+        var txtItterator = document.createNodeIterator(root, NodeFilter.SHOW_TEXT);
+        var text_node;
+        while ((text_node = txtItterator.nextNode())) {
+            //disregard text inside of A tag links and already colored text
+            if (text_node.parentNode.tagName == "A")
+                continue;
+            wbr_indices = this.addWBR(text_node, txtItterator, wbr_indices);
+        }
+
 	}
+	
+	//reinsert <wbr>
+	 addWBR(text_node, txtItterator, wbr_indices){
+        wbr_indices[0] = wbr_indices[0] - text_node.length;
+        if(wbr_indices[0] <= 0){
+            var split_node = text_node.splitText(text_node.length + wbr_indices[0]);
+            var wbr = document.createElement("WBR");
+            split_node.parentNode.insertBefore(wbr, text_node.nextSibling);
+            wbr_indices.shift();
+        }
+        return wbr_indices;
+    }
 
 	//give color to text inside of nodes.
 	// first scan for yen symbols and then check the front of the text for not nested kita.
