@@ -58,7 +58,7 @@ class Main extends FeatureInterface{
 		
 	}
 	decideAction(node:any):void{
-		if(node === undefined || node.tagName === undefined) return;
+		if(node == undefined || node.tagName == undefined) return;
 		var start:any = node;
 		var itterator:any = document.createNodeIterator(start, NodeFilter.SHOW_ELEMENT);
 		var node:any;

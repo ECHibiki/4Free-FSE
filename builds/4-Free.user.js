@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 // @name         4Free-FSE [4chan X Enhancement]
 // @author       ECHibiki - /qa/
 // @description  4Free - Free Stuff Enhancments. 7 additional features on top of 4chanX
-// @version      1.3.11
+// @version      1.3.12
 // @namespace    http://verniy.xyz/
 // @match		 *://boards.4chan.org/*
 // @updateURL    https://raw.githubusercontent.com/ECHibiki/4Free-FSE/master/builds/4-Free.user.js
@@ -839,6 +839,7 @@ var DanbooruImageAdder = /** @class */ (function (_super) {
                 this_arr.reset_search_timer_fields();
                 return;
             }
+            //Out of items on current json page so go to next page
             else if ((data.length < this_arr.post_number + 1) && this_arr.number_of_attempts > 0) {
                 if (this_arr.top_page > this_arr.page_number) {
                     this_arr.top_page = this_arr.page_number + this_arr.post_number / 20;
@@ -971,11 +972,13 @@ var DanbooruImageAdder = /** @class */ (function (_super) {
                     tags.forEach(function (tag) {
                         //if tag contains an order then whatever
                         if (tag.indexOf("order:") > -1) { }
+                        //if it contains a raiting, check the rating character at the seventh index
                         else if (tag.indexOf("rating:") > -1) {
                             if (tag.charAt(7) !== this_arr.json_page["" + this_arr.post_number]["rating"]) {
                                 failed_to_find_required_tags = true;
                             }
                         }
+                        //otherwise check if the tagstring contains the tags
                         else if (this_arr.json_page["" + this_arr.post_number]["tag_string"].indexOf(tag) == -1) {
                             failed_to_find_required_tags = true;
                         }
@@ -2399,7 +2402,7 @@ var Main = /** @class */ (function (_super) {
         }).observe(document.body, { childList: true, subtree: true });
     };
     Main.prototype.decideAction = function (node) {
-        if (node === undefined || node.tagName === undefined)
+        if (node == undefined || node.tagName == undefined)
             return;
         var start = node;
         var itterator = document.createNodeIterator(start, NodeFilter.SHOW_ELEMENT);
