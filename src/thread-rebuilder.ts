@@ -20,8 +20,8 @@ class ThreadRebuilder extends FeatureInterface{
 	}
 		
 	init():void{
-		var board_uproces = window.location.pathname;
-		this.board = board_uproces.substring(1, board_uproces.length - 1);
+		var pathname = window.location.pathname.substring(1);
+		this.board = pathname.substring(0, pathname.indexOf("/"));
 		this.activate();
 	}
 	
@@ -156,72 +156,72 @@ class ThreadRebuilder extends FeatureInterface{
 			var URL  = "https://www.archived.moe/_/api/chan/thread/?board=" + this.board + "&num=" + (<HTMLInputElement>document.getElementById("threadInput")).value;
 		else
 			var URL  = "https://a.4cdn.org/" + this.board + "/thread/" + (<HTMLInputElement>document.getElementById("threadInput")).value + ".json";
-			var xhr = new GM_xmlhttpRequest(({
-				method: "GET",
-				url: URL,
-				responseType : "json",
-				onload: (data) => {
-					if(this.use_offsite_archive)
-						data = data.response["" + (<HTMLInputElement>document.getElementById("threadInput")).value]["posts"];
-					else
-						data = data.response["posts"];
-					if(data == undefined){
-						alert("Invalid Thread ID: " + (<HTMLInputElement>document.getElementById("threadInput")).value + ". ");
-					}
-					else{
-						link_arr.forEach((link_item)=>{
-							for(var data_entry = 0 ; data_entry < data.length ; data_entry++){
-								if(parseInt(link_item[0]) == parseInt(data[data_entry]["no"])){
-									if(this.use_offsite_archive && data[data_entry]["comment_processed"] !== undefined)
-										responding_text.push([ [post_no, end_index], data[data_entry]["comment_processed"].replace(/(&gt;&gt;|https:\/\/www\.archived\.moe\/.*\/thread\/.*\/#)\d+/g, ""), link_item["media"]["safe_media_hash"] ]);
-									else if(data[data_entry]["com"] !== undefined)
-										responding_text.push([ [post_no, end_index], data[data_entry]["com"].replace(/(&gt;&gt;|#p)\d+/g, ""), data[data_entry]["md5"] ]);
-									else responding_text.push([ [post_no, end_index], undefined, data[data_entry]["md5"] ]);
-									break;
-								}
-							}
-						});
-
-						var current_url = window.location.href;
-						var hash_index = current_url.lastIndexOf("#") != -1 ? current_url.lastIndexOf("#"):  window.location.href.length;
-						var current_thread = window.location.href.substring(current_url.lastIndexOf("/")+1, hash_index);
-						var current_url =  "https://a.4cdn.org/" + this.board + "/thread/" + current_thread + ".json";
-						//open current thread to hunt down the text found in links
-						var xhr = new GM_xmlhttpRequest(({
-							method: "GET",
-							url: current_url,
-							responseType : "json",
-							onload: (data)=>{
-								data = data.response["posts"];
-								if(data == undefined){
-									alert("Invalid Thread ID: " + (<HTMLInputElement>document.getElementById("threadInput")).value + ". ");
-								}
-								else{
-									responding_text.forEach((response_item)=>{
-										for(var data_entry = 0 ; data_entry < data.length ; data_entry++){
-											if(data[data_entry]["com"] !== undefined && (response_item[1] == data[data_entry]["com"].replace(/(&gt;&gt;|#p)\d+/g, "") || response_item[1] == null)
-												&& (response_item[2] == data[data_entry]["md5"] || response_item[2] == null)){
-												var start_index = response_item[0][0].legth - response_item[0][1];
-												text = text.substring(0, start_index) + ">>" + data[data_entry]["no"] + text.substring(response_item[0][1]);
-													break;
-											}
-											else if(response_item[2] !== undefined && response_item[2] == data[data_entry]["md5"]){
-																							var start_index = response_item[0][0].legth - response_item[0][1];
-												text = text.substring(0, start_index) + ">>" + data[data_entry]["no"] + text.substring(response_item[0][1]);
-													break;
-											}
-										}
-									});
-												(<HTMLInputElement>document.getElementById("qr").getElementsByTagName("TEXTAREA")[0]).value = text;
-												document.getElementById("add-post").click();
-												this.semaphore_posts++;
-								}
-							}
-						}));
-					}
+		
+		var xhr = new GM_xmlhttpRequest(({
+			method: "GET",
+			url: URL,
+			responseType : "json",
+			onload: (data) => {
+				if(this.use_offsite_archive)
+					data = data.response["" + (<HTMLInputElement>document.getElementById("threadInput")).value]["posts"];
+				else
+					data = data.response["posts"];
+				if(data == undefined){
+					alert("Invalid Thread ID: " + (<HTMLInputElement>document.getElementById("threadInput")).value + ". ");
 				}
-			}));
+				else{
+					link_arr.forEach((link_item)=>{
+						for(var data_entry = 0 ; data_entry < data.length ; data_entry++){
+							if(parseInt(link_item[0]) == parseInt(data[data_entry]["no"])){
+								if(this.use_offsite_archive && data[data_entry]["comment_processed"] !== undefined)
+									responding_text.push([ [post_no, end_index], data[data_entry]["comment_processed"].replace(/(&gt;&gt;|https:\/\/www\.archived\.moe\/.*\/thread\/.*\/#)\d+/g, ""), link_item["media"]["safe_media_hash"] ]);
+								else if(data[data_entry]["com"] !== undefined)
+									responding_text.push([ [post_no, end_index], data[data_entry]["com"].replace(/(&gt;&gt;|#p)\d+/g, ""), data[data_entry]["md5"] ]);
+								else responding_text.push([ [post_no, end_index], undefined, data[data_entry]["md5"] ]);
+								break;
+							}
+						}
+					});
 
+					var current_url = window.location.href;
+					var hash_index = current_url.lastIndexOf("#") != -1 ? current_url.lastIndexOf("#"):  window.location.href.length;
+					var current_thread = window.location.href.substring(current_url.lastIndexOf("/")+1, hash_index);
+					var current_url =  "https://a.4cdn.org/" + this.board + "/thread/" + current_thread + ".json";
+					//open current thread to hunt down the text found in links
+					var xhr = new GM_xmlhttpRequest(({
+						method: "GET",
+						url: current_url,
+						responseType : "json",
+						onload: (data)=>{
+							data = data.response["posts"];
+							if(data == undefined){
+								alert("Invalid Thread ID: " + (<HTMLInputElement>document.getElementById("threadInput")).value + ". ");
+							}
+							else{
+								responding_text.forEach((response_item)=>{
+									for(var data_entry = 0 ; data_entry < data.length ; data_entry++){
+										if(data[data_entry]["com"] !== undefined && (response_item[1] == data[data_entry]["com"].replace(/(&gt;&gt;|#p)\d+/g, "") || response_item[1] == null)
+											&& (response_item[2] == data[data_entry]["md5"] || response_item[2] == null)){
+											var start_index = response_item[0][0].legth - response_item[0][1];
+											text = text.substring(0, start_index) + ">>" + data[data_entry]["no"] + text.substring(response_item[0][1]);
+												break;
+										}
+										else if(response_item[2] !== undefined && response_item[2] == data[data_entry]["md5"]){
+																						var start_index = response_item[0][0].legth - response_item[0][1];
+											text = text.substring(0, start_index) + ">>" + data[data_entry]["no"] + text.substring(response_item[0][1]);
+												break;
+										}
+									}
+								});
+											(<HTMLInputElement>document.getElementById("qr").getElementsByTagName("TEXTAREA")[0]).value = text;
+											document.getElementById("add-post").click();
+											this.semaphore_posts++;
+							}
+						}
+					}));
+				}
+			}
+		}));
 	};
 
 
