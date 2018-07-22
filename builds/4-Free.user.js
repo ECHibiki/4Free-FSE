@@ -1087,7 +1087,7 @@ var ThreadRebuilder = /** @class */ (function (_super) {
         this.activate();
     };
     ThreadRebuilder.prototype.retrieveStates = function () {
-        this.use_offsite_archive = localStorage.getItem("ArchiveType") == "0" ? true : false;
+        this.use_offsite_archive = localStorage.getItem("ArchiveType_FSE") == "0" ? true : false;
     };
     ThreadRebuilder.prototype.storeStates = function () {
         var items = [];
@@ -1303,9 +1303,20 @@ var ThreadRebuilder = /** @class */ (function (_super) {
                     alert("Invalid Thread ID: " + threadNo + ".\n4chan Archive ");
                 }
                 else {
-                    if (_this.use_offsite_archive)
-                        data["posts"] = data.values(data["posts"]);
-                    var len = data["posts"].length;
+                    var len = 0;
+                    if (_this.use_offsite_archive) {
+                        var data_post_copy = {};
+                        var index = 0;
+                        for (var key in data["posts"]) {
+                            data_post_copy['' + index] = data["posts"][key];
+                            index++;
+                        }
+                        data["posts"] = data_post_copy;
+                        len = index;
+                    }
+                    else {
+                        len = data["posts"].length;
+                    }
                     for (var post_number = starting_post; post_number < len; post_number++) {
                         var comment = undefined;
                         if (_this.use_offsite_archive)
@@ -1355,22 +1366,21 @@ var ThreadRebuilder = /** @class */ (function (_super) {
         var _this = this;
         if (imageURL != "") {
             var response_type = "arraybuffer";
-            if (this.use_offsite_archive)
-                response_type = "text";
+            // if(this.use_offsite_archive) response_type = "text"
             var xhr = new GM_xmlhttpRequest(({
                 method: "GET",
                 url: imageURL,
                 responseType: response_type,
                 onload: function (response) {
                     if (_this.use_offsite_archive) {
-                        var parser = new DOMParser();
-                        var content_attribute = parser.parseFromString(response.response, "text/html").getElementsByTagName("META")[0].getAttribute("content");
-                        var redirect_url = content_attribute.substring(content_attribute.indexOf("http"));
-                        var xhr = new GM_xmlhttpRequest(({ method: "GET", url: redirect_url, responseType: "arraybuffer",
-                            onload: function (response) {
-                                _this.inputImage(response, text, imageURL, imageName);
-                            }
-                        }));
+                        // var parser = new DOMParser();
+                        // var content_attribute = parser.parseFromString(response.response, "text/html").getElementsByTagName("META")[0].getAttribute("content");
+                        // var redirect_url = content_attribute.substring(content_attribute.indexOf("http"));
+                        // var xhr = new GM_xmlhttpRequest(({method:"GET", url: redirect_url, responseType:"arraybuffer",
+                        // onload:(response) => {
+                        _this.inputImage(response, text, imageURL, imageName);
+                        // }
+                        // }));
                     }
                     else {
                         _this.inputImage(response, text, imageURL, imageName);

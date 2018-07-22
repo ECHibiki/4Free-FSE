@@ -26,7 +26,7 @@ class ThreadRebuilder extends FeatureInterface{
 	}
 	
 	retrieveStates():void{
-		this.use_offsite_archive =  localStorage.getItem("ArchiveType") == "0"  ? true : false;
+		this.use_offsite_archive =  localStorage.getItem("ArchiveType_FSE") == "0"  ? true : false;
 	}
     storeStates(...items:any[]):void{}
 	activate():void{
@@ -251,10 +251,21 @@ class ThreadRebuilder extends FeatureInterface{
 					alert("Invalid Thread ID: " + threadNo + ".\n4chan Archive ");
 				}
 				else{
-					if(this.use_offsite_archive) data["posts"] = data.values(data["posts"]);
+                    var len  = 0;
+                    if (this.use_offsite_archive){
+                        var data_post_copy = {};
+                        var index = 0;
+                        for (var key in data["posts"]){
+                            data_post_copy[''+index] = data["posts"][key]
+                            index++;
+                        }
+                        data["posts"] = data_post_copy;
 
-					var len = data["posts"].length;
-
+                        len = index;
+                    }
+                    else{
+                        len = data["posts"].length;
+                    }
 					for(var post_number = starting_post ; post_number < len ; post_number++){
 						var comment = undefined;
 						if(this.use_offsite_archive)
@@ -303,7 +314,7 @@ class ThreadRebuilder extends FeatureInterface{
 	createPost(text, imageURL, imageName):void{
 		if(imageURL != ""){
 			var response_type = "arraybuffer";
-			if(this.use_offsite_archive) response_type = "text"
+			// if(this.use_offsite_archive) response_type = "text"
 			var xhr = new GM_xmlhttpRequest(({
 				method: "GET",
 				url: imageURL,
@@ -311,14 +322,14 @@ class ThreadRebuilder extends FeatureInterface{
 				onload: (response) =>
 				{
 					if(this.use_offsite_archive){
-						var parser = new DOMParser();
-						var content_attribute = parser.parseFromString(response.response, "text/html").getElementsByTagName("META")[0].getAttribute("content");
-						var redirect_url = content_attribute.substring(content_attribute.indexOf("http"));
-						var xhr = new GM_xmlhttpRequest(({method:"GET", url: redirect_url, responseType:"arraybuffer",
-							onload:(response) => {
+						// var parser = new DOMParser();
+						// var content_attribute = parser.parseFromString(response.response, "text/html").getElementsByTagName("META")[0].getAttribute("content");
+						// var redirect_url = content_attribute.substring(content_attribute.indexOf("http"));
+						// var xhr = new GM_xmlhttpRequest(({method:"GET", url: redirect_url, responseType:"arraybuffer",
+							// onload:(response) => {
 								this.inputImage(response, text,  imageURL, imageName);
-							}
-						}));
+							// }
+						// }));
 					}
 					else{
 						this.inputImage(response, text, imageURL, imageName);
