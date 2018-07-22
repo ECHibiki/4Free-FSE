@@ -253,10 +253,10 @@ class ThreadRebuilder extends FeatureInterface{
 				else{
                     var len  = 0;
                     if (this.use_offsite_archive){
-                        var data_post_copy = {};
+                        var data_post_copy = [];
                         var index = 0;
                         for (var key in data["posts"]){
-                            data_post_copy[''+index] = data["posts"][key]
+                            data_post_copy[index] = data["posts"][key]
                             index++;
                         }
                         data["posts"] = data_post_copy;
